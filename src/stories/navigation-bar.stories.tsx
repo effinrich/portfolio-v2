@@ -1,11 +1,11 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { NavigationBar } from '#/features/layout/navigation-bar'
+import type { Meta, StoryObj } from "@storybook/tanstack-react"
+import { NavigationBar } from "#/features/layout/navigation-bar"
 
 const meta: Meta<typeof NavigationBar> = {
-  title: 'Layout/NavigationBar',
+  title: "Layout/NavigationBar",
   component: NavigationBar,
   parameters: {
-    layout: 'fullscreen',
+    layout: "fullscreen",
   },
 }
 
@@ -14,21 +14,21 @@ type Story = StoryObj<typeof NavigationBar>
 
 export const Home: Story = {
   args: {
-    activeItem: 'home',
+    activeItem: "home",
     isAvailable: true,
   },
 }
 
 export const Work: Story = {
   args: {
-    activeItem: 'work',
+    activeItem: "work",
     isAvailable: true,
   },
 }
 
 export const Contact: Story = {
   args: {
-    activeItem: 'contact',
+    activeItem: "contact",
     isAvailable: false,
   },
 }

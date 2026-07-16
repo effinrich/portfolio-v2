@@ -1,8 +1,8 @@
-import { Link } from '@tanstack/react-router'
-import { ArrowRight, ArrowUpRight, MousePointerClick } from 'lucide-react'
-import { METRICS } from '#/features/content/seed-data'
-import { PortfolioLayout } from '#/features/layout/portfolio-layout'
-import { GlassPanel } from '#/features/ui/glass-panel'
+import { Link } from "@tanstack/react-router"
+import { ArrowRight, ArrowUpRight, MousePointerClick } from "lucide-react"
+import { METRICS } from "#/features/content/seed-data"
+import { PortfolioLayout } from "#/features/layout/portfolio-layout"
+import { GlassPanel } from "#/features/ui/glass-panel"
 
 export function HomePage() {
   return (
@@ -26,13 +26,13 @@ export function HomePage() {
           </div>
 
           <h1 className="text-5xl font-bold leading-[1.05] tracking-tighter text-white drop-shadow-2xl sm:text-6xl md:text-7xl lg:text-8xl">
-            Building the bridge between design{' '}
-            <span className="neon-text">systems</span> and AI-native developer tooling.
+            Building the bridge between design <span className="neon-text">systems</span> and
+            AI-native developer tooling.
           </h1>
 
           <p className="max-w-2xl text-lg leading-relaxed font-normal text-white/60 md:text-xl">
             I&apos;m <span className="font-medium text-white">Rich Tillman</span> — Principal
-            Frontend Engineer. I architect{' '}
+            Frontend Engineer. I architect{" "}
             <span className="font-medium text-white">enterprise-scale</span> React platforms, Nx
             monorepos, and 0→1 SaaS products — and the design systems (Storybook + React + Figma)
             that keep design, product, and engineering shipping in lockstep.
@@ -77,7 +77,7 @@ export function HomePage() {
           {METRICS.map((metric, index) => (
             <div
               key={metric.label}
-              className={`flex flex-col gap-2 ${index > 0 ? 'md:border-l md:border-white/10 md:pl-12' : ''}`}
+              className={`flex flex-col gap-2 ${index > 0 ? "md:border-l md:border-white/10 md:pl-12" : ""}`}
               style={{ animation: `fade-in-up 0.6s ease-out ${0.1 + index * 0.15}s backwards` }}
             >
               <h3 className="text-4xl font-bold tracking-tight text-white md:text-5xl">

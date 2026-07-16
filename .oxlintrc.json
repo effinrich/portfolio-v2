@@ -1,15 +1,45 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "react", "import"],
+  "plugins": ["react", "typescript", "import", "jsx-a11y"],
+  "categories": {
+    "correctness": "error",
+    "perf": "warn",
+    "suspicious": "warn",
+    "pedantic": "off",
+    "style": "off"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2024": true
+  },
   "rules": {
+    "no-console": "off",
     "no-unused-vars": "warn",
-    "react-in-jsx-scope": "off"
+    "typescript/no-unused-vars": "warn",
+    "typescript/no-explicit-any": "warn",
+    "react/jsx-key": "error",
+    "react/no-array-index-key": "off",
+    "react/react-in-jsx-scope": "off",
+    "import/no-unassigned-import": "off",
+    "unicorn/filename-case": [
+      "error",
+      {
+        "case": "kebabCase",
+        "ignore": "^(AGENTS\\.md|README\\.md|CHANGELOG\\.md|LICENSE|__root\\.tsx|routeTree\\.gen\\.ts|\\d{14}_[a-f0-9-]+\\.sql)$"
+      }
+    ]
   },
   "ignorePatterns": [
     "node_modules",
     "dist",
-    ".tanstack",
-    "src/routeTree.gen.ts",
-    "storybook-static"
+    "dist-ssr",
+    ".output",
+    ".vinxi",
+    ".tanstack/**",
+    ".nitro",
+    ".wrangler/",
+    "storybook-static/**",
+    "src/routeTree.gen.ts"
   ]
 }

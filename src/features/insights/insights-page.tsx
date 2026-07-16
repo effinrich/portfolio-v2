@@ -1,13 +1,13 @@
-import { Link } from '@tanstack/react-router'
-import type { Article } from '#/features/content/seed-data'
-import { ArticleCard } from '#/features/insights/article-card'
-import { PortfolioLayout } from '#/features/layout/portfolio-layout'
-import { Badge } from '#/features/ui/badge'
-import { GlassPanel } from '#/features/ui/glass-panel'
-import { SectionHeader } from '#/features/ui/section-header'
+import { Link } from "@tanstack/react-router"
+import type { Article } from "#/features/content/seed-data"
+import { ArticleCard } from "#/features/insights/article-card"
+import { PortfolioLayout } from "#/features/layout/portfolio-layout"
+import { Badge } from "#/features/ui/badge"
+import { GlassPanel } from "#/features/ui/glass-panel"
+import { SectionHeader } from "#/features/ui/section-header"
 
 type InsightsPageProps = {
-  articles: Article[]
+  articles: Array<Article>
 }
 
 export function InsightsPage({ articles }: InsightsPageProps) {
@@ -46,7 +46,7 @@ export function InsightsPage({ articles }: InsightsPageProps) {
                   Read article
                 </Link>
               </div>
-              <div className="flex min-h-[280px] items-center justify-center bg-gradient-to-br from-gold/10 via-cyan/5 to-magenta/10">
+              <div className="flex min-h-[280px] items-center justify-center bg-linear-to-br from-gold/10 via-cyan/5 to-magenta/10">
                 <span className="font-mono text-6xl font-bold text-white/10">MCP</span>
               </div>
             </GlassPanel>

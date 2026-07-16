@@ -1,9 +1,9 @@
-import { Link } from '@tanstack/react-router'
-import { ArrowRight } from 'lucide-react'
-import { getCaseStudies } from '#/features/content/queries'
-import { PortfolioLayout } from '#/features/layout/portfolio-layout'
-import { GlassPanel } from '#/features/ui/glass-panel'
-import { SectionHeader } from '#/features/ui/section-header'
+import { Link } from "@tanstack/react-router"
+import { ArrowRight } from "lucide-react"
+import { getCaseStudies } from "#/features/content/queries"
+import { PortfolioLayout } from "#/features/layout/portfolio-layout"
+import { GlassPanel } from "#/features/ui/glass-panel"
+import { SectionHeader } from "#/features/ui/section-header"
 
 export function CaseStudiesPage() {
   const caseStudies = getCaseStudies()

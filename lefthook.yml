@@ -1,14 +1,50 @@
+# Lefthook — https://lefthook.dev
+# Run `bun run prepare` (or `bunx lefthook install`) once after cloning to install hooks.
+#
+# This repo is bun-only (see AGENTS.md). Don't reintroduce an npx fallback —
+# bun's shell trips on multi-line POSIX `if … fi` constructs.
+#
+# `--no-error-on-unmatched-pattern` is critical: when the only staged files
+# matching the glob are paths covered by .oxlintrc.json / .oxfmtrc.json
+# `ignorePatterns` (e.g. src/components/ui/**, src/routeTree.gen.ts), oxlint
+# and oxfmt receive a non-empty argv but resolve it to zero lintable files
+# and would otherwise exit 1. The flag makes that case a no-op instead of a
+# pre-commit failure.
+
 pre-commit:
   parallel: true
-  commands:
-    lint:
-      glob: "*.{ts,tsx,js,jsx}"
-      run: bunx oxlint {staged_files}
-    format:
-      glob: "*.{ts,tsx,js,jsx,json,css}"
-      run: bunx oxfmt --check {staged_files}
+  jobs:
+    - name: oxlint
+      run: bunx oxlint --no-error-on-unmatched-pattern --fix {staged_files}
+      glob:
+        - "*.ts"
+        - "*.tsx"
+        - "*.js"
+        - "*.jsx"
+      stage_fixed: true
+
+    - name: oxfmt
+      run: bunx oxfmt --no-error-on-unmatched-pattern {staged_files}
+      glob:
+        - "*.ts"
+        - "*.tsx"
+        - "*.js"
+        - "*.jsx"
+        - "*.json"
+        - "*.css"
+        - "*.md"
+      stage_fixed: true
+
+    # Whole-project typecheck. tsc has no staged-file mode, so it runs on every
+    # commit that touches TS — catches type errors before they land, not at push.
+    # The glob gates the job so non-TS commits skip it.
+    - name: typecheck
+      run: bunx tsc --noEmit
+      glob:
+        - "*.ts"
+        - "*.tsx"
 
 pre-push:
-  commands:
-    build:
-      run: bun run build
+  jobs:
+    - name: typecheck
+      run: bunx tsc --noEmit

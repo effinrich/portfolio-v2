@@ -7,13 +7,13 @@ import {
   RESOURCES,
   SERVICES,
   TESTIMONIALS,
-} from '#/features/content/seed-data'
-import { supabase } from '#/features/supabase/client'
+} from "#/features/content/seed-data"
+import { supabase } from "#/features/supabase/client"
 
 export async function getProjects() {
   if (!supabase) return PROJECTS
 
-  const { data, error } = await supabase.from('projects').select('*').order('created_at')
+  const { data, error } = await supabase.from("projects").select("*").order("created_at")
   if (error || !data?.length) return PROJECTS
 
   return data.map((row) => ({
@@ -36,9 +36,9 @@ export async function getArticles() {
   if (!supabase) return ARTICLES
 
   const { data, error } = await supabase
-    .from('articles')
-    .select('*')
-    .order('published_at', { ascending: false })
+    .from("articles")
+    .select("*")
+    .order("published_at", { ascending: false })
   if (error || !data?.length) return ARTICLES
 
   return data.map((row) => ({
@@ -58,7 +58,7 @@ export async function getArticleBySlug(slug: string) {
     return ARTICLES.find((a) => a.slug === slug) ?? null
   }
 
-  const { data, error } = await supabase.from('articles').select('*').eq('slug', slug).single()
+  const { data, error } = await supabase.from("articles").select("*").eq("slug", slug).single()
   if (error || !data) return ARTICLES.find((a) => a.slug === slug) ?? null
 
   return {
@@ -76,7 +76,7 @@ export async function getArticleBySlug(slug: string) {
 export async function getTestimonials() {
   if (!supabase) return TESTIMONIALS
 
-  const { data, error } = await supabase.from('testimonials').select('*')
+  const { data, error } = await supabase.from("testimonials").select("*")
   if (error || !data?.length) return TESTIMONIALS
 
   return data.map((row) => ({
@@ -120,11 +120,11 @@ export async function submitContactForm(input: {
   message: string
 }) {
   if (!supabase) {
-    return { success: true, id: 'local-dev' }
+    return { success: true, id: "local-dev" }
   }
 
   const { data, error } = await supabase
-    .from('contact_messages')
+    .from("contact_messages")
     .insert({
       name: input.name,
       email: input.email,
@@ -132,7 +132,7 @@ export async function submitContactForm(input: {
       project_type: input.projectType,
       message: input.message,
     })
-    .select('id')
+    .select("id")
     .single()
 
   if (error) throw new Error(error.message)

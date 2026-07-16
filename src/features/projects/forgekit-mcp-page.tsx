@@ -1,8 +1,8 @@
-import { Link } from '@tanstack/react-router'
-import { ArrowLeft, ExternalLink } from 'lucide-react'
-import { PortfolioLayout } from '#/features/layout/portfolio-layout'
-import { Badge } from '#/features/ui/badge'
-import { GlassPanel } from '#/features/ui/glass-panel'
+import { Link } from "@tanstack/react-router"
+import { ArrowLeft, ExternalLink } from "lucide-react"
+import { PortfolioLayout } from "#/features/layout/portfolio-layout"
+import { Badge } from "#/features/ui/badge"
+import { GlassPanel } from "#/features/ui/glass-panel"
 
 export function ForgekitMcpPage() {
   return (
@@ -31,9 +31,9 @@ export function ForgekitMcpPage() {
 
         <div className="mb-12 grid grid-cols-3 gap-4">
           {[
-            { value: '5,703+', label: 'npm installs' },
-            { value: '200+', label: 'components mapped' },
-            { value: '4', label: 'IDE integrations' },
+            { value: "5,703+", label: "npm installs" },
+            { value: "200+", label: "components mapped" },
+            { value: "4", label: "IDE integrations" },
           ].map((metric) => (
             <GlassPanel key={metric.label} className="rounded-xl p-4 text-center">
               <p className="text-2xl font-bold text-gold">{metric.value}</p>

@@ -1,6 +1,6 @@
-import { Link } from '@tanstack/react-router'
-import { Box } from 'lucide-react'
-import type { Project } from '#/features/content/seed-data'
+import { Link } from "@tanstack/react-router"
+import { Box } from "lucide-react"
+import type { Project } from "#/features/content/seed-data"
 
 type ProjectCardProps = {
   project: Project
@@ -8,7 +8,7 @@ type ProjectCardProps = {
 
 export function ProjectCard({ project }: ProjectCardProps) {
   const className =
-    'project-card group glass-panel block overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-[1.02] hover:border-gold/40 hover:shadow-[0_0_20px_rgba(255,215,0,0.1)]'
+    "project-card group glass-panel block overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-[1.02] hover:border-gold/40 hover:shadow-[0_0_20px_rgba(255,215,0,0.1)]"
 
   const cardContent = (
     <>
@@ -38,7 +38,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
     </>
   )
 
-  if (project.href.startsWith('http')) {
+  if (project.href.startsWith("http")) {
     return (
       <a href={project.href} target="_blank" rel="noopener noreferrer" className={className}>
         {cardContent}
@@ -46,7 +46,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
     )
   }
 
-  if (project.href === '/projects/forgekit-mcp') {
+  if (project.href === "/projects/forgekit-mcp") {
     return (
       <Link to="/projects/forgekit-mcp" className={className}>
         {cardContent}
@@ -54,8 +54,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
     )
   }
 
-  if (project.href.startsWith('/case-studies/')) {
-    const slug = project.href.replace('/case-studies/', '')
+  if (project.href.startsWith("/case-studies/")) {
+    const slug = project.href.replace("/case-studies/", "")
     return (
       <Link to="/case-studies/$slug" params={{ slug }} className={className}>
         {cardContent}
@@ -63,8 +63,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
     )
   }
 
-  if (project.href.startsWith('/insights/')) {
-    const slug = project.href.replace('/insights/', '')
+  if (project.href.startsWith("/insights/")) {
+    const slug = project.href.replace("/insights/", "")
     return (
       <Link to="/insights/$slug" params={{ slug }} className={className}>
         {cardContent}

@@ -1,6 +1,6 @@
-import { Link } from '@tanstack/react-router'
-import { Github, Linkedin, Mail } from 'lucide-react'
-import { SECONDARY_NAV } from '#/features/layout/types'
+import { Link } from "@tanstack/react-router"
+import { Github, Linkedin, Mail } from "lucide-react"
+import { SECONDARY_NAV } from "#/features/layout/types"
 
 export function SiteFooter() {
   return (

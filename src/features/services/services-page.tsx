@@ -1,27 +1,21 @@
-import {
-  Cpu,
-  GitBranch,
-  Layers,
-  Users,
-  Zap,
-} from 'lucide-react'
-import { getServices } from '#/features/content/queries'
-import { PortfolioLayout } from '#/features/layout/portfolio-layout'
-import { GlassPanel } from '#/features/ui/glass-panel'
-import { SectionHeader } from '#/features/ui/section-header'
+import { Cpu, GitBranch, Layers, Users, Zap } from "lucide-react"
+import { getServices } from "#/features/content/queries"
+import { PortfolioLayout } from "#/features/layout/portfolio-layout"
+import { GlassPanel } from "#/features/ui/glass-panel"
+import { SectionHeader } from "#/features/ui/section-header"
 
 const iconMap = {
   layers: Layers,
-  'git-branch': GitBranch,
+  "git-branch": GitBranch,
   cpu: Cpu,
   zap: Zap,
 } as const
 
 const ENGAGEMENT_TYPES = [
-  { title: 'Hourly Consulting', detail: 'Architecture reviews, pairing, advisory' },
-  { title: 'Project-Based', detail: 'Fixed-scope design systems & platforms' },
-  { title: 'Retainer', detail: 'Fractional principal (1–2 days/week)' },
-  { title: 'Code Review Sessions', detail: 'Focused audits with actionable reports' },
+  { title: "Hourly Consulting", detail: "Architecture reviews, pairing, advisory" },
+  { title: "Project-Based", detail: "Fixed-scope design systems & platforms" },
+  { title: "Retainer", detail: "Fractional principal (1–2 days/week)" },
+  { title: "Code Review Sessions", detail: "Focused audits with actionable reports" },
 ] as const
 
 export function ServicesPage() {

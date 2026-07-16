@@ -1,8 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { getProjects } from '#/features/content/queries'
-import { WorkPage } from '#/features/work/work-page'
+import { createFileRoute } from "@tanstack/react-router"
+import { getProjects } from "#/features/content/queries"
+import { WorkPage } from "#/features/work/work-page"
 
-export const Route = createFileRoute('/work')({
+export const Route = createFileRoute("/work")({
   loader: () => getProjects(),
   component: WorkRoute,
 })

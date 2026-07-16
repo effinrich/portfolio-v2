@@ -342,9 +342,7 @@ const ProjectsRouteChildren: ProjectsRouteChildren = {
   ProjectsForgekitMcpRoute: ProjectsForgekitMcpRoute,
 }
 
-const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
-  ProjectsRouteChildren,
-)
+const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(ProjectsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,

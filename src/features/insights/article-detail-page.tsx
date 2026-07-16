@@ -1,9 +1,9 @@
-import { Link } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
-import type { Article } from '#/features/content/seed-data'
-import { PortfolioLayout } from '#/features/layout/portfolio-layout'
-import { Badge } from '#/features/ui/badge'
-import { GlassPanel } from '#/features/ui/glass-panel'
+import { Link } from "@tanstack/react-router"
+import { ArrowLeft } from "lucide-react"
+import type { Article } from "#/features/content/seed-data"
+import { PortfolioLayout } from "#/features/layout/portfolio-layout"
+import { Badge } from "#/features/ui/badge"
+import { GlassPanel } from "#/features/ui/glass-panel"
 
 type ArticleDetailPageProps = {
   article: Article

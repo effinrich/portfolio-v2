@@ -1,28 +1,28 @@
-import { Link } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
-import type { CaseStudy } from '#/features/content/seed-data'
-import { PortfolioLayout } from '#/features/layout/portfolio-layout'
-import { GlassPanel } from '#/features/ui/glass-panel'
+import { Link } from "@tanstack/react-router"
+import { ArrowLeft } from "lucide-react"
+import type { CaseStudy } from "#/features/content/seed-data"
+import { PortfolioLayout } from "#/features/layout/portfolio-layout"
+import { GlassPanel } from "#/features/ui/glass-panel"
 
 type CaseStudyDetailPageProps = {
   caseStudy: CaseStudy
 }
 
 const DETAIL_CONTENT: Record<string, string[]> = {
-  'nx-monorepo': [
-    'When I joined, three React apps shared no code. Twelve months later, 40+ packages powered every product team with a shared design system, auth layer, and data fetching utilities.',
-    'The key architectural decision was treating the monorepo as a product — with its own CI pipeline, documentation site, and developer onboarding. Nx affected graph optimization reduced CI build times by 65%.',
-    'Each team owned their app but consumed shared libraries through strict API boundaries. Breaking changes required migration guides and codemods — never silent failures.',
+  "nx-monorepo": [
+    "When I joined, three React apps shared no code. Twelve months later, 40+ packages powered every product team with a shared design system, auth layer, and data fetching utilities.",
+    "The key architectural decision was treating the monorepo as a product — with its own CI pipeline, documentation site, and developer onboarding. Nx affected graph optimization reduced CI build times by 65%.",
+    "Each team owned their app but consumed shared libraries through strict API boundaries. Breaking changes required migration guides and codemods — never silent failures.",
   ],
-  'forgekit-mcp': [
-    'ForgeKit MCP exposes Figma designs as structured context for AI coding assistants. Instead of screenshot interpretation, the MCP server returns component trees, design tokens, and layout constraints.',
-    'The server architecture uses Figma REST API for file metadata and a custom parser for component instance resolution. Results are cached with Supabase Realtime for collaborative sessions.',
-    'Reaching 5,700+ npm installs validated the thesis: developers want AI tools that understand their design system, not generic code generators.',
+  "forgekit-mcp": [
+    "ForgeKit MCP exposes Figma designs as structured context for AI coding assistants. Instead of screenshot interpretation, the MCP server returns component trees, design tokens, and layout constraints.",
+    "The server architecture uses Figma REST API for file metadata and a custom parser for component instance resolution. Results are cached with Supabase Realtime for collaborative sessions.",
+    "Reaching 5,700+ npm installs validated the thesis: developers want AI tools that understand their design system, not generic code generators.",
   ],
-  'design-system-scale': [
-    'Building a 200+ component design system requires more than Storybook stories — it requires governance, visual regression, and token pipelines that keep Figma and code in sync.',
-    'Chromatic integration caught 98% of visual regressions before they reached consumer apps. Figma Code Connect mapped 150+ components to their React implementations.',
-    'The system served 8 product teams with zero breaking changes over 18 months — achieved through semver discipline and automated migration tooling.',
+  "design-system-scale": [
+    "Building a 200+ component design system requires more than Storybook stories — it requires governance, visual regression, and token pipelines that keep Figma and code in sync.",
+    "Chromatic integration caught 98% of visual regressions before they reached consumer apps. Figma Code Connect mapped 150+ components to their React implementations.",
+    "The system served 8 product teams with zero breaking changes over 18 months — achieved through semver discipline and automated migration tooling.",
   ],
 }
 

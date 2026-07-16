@@ -1,6 +1,6 @@
-import { Link } from '@tanstack/react-router'
-import type { Article } from '#/features/content/seed-data'
-import { Badge } from '#/features/ui/badge'
+import { Link } from "@tanstack/react-router"
+import type { Article } from "#/features/content/seed-data"
+import { Badge } from "#/features/ui/badge"
 
 type ArticleCardProps = {
   article: Article
