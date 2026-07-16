@@ -1,17 +1,17 @@
 const TICKER_ITEMS = [
-  'Next.js',
-  'TanStack Start',
-  'React Native',
-  'Expo',
-  'Storybook 10+',
-  'Chromatic',
-  'Nx',
-  'Turborepo',
-  'Chakra UI',
-  'shadcn/ui',
-  'Tamagui',
-  'Radix UI',
-  'Figma MCP',
+  "Next.js",
+  "TanStack Start",
+  "React Native",
+  "Expo",
+  "Storybook 10+",
+  "Chromatic",
+  "Nx",
+  "Turborepo",
+  "Chakra UI",
+  "shadcn/ui",
+  "Tamagui",
+  "Radix UI",
+  "Figma MCP",
 ]
 
 export function TechTicker() {
@@ -20,9 +20,7 @@ export function TechTicker() {
       {TICKER_ITEMS.map((item, index) => (
         <span key={`${item}-${index}`} className="flex items-center gap-12">
           <span>{item}</span>
-          {index < TICKER_ITEMS.length - 1 ? (
-            <span className="text-white/10">/</span>
-          ) : null}
+          {index < TICKER_ITEMS.length - 1 ? <span className="text-white/10">/</span> : null}
         </span>
       ))}
     </div>

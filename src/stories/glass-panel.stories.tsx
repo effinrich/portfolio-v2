@@ -1,11 +1,11 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { GlassPanel } from '#/features/ui/glass-panel'
+import type { Meta, StoryObj } from "@storybook/tanstack-react"
+import { GlassPanel } from "#/features/ui/glass-panel"
 
 const meta: Meta<typeof GlassPanel> = {
-  title: 'UI/GlassPanel',
+  title: "UI/GlassPanel",
   component: GlassPanel,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 }
 
@@ -20,7 +20,7 @@ export const Default: Story = {
         <p className="text-white/50">Neon portfolio aesthetic component</p>
       </div>
     ),
-    className: 'rounded-2xl',
+    className: "rounded-2xl",
   },
 }
 
@@ -31,6 +31,6 @@ export const WithNeonBorder: Story = {
         <p>Content with gold neon border accent</p>
       </div>
     ),
-    className: 'rounded-2xl neon-border-gold',
+    className: "rounded-2xl neon-border-gold",
   },
 }

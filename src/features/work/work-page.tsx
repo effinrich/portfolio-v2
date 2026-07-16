@@ -1,9 +1,9 @@
-import { Link } from '@tanstack/react-router'
-import { ArrowRight } from 'lucide-react'
-import type { Project } from '#/features/content/seed-data'
-import { PortfolioLayout } from '#/features/layout/portfolio-layout'
-import { SectionHeader } from '#/features/ui/section-header'
-import { ProjectCard } from '#/features/work/project-card'
+import { Link } from "@tanstack/react-router"
+import { ArrowRight } from "lucide-react"
+import type { Project } from "#/features/content/seed-data"
+import { PortfolioLayout } from "#/features/layout/portfolio-layout"
+import { SectionHeader } from "#/features/ui/section-header"
+import { ProjectCard } from "#/features/work/project-card"
 
 type WorkPageProps = {
   projects: Project[]

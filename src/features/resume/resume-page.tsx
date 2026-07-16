@@ -1,7 +1,7 @@
-import { getResumeSections } from '#/features/content/queries'
-import { PortfolioLayout } from '#/features/layout/portfolio-layout'
-import { GlassPanel } from '#/features/ui/glass-panel'
-import { SectionHeader } from '#/features/ui/section-header'
+import { getResumeSections } from "#/features/content/queries"
+import { PortfolioLayout } from "#/features/layout/portfolio-layout"
+import { GlassPanel } from "#/features/ui/glass-panel"
+import { SectionHeader } from "#/features/ui/section-header"
 
 export function ResumePage() {
   const resume = getResumeSections()

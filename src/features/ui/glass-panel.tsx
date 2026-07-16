@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
-import { cn } from '#/lib/cn'
+import type { ReactNode } from "react"
+import { cn } from "#/lib/cn"
 
 type GlassPanelProps = {
   children: ReactNode
@@ -7,5 +7,5 @@ type GlassPanelProps = {
 }
 
 export function GlassPanel({ children, className }: GlassPanelProps) {
-  return <div className={cn('glass-panel', className)}>{children}</div>
+  return <div className={cn("glass-panel", className)}>{children}</div>
 }

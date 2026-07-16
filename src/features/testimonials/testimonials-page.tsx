@@ -1,18 +1,18 @@
-import { Quote } from 'lucide-react'
-import type { Testimonial } from '#/features/content/seed-data'
-import { PortfolioLayout } from '#/features/layout/portfolio-layout'
-import { GlassPanel } from '#/features/ui/glass-panel'
-import { SectionHeader } from '#/features/ui/section-header'
+import { Quote } from "lucide-react"
+import type { Testimonial } from "#/features/content/seed-data"
+import { PortfolioLayout } from "#/features/layout/portfolio-layout"
+import { GlassPanel } from "#/features/ui/glass-panel"
+import { SectionHeader } from "#/features/ui/section-header"
 
 type TestimonialsPageProps = {
   testimonials: Testimonial[]
 }
 
 const SOCIAL_PROOF = [
-  { value: '50+', label: 'Teams advised' },
-  { value: '500K+', label: 'Users shipped to' },
-  { value: '98%', label: 'Visual test coverage' },
-  { value: '10+', label: 'Years shipping React' },
+  { value: "50+", label: "Teams advised" },
+  { value: "500K+", label: "Users shipped to" },
+  { value: "98%", label: "Visual test coverage" },
+  { value: "10+", label: "Years shipping React" },
 ] as const
 
 export function TestimonialsPage({ testimonials }: TestimonialsPageProps) {

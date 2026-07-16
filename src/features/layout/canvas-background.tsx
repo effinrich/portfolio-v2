@@ -1,25 +1,27 @@
-import { useCallback, useEffect, useRef } from 'react'
-import { cn } from '#/lib/cn'
+import { useCallback, useEffect, useRef } from "react"
+import { cn } from "#/lib/cn"
 
 type CanvasBackgroundProps = {
   className?: string
 }
 
-const DEFAULT_TUBE_COLORS = ['#00f0ff', '#ff007f', '#ffd700']
-const DEFAULT_LIGHT_COLORS = ['#83f36e', '#00f0ff', '#ff008a', '#ffd700']
+const DEFAULT_TUBE_COLORS = ["#00f0ff", "#ff007f", "#ffd700"]
+const DEFAULT_LIGHT_COLORS = ["#83f36e", "#00f0ff", "#ff008a", "#ffd700"]
 
 function randomHexColors(count: number) {
-  return Array.from({ length: count }, () =>
-    `#${Math.floor(Math.random() * 16777215)
-      .toString(16)
-      .padStart(6, '0')}`,
+  return Array.from(
+    { length: count },
+    () =>
+      `#${Math.floor(Math.random() * 16777215)
+        .toString(16)
+        .padStart(6, "0")}`,
   )
 }
 
 type TubesApp = {
   tubes: {
-    setColors: (colors: string[]) => void
-    setLightsColors: (colors: string[]) => void
+    setColors: (colors: Array<string>) => void
+    setLightsColors: (colors: Array<string>) => void
   }
 }
 
@@ -38,17 +40,17 @@ export function CanvasBackground({ className }: CanvasBackgroundProps) {
 
     async function init() {
       try {
-        const script = document.createElement('script')
-        script.type = 'module'
+        const script = document.createElement("script")
+        script.type = "module"
         script.textContent = `
           import TubesCursor from 'https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js';
-          window.__tubesCursor = TubesCursor;
+          window.tubesCursor = TubesCursor;
         `
         document.head.appendChild(script)
 
         await new Promise<void>((resolve) => {
           const check = () => {
-            if ((window as Window & { __tubesCursor?: unknown }).__tubesCursor) {
+            if ((window as Window & { tubesCursor?: unknown }).tubesCursor) {
               resolve()
             } else {
               requestAnimationFrame(check)
@@ -61,17 +63,17 @@ export function CanvasBackground({ className }: CanvasBackgroundProps) {
 
         const TubesCursor = (
           window as unknown as {
-            __tubesCursor: (
+            tubesCursor: (
               canvas: HTMLCanvasElement,
               options: {
                 tubes: {
-                  colors: string[]
-                  lights: { intensity: number; colors: string[] }
+                  colors: Array<string>
+                  lights: { intensity: number; colors: Array<string> }
                 }
               },
             ) => TubesApp
           }
-        ).__tubesCursor
+        ).tubesCursor
 
         if (!TubesCursor) return
 
@@ -97,14 +99,14 @@ export function CanvasBackground({ className }: CanvasBackgroundProps) {
 
   function handleClick(event: React.MouseEvent<HTMLDivElement>) {
     const target = event.target as HTMLElement
-    if (target.closest('a, button, input, textarea, select, label')) return
+    if (target.closest("a, button, input, textarea, select, label")) return
     randomize()
   }
 
   return (
     <div
       className={cn(
-        'fixed inset-0 z-0 flex min-h-screen w-full cursor-crosshair flex-col overflow-hidden bg-black',
+        "fixed inset-0 z-0 flex min-h-screen w-full cursor-crosshair flex-col overflow-hidden bg-black",
         className,
       )}
       onClick={handleClick}
@@ -113,17 +115,17 @@ export function CanvasBackground({ className }: CanvasBackgroundProps) {
       <canvas
         ref={canvasRef}
         className="absolute inset-0 z-0 block h-full w-full"
-        style={{ opacity: 0.9, touchAction: 'none' }}
+        style={{ opacity: 0.9, touchAction: "none" }}
       />
       <div
         className="pointer-events-none absolute inset-0 z-0"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
+            "linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
         }}
       />
-      <div className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-b from-black/20 via-black/40 to-black" />
+      <div className="pointer-events-none absolute inset-0 z-0 bg-linear-to-b from-black/20 via-black/40 to-black" />
     </div>
   )
 }

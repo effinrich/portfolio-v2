@@ -1,17 +1,14 @@
-import { Link } from '@tanstack/react-router'
-import { PRIMARY_NAV } from '#/features/layout/types'
-import type { NavItem } from '#/features/layout/types'
-import { cn } from '#/lib/cn'
+import { Link } from "@tanstack/react-router"
+import { PRIMARY_NAV } from "#/features/layout/types"
+import type { NavItem } from "#/features/layout/types"
+import { cn } from "#/lib/cn"
 
 type NavigationBarProps = {
   activeItem?: NavItem
   isAvailable?: boolean
 }
 
-export function NavigationBar({
-  activeItem = 'home',
-  isAvailable = true,
-}: NavigationBarProps) {
+export function NavigationBar({ activeItem = "home", isAvailable = true }: NavigationBarProps) {
   return (
     <nav className="fixed top-0 left-0 z-40 w-full border-b border-white/10 px-6 py-4 glass-panel">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
@@ -20,7 +17,7 @@ export function NavigationBar({
             R
           </div>
           <span className="hidden font-medium tracking-tight text-white/90 sm:inline-block">
-            Rich Tillman{' '}
+            Rich Tillman{" "}
             <span className="font-normal text-white/40">/ Principal Frontend Engineer</span>
           </span>
         </Link>
@@ -31,8 +28,8 @@ export function NavigationBar({
               key={link.href}
               to={link.href}
               className={cn(
-                'transition-colors',
-                activeItem === link.item ? 'text-white' : 'text-white/60 hover:text-white',
+                "transition-colors",
+                activeItem === link.item ? "text-white" : "text-white/60 hover:text-white",
               )}
             >
               {link.label}

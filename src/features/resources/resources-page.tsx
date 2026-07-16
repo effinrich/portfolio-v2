@@ -1,8 +1,8 @@
-import { ExternalLink } from 'lucide-react'
-import { getResources } from '#/features/content/queries'
-import { PortfolioLayout } from '#/features/layout/portfolio-layout'
-import { GlassPanel } from '#/features/ui/glass-panel'
-import { SectionHeader } from '#/features/ui/section-header'
+import { ExternalLink } from "lucide-react"
+import { getResources } from "#/features/content/queries"
+import { PortfolioLayout } from "#/features/layout/portfolio-layout"
+import { GlassPanel } from "#/features/ui/glass-panel"
+import { SectionHeader } from "#/features/ui/section-header"
 
 export function ResourcesPage() {
   const resources = getResources()
@@ -21,26 +21,32 @@ export function ResourcesPage() {
         />
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {resources.map((resource, index) => (
-            <a
-              key={resource.id}
-              href={resource.href}
-              target={resource.href.startsWith('http') ? '_blank' : undefined}
-              rel={resource.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-              className={`group stagger-${index + 1}`}
-            >
-              <GlassPanel className="h-full rounded-2xl p-6 transition-all hover:border-cyan/30 hover:shadow-[0_0_20px_rgba(0,240,255,0.1)]">
-                <span className="mb-3 inline-block font-mono text-[10px] uppercase tracking-widest text-cyan">
-                  {resource.category}
-                </span>
-                <div className="mb-2 flex items-center justify-between">
-                  <h3 className="text-lg font-bold text-white group-hover:text-cyan">{resource.title}</h3>
-                  <ExternalLink className="h-4 w-4 text-white/30 group-hover:text-cyan" />
-                </div>
-                <p className="text-sm text-white/50">{resource.description}</p>
-              </GlassPanel>
-            </a>
-          ))}
+          {resources.map((resource, index) => {
+            const isExternal = resource.href.startsWith("http")
+            return (
+              <a
+                key={resource.id}
+                href={resource.href}
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+                aria-label={`${resource.title}${isExternal ? " (opens in new tab)" : ""}`}
+                className={`group stagger-${index + 1}`}
+              >
+                <GlassPanel className="h-full rounded-2xl p-6 transition-all hover:border-cyan/30 hover:shadow-[0_0_20px_rgba(0,240,255,0.1)]">
+                  <span className="mb-3 inline-block font-mono text-[10px] uppercase tracking-widest text-cyan">
+                    {resource.category}
+                  </span>
+                  <div className="mb-2 flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-white group-hover:text-cyan">
+                      {resource.title}
+                    </h3>
+                    <ExternalLink className="h-4 w-4 text-white/30 group-hover:text-cyan" />
+                  </div>
+                  <p className="text-sm text-white/50">{resource.description}</p>
+                </GlassPanel>
+              </a>
+            )
+          })}
         </div>
       </main>
     </PortfolioLayout>

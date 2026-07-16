@@ -1,17 +1,17 @@
-import { useState } from 'react'
-import { CheckCircle, Mail, MapPin } from 'lucide-react'
-import { PortfolioLayout } from '#/features/layout/portfolio-layout'
-import { GlassPanel } from '#/features/ui/glass-panel'
-import { SectionHeader } from '#/features/ui/section-header'
-import { submitContactForm } from '#/features/content/queries'
+import { useState } from "react"
+import { CheckCircle, Mail, MapPin } from "lucide-react"
+import { PortfolioLayout } from "#/features/layout/portfolio-layout"
+import { GlassPanel } from "#/features/ui/glass-panel"
+import { SectionHeader } from "#/features/ui/section-header"
+import { submitContactForm } from "#/features/content/queries"
 
 const PROJECT_TYPES = [
-  'Design System',
-  'Nx Monorepo',
-  'MCP / AI Tooling',
-  'Frontend Platform',
-  'Advisory',
-  'Other',
+  "Design System",
+  "Nx Monorepo",
+  "MCP / AI Tooling",
+  "Frontend Platform",
+  "Advisory",
+  "Other",
 ]
 
 export function ContactPage() {
@@ -27,16 +27,16 @@ export function ContactPage() {
     const form = new FormData(event.currentTarget)
     try {
       await submitContactForm({
-        name: String(form.get('name') ?? ''),
-        email: String(form.get('email') ?? ''),
-        company: String(form.get('company') ?? '') || undefined,
-        projectType: String(form.get('projectType') ?? ''),
-        message: String(form.get('message') ?? ''),
+        name: String(form.get("name") ?? ""),
+        email: String(form.get("email") ?? ""),
+        company: String(form.get("company") ?? "") || undefined,
+        projectType: String(form.get("projectType") ?? ""),
+        message: String(form.get("message") ?? ""),
       })
       setSubmitted(true)
       event.currentTarget.reset()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit')
+      setError(err instanceof Error ? err.message : "Failed to submit")
     } finally {
       setLoading(false)
     }
@@ -68,7 +68,10 @@ export function ContactPage() {
           <form onSubmit={handleSubmit} className="space-y-6 lg:col-span-3">
             <div className="form-field grid gap-6 sm:grid-cols-2">
               <div>
-                <label htmlFor="name" className="mb-2 block font-mono text-xs uppercase tracking-widest text-white/40">
+                <label
+                  htmlFor="name"
+                  className="mb-2 block font-mono text-xs uppercase tracking-widest text-white/40"
+                >
                   Name
                 </label>
                 <input
@@ -80,7 +83,10 @@ export function ContactPage() {
                 />
               </div>
               <div>
-                <label htmlFor="email" className="mb-2 block font-mono text-xs uppercase tracking-widest text-white/40">
+                <label
+                  htmlFor="email"
+                  className="mb-2 block font-mono text-xs uppercase tracking-widest text-white/40"
+                >
                   Email
                 </label>
                 <input
@@ -95,7 +101,10 @@ export function ContactPage() {
             </div>
 
             <div className="form-field">
-              <label htmlFor="company" className="mb-2 block font-mono text-xs uppercase tracking-widest text-white/40">
+              <label
+                htmlFor="company"
+                className="mb-2 block font-mono text-xs uppercase tracking-widest text-white/40"
+              >
                 Company
               </label>
               <input
@@ -107,7 +116,10 @@ export function ContactPage() {
             </div>
 
             <div className="form-field">
-              <label htmlFor="projectType" className="mb-2 block font-mono text-xs uppercase tracking-widest text-white/40">
+              <label
+                htmlFor="projectType"
+                className="mb-2 block font-mono text-xs uppercase tracking-widest text-white/40"
+              >
                 Project Type
               </label>
               <select
@@ -125,7 +137,10 @@ export function ContactPage() {
             </div>
 
             <div className="form-field">
-              <label htmlFor="message" className="mb-2 block font-mono text-xs uppercase tracking-widest text-white/40">
+              <label
+                htmlFor="message"
+                className="mb-2 block font-mono text-xs uppercase tracking-widest text-white/40"
+              >
                 Message
               </label>
               <textarea
@@ -145,7 +160,7 @@ export function ContactPage() {
               disabled={loading}
               className="w-full rounded-full bg-gold px-6 py-3 font-semibold text-black transition-all hover:bg-[#ffe54c] disabled:opacity-50 sm:w-auto"
             >
-              {loading ? 'Sending...' : 'Send message'}
+              {loading ? "Sending..." : "Send message"}
             </button>
           </form>
 
@@ -155,7 +170,10 @@ export function ContactPage() {
                 <Mail className="h-5 w-5 text-gold" />
                 <h3 className="font-bold text-white">Email</h3>
               </div>
-              <a href="mailto:hello@richtillman.dev" className="text-white/60 transition-colors hover:text-gold">
+              <a
+                href="mailto:hello@richtillman.dev"
+                className="text-white/60 transition-colors hover:text-gold"
+              >
                 hello@richtillman.dev
               </a>
             </GlassPanel>
@@ -174,7 +192,8 @@ export function ContactPage() {
                 <span className="text-sm font-medium text-gold">Available for new projects</span>
               </div>
               <p className="text-sm text-white/40">
-                Typical engagement: 3-6 month contracts for design systems, monorepo architecture, or MCP tooling.
+                Typical engagement: 3-6 month contracts for design systems, monorepo architecture,
+                or MCP tooling.
               </p>
             </GlassPanel>
           </div>

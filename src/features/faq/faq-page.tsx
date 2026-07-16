@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { ChevronDown } from 'lucide-react'
-import { getFaqItems } from '#/features/content/queries'
-import { PortfolioLayout } from '#/features/layout/portfolio-layout'
-import { GlassPanel } from '#/features/ui/glass-panel'
-import { SectionHeader } from '#/features/ui/section-header'
-import { cn } from '#/lib/cn'
+import { useState } from "react"
+import { ChevronDown } from "lucide-react"
+import { getFaqItems } from "#/features/content/queries"
+import { PortfolioLayout } from "#/features/layout/portfolio-layout"
+import { GlassPanel } from "#/features/ui/glass-panel"
+import { SectionHeader } from "#/features/ui/section-header"
+import { cn } from "#/lib/cn"
 
 export function FaqPage() {
   const faqItems = getFaqItems()
@@ -39,8 +39,8 @@ export function FaqPage() {
                   <span className="pr-4 font-bold text-white">{item.question}</span>
                   <ChevronDown
                     className={cn(
-                      'h-5 w-5 shrink-0 text-white/40 transition-transform',
-                      isOpen && 'rotate-180',
+                      "h-5 w-5 shrink-0 text-white/40 transition-transform",
+                      isOpen && "rotate-180",
                     )}
                   />
                 </button>

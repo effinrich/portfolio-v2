@@ -1,35 +1,35 @@
-import { Link } from '@tanstack/react-router'
-import { GlassPanel } from '#/features/ui/glass-panel'
+import { Link } from "@tanstack/react-router"
+import { GlassPanel } from "#/features/ui/glass-panel"
 
 export type SiteMapLink = {
   title: string
   description: string
   to:
-    | '/'
-    | '/work'
-    | '/contact'
-    | '/resume'
-    | '/projects/forgekit-mcp'
-    | '/case-studies'
-    | '/services'
-    | '/resources'
-    | '/testimonials'
-    | '/faq'
-    | '/insights'
+    | "/"
+    | "/work"
+    | "/contact"
+    | "/resume"
+    | "/projects/forgekit-mcp"
+    | "/case-studies"
+    | "/services"
+    | "/resources"
+    | "/testimonials"
+    | "/faq"
+    | "/insights"
   params?: { slug: string }
-  accent: 'gold' | 'cyan' | 'magenta'
+  accent: "gold" | "cyan" | "magenta"
 }
 
 const accentClass = {
-  gold: 'hover:border-gold/30',
-  cyan: 'hover:border-cyan/30',
-  magenta: 'hover:border-magenta/30',
+  gold: "hover:border-gold/30",
+  cyan: "hover:border-cyan/30",
+  magenta: "hover:border-magenta/30",
 } as const
 
 const titleHover = {
-  gold: 'group-hover:text-gold',
-  cyan: 'group-hover:text-cyan',
-  magenta: 'group-hover:text-magenta',
+  gold: "group-hover:text-gold",
+  cyan: "group-hover:text-cyan",
+  magenta: "group-hover:text-magenta",
 } as const
 
 type SiteMapCardProps = {
@@ -53,7 +53,7 @@ export function SiteMapCard({ link }: SiteMapCardProps) {
   )
 
   if (link.params) {
-    if (link.to === '/case-studies') {
+    if (link.to === "/case-studies") {
       return (
         <Link to="/case-studies/$slug" params={link.params} className="block">
           {card}

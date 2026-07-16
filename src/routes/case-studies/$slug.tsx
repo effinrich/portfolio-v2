@@ -1,8 +1,8 @@
-import { createFileRoute, notFound } from '@tanstack/react-router'
-import { getCaseStudyBySlug } from '#/features/content/queries'
-import { CaseStudyDetailPage } from '#/features/case-studies/case-study-detail-page'
+import { createFileRoute, notFound } from "@tanstack/react-router"
+import { getCaseStudyBySlug } from "#/features/content/queries"
+import { CaseStudyDetailPage } from "#/features/case-studies/case-study-detail-page"
 
-export const Route = createFileRoute('/case-studies/$slug')({
+export const Route = createFileRoute("/case-studies/$slug")({
   loader: ({ params }) => {
     const caseStudy = getCaseStudyBySlug(params.slug)
     if (!caseStudy) throw notFound()
