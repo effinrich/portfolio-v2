@@ -1,0 +1,1447 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="view-transition" content="same-origin">
+  <title>Case Study: Nx Monorepo Architecture — Rich Tillman</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <script src="https://unpkg.com/petite-vue" defer="" init=""></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <script type="module">
+    import TubesCursor from 'https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const canvas = document.getElementById('bg-canvas');
+        if (!canvas) return;
+        
+        try {
+          const app = TubesCursor(canvas, {
+            tubes: {
+              colors: ['#00f0ff', '#ff007f', '#ffd700'],
+              lights: {
+                intensity: 150,
+                colors: ['#83f36e', '#00f0ff', '#ff008a', '#ffd700']
+              }
+            }
+          });
+          
+          const randomColors = (count) => {
+            return new Array(count)
+              .fill(0)
+              .map(() => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'));
+          };
+
+          const container = document.getElementById('bg-container');
+          if (container) {
+            container.addEventListener('click', (e) => {
+              if (e.target.closest('a') || e.target.closest('button')) return;
+              const colors = randomColors(3);
+              const lightsColors = randomColors(4);
+              app.tubes.setColors(colors);
+              app.tubes.setLightsColors(lightsColors);
+            });
+          }
+        } catch (err) {
+          console.error('Failed to init tubes:', err);
+        }
+      }, 100);
+    });
+  </script>
+  <style>
+    html { background-color: #0a0a0a; }
+    @view-transition { navigation: auto; }
+    ::view-transition { background-color: #0a0a0a; }
+    ::view-transition-old(main-content) { animation: 0.25s ease-out both fade-out; }
+    ::view-transition-new(main-content) { animation: 0.25s ease-in 0.1s both fade-in; }
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+    @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    .glass-panel {
+      background: rgba(20, 20, 20, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    }
+    
+    .neon-text {
+      background: linear-gradient(90deg, #00f0ff, #ffd700, #ff007f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shine 5s linear infinite;
+    }
+    @keyframes shine { to { background-position: 200% center; } }
+    
+    .grid-bg {
+      background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), 
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .reveal { animation: fade-in-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+    .reveal:nth-child(1) { animation-delay: 0.05s; }
+    .reveal:nth-child(2) { animation-delay: 0.15s; }
+    .reveal:nth-child(3) { animation-delay: 0.25s; }
+    .reveal:nth-child(4) { animation-delay: 0.35s; }
+    
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+    }
+    .scroll-reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .mockup-screen {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(20, 20, 20, 0.6) 50%, rgba(255, 0, 127, 0.08) 100%);
+    }
+    .code-line { background: rgba(255, 255, 255, 0.04); }
+    
+    .timeline-line {
+      background: linear-gradient(to bottom, rgba(255,215,0,0.5), rgba(255,255,255,0.1), transparent);
+    }
+    
+    .pain-card {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .pain-card:hover {
+      border-color: rgba(239, 68, 68, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .solution-card {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .solution-card:hover {
+      border-color: rgba(255, 215, 0, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5), 0 0 20px -5px rgba(255,215,0,0.15);
+    }
+    
+    .tech-badge {
+      transition: all 0.3s ease;
+    }
+    .tech-badge:hover {
+      background: rgba(255, 215, 0, 0.1);
+      border-color: rgba(255, 215, 0, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .bar-fill {
+      transform-origin: left;
+      animation: bar-grow 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes bar-grow {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+    
+    .related-card {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .related-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .related-card:hover .related-arrow {
+      transform: translate(2px, -2px);
+      color: #ffd700;
+    }
+    
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #000000; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 215, 0, 0.3); }
+    
+    @media (prefers-reduced-motion: reduce) {
+      .neon-text, .reveal, .scroll-reveal { animation: none; opacity: 1; transform: none; }
+      .bar-fill { animation: none; transform: scaleX(1); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Fixed Canvas Background -->
+  <div class="fixed inset-0 z-0" style="view-transition-name: canvas-bg;" data-sd-id="1">
+    <!-- component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+<div v-scope="{ ...{&quot;canvasOpacity&quot;:0.9,&quot;showGrid&quot;:true,&quot;showGradient&quot;:true}, $emit() {} }">
+<div id="bg-container" class="relative min-h-screen w-full overflow-hidden bg-black flex flex-col cursor-crosshair" @click="$emit('backgroundClick', $event)"><canvas id="bg-canvas" class="absolute inset-0 w-full h-full block z-0" :style="{ opacity: canvasOpacity, touchAction: 'none' }"></canvas><div v-if="showGrid" class="absolute inset-0 pointer-events-none z-0" style="background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div><div v-if="showGradient" class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-0 pointer-events-none"></div></div>
+</div>
+<!-- /component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+  </div>
+
+  <!-- Content Wrapper -->
+  <div class="relative min-h-screen w-full flex flex-col cursor-crosshair z-10 pointer-events-none" data-sd-id="2">
+    
+    <!-- Navigation (Persistent) -->
+    <div class="pointer-events-auto" style="view-transition-name: main-nav;" data-sd-id="3">
+      <!-- component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+<div v-scope="{ ...{&quot;activeItem&quot;:&quot;work&quot;,&quot;isAvailable&quot;:true,&quot;workHref&quot;:&quot;#work&quot;,&quot;projectsHref&quot;:&quot;#projects&quot;,&quot;stackHref&quot;:&quot;#stack&quot;,&quot;contactHref&quot;:&quot;#contact&quot;}, $emit() {} }">
+<nav class="fixed top-0 left-0 w-full z-40 border-x-0 border-t-0 border-b border-white/10 px-6 py-4" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-8 h-8 rounded bg-zinc-900 border border-white/20 flex items-center justify-center font-mono text-sm font-bold text-[#ffd700]">
+        R
+      </div>
+      <span class="font-medium tracking-tight text-white/90 hidden sm:inline-block">
+        Rich Tillman <span class="text-white/40 font-normal">/ Principal Frontend Engineer</span>
+      </span>
+    </div>
+    
+    <div class="hidden md:flex items-center gap-12 text-sm font-medium">
+      <a :href="workHref" :class="activeItem === 'work' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Work</a>
+      <a :href="projectsHref" :class="activeItem === 'projects' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Projects</a>
+      <a :href="stackHref" :class="activeItem === 'stack' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Stack</a>
+      <a :href="contactHref" :class="activeItem === 'contact' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Contact</a>
+    </div>
+
+    <div v-if="isAvailable" class="flex items-center gap-3 rounded-full px-3 py-1.5 border border-[#ffd700]/30 bg-[#ffd700]/5" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px);">
+      <div class="w-2 h-2 rounded-full bg-[#ffd700] animate-pulse"></div>
+      <span class="text-xs font-medium text-[#ffd700]">Available</span>
+    </div>
+  </div>
+</nav>
+</div>
+<!-- /component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+    </div>
+
+    <!-- Main Content -->
+    <main style="view-transition-name: main-content;" class="relative z-10 flex-1 max-w-7xl mx-auto w-full px-6 pt-28 pb-16 pointer-events-auto" data-sd-id="4">
+      
+      <!-- Back Button + Breadcrumb -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8" data-sd-id="5">
+        <a href="https://p.superdesign.dev/draft/36b48549-7be9-418d-b0c1-af81de96c79f" id="back-to-case-studies" class="group inline-flex items-center gap-2 text-sm font-mono text-white/50 hover:text-[#ffd700] transition-colors w-fit" data-sd-id="5a">
+          <iconify-icon icon="lucide:arrow-left" class="text-base transition-transform group-hover:-translate-x-1"></iconify-icon>
+          Back to Case Studies
+        </a>
+        <div class="flex items-center gap-2 text-sm font-mono text-white/40" data-sd-id="5b">
+          <a href="https://p.superdesign.dev/draft/842ac3f0-3493-41fc-b33e-0b65dc7b1fac" id="breadcrumb-work" class="hover:text-white/80 transition-colors" data-sd-id="6">Work</a>
+          <iconify-icon icon="lucide:chevron-right" class="text-xs"></iconify-icon>
+          <a href="https://p.superdesign.dev/draft/36b48549-7be9-418d-b0c1-af81de96c79f" id="breadcrumb-cases" class="hover:text-white/80 transition-colors" data-sd-id="7">Case Studies</a>
+          <iconify-icon icon="lucide:chevron-right" class="text-xs"></iconify-icon>
+          <span class="text-white/70" data-sd-id="8">Nx Monorepo Architecture</span>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- HERO SECTION -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-20" data-sd-id="9">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start" data-sd-id="10">
+          
+          <!-- Left: Title & Meta -->
+          <div class="lg:col-span-7 space-y-6" data-sd-id="11">
+            <div class="flex flex-wrap items-center gap-3 font-mono text-xs" data-sd-id="12">
+              <span class="glass-panel px-3 py-1.5 rounded-full flex items-center gap-2 text-white/70" data-sd-id="13">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#ffd700]" data-sd-id="14"></div> Case Study
+              </span>
+              <span class="glass-panel px-3 py-1.5 rounded-full text-white/70" data-sd-id="15">Architecture</span>
+              <span class="glass-panel px-3 py-1.5 rounded-full text-white/70" data-sd-id="16">2023</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.02] text-white" data-sd-id="17">
+              Architecting a Monorepo for <span class="neon-text" data-sd-id="18">50 Engineers</span>
+            </h1>
+
+            <p class="text-lg md:text-xl text-white/60 leading-relaxed max-w-2xl" data-sd-id="19">
+              Reduced CI/CD times by 60% and unified development experience across 15+ micro-apps by migrating from fragmented polyrepos to a single Nx monorepo with distributed caching.
+            </p>
+
+            <!-- Meta Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2" data-sd-id="20">
+              <div class="glass-panel rounded-xl p-4" data-sd-id="21">
+                <div class="flex items-center gap-2 text-white/40 mb-1" data-sd-id="22">
+                  <iconify-icon icon="lucide:building-2" class="text-sm"></iconify-icon>
+                  <span class="text-[10px] font-mono uppercase tracking-wider" data-sd-id="23">Client</span>
+                </div>
+                <div class="text-sm font-medium text-white" data-sd-id="24">High-Growth SaaS Startup</div>
+              </div>
+              <div class="glass-panel rounded-xl p-4" data-sd-id="25">
+                <div class="flex items-center gap-2 text-white/40 mb-1" data-sd-id="26">
+                  <iconify-icon icon="lucide:calendar" class="text-sm"></iconify-icon>
+                  <span class="text-[10px] font-mono uppercase tracking-wider" data-sd-id="27">Timeline</span>
+                </div>
+                <div class="text-sm font-medium text-white" data-sd-id="28">6 months</div>
+              </div>
+              <div class="glass-panel rounded-xl p-4 col-span-2 sm:col-span-1" data-sd-id="29">
+                <div class="flex items-center gap-2 text-white/40 mb-1" data-sd-id="30">
+                  <iconify-icon icon="lucide:users" class="text-sm"></iconify-icon>
+                  <span class="text-[10px] font-mono uppercase tracking-wider" data-sd-id="31">Team Impact</span>
+                </div>
+                <div class="text-sm font-medium text-white" data-sd-id="32">15 teams / 50+ eng</div>
+              </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 pt-2" data-sd-id="33">
+              <a href="https://p.superdesign.dev/draft/c906d6dd-0318-4f57-9ecd-0bd1b1280b06" id="cta-hero-book" class="w-full sm:w-auto px-6 py-3 bg-[#ffd700] hover:bg-[#ffe54c] text-black font-semibold rounded-full flex items-center justify-center gap-2 transition-all duration-500 hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)]" data-sd-id="34">
+                Book architecture consulting
+                <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon>
+              </a>
+              <a href="https://p.superdesign.dev/draft/36b48549-7be9-418d-b0c1-af81de96c79f" id="cta-hero-all" class="w-full sm:w-auto px-6 py-3 glass-panel hover:bg-white/10 text-white font-medium rounded-full transition-all duration-500 hover:scale-105" data-sd-id="35">
+                All case studies
+              </a>
+            </div>
+          </div>
+
+          <!-- Right: Featured Terminal Mockup -->
+          <div class="lg:col-span-5" data-sd-id="36">
+            <div class="glass-panel rounded-2xl overflow-hidden mockup-screen" data-sd-id="37">
+              <!-- Window Chrome -->
+              <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-black/40" data-sd-id="38">
+                <div class="w-3 h-3 rounded-full bg-[#ff5f56]" data-sd-id="39"></div>
+                <div class="w-3 h-3 rounded-full bg-[#ffbd2e]" data-sd-id="40"></div>
+                <div class="w-3 h-3 rounded-full bg-[#27c93f]" data-sd-id="41"></div>
+                <span class="font-mono text-xs text-white/40 ml-2" data-sd-id="42">nx-build — terminal</span>
+              </div>
+              <!-- Mock Content -->
+              <div class="p-6 space-y-3 font-mono text-xs" data-sd-id="43">
+                <div class="code-line rounded px-3 py-2 text-white/50" data-sd-id="44">
+                  <span class="text-[#ff007f]" data-sd-id="45">$</span> nx run-many --target=build --all
+                </div>
+                <div class="space-y-1.5 pl-3" data-sd-id="46">
+                  <div class="text-white/40" data-sd-id="47">→ Running task 1/8: build-app-web</div>
+                  <div class="text-white/40" data-sd-id="48">→ Cache hit · restored in 12ms</div>
+                  <div class="text-[#27c93f]" data-sd-id="49">✓ build-app-web [existing outputs match cache]</div>
+                </div>
+                <div class="space-y-1.5 pl-3" data-sd-id="50">
+                  <div class="text-white/40" data-sd-id="51">→ Running task 2/8: build-app-admin</div>
+                  <div class="text-white/40" data-sd-id="52">→ Cache hit · restored in 8ms</div>
+                  <div class="text-[#27c93f]" data-sd-id="53">✓ build-app-admin [existing outputs match cache]</div>
+                </div>
+                <div class="space-y-1.5 pl-3" data-sd-id="54">
+                  <div class="text-white/40" data-sd-id="55">→ Running task 8/8: build-shared-ui</div>
+                  <div class="text-[#ffd700]" data-sd-id="56">→ Compiling...</div>
+                  <div class="text-[#27c93f]" data-sd-id="57">✓ build-shared-ui [compiled successfully]</div>
+                </div>
+                <div class="code-line rounded px-3 py-2 text-[#00f0ff]" data-sd-id="58">
+                  ✓ 8/8 tasks succeeded · 7 cache hits · 18.4s
+                </div>
+                <div class="grid grid-cols-3 gap-2 pt-2" data-sd-id="59">
+                  <div class="code-line rounded p-2 text-center" data-sd-id="60">
+                    <div class="text-white/80 font-bold" data-sd-id="61">18m</div>
+                    <div class="text-white/30 text-[10px]" data-sd-id="62">Build Time</div>
+                  </div>
+                  <div class="code-line rounded p-2 text-center" data-sd-id="63">
+                    <div class="text-[#ffd700] font-bold" data-sd-id="64">87%</div>
+                    <div class="text-white/30 text-[10px]" data-sd-id="65">Cache Hit</div>
+                  </div>
+                  <div class="code-line rounded p-2 text-center" data-sd-id="66">
+                    <div class="text-[#00f0ff] font-bold" data-sd-id="67">8</div>
+                    <div class="text-white/30 text-[10px]" data-sd-id="68">Apps Built</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- CHALLENGE SECTION -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="69">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="70">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="71"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="72">The Challenge</span>
+        </div>
+        
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-6 max-w-3xl" data-sd-id="73">
+          Polyrepo chaos <span class="neon-text" data-sd-id="74">at scale</span>
+        </h2>
+        
+        <p class="text-lg text-white/60 max-w-3xl leading-relaxed mb-12" data-sd-id="75">
+          15 separate repositories, fragmented dependencies, 45-minute CI/CD builds, no shared patterns. Developers context-switched between repos daily, tooling was inconsistent, and shipping required cross-team coordination that stalled velocity.
+        </p>
+
+        <!-- Pain Point Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12" data-sd-id="76">
+          <div class="pain-card glass-panel rounded-2xl p-6" data-sd-id="77">
+            <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4" data-sd-id="78">
+              <iconify-icon icon="lucide:shuffle" class="text-xl text-red-400"></iconify-icon>
+            </div>
+            <h3 class="text-base font-semibold text-white mb-2" data-sd-id="79">Context-switching</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="80">Engineers juggled 5+ repos daily, losing focus and productivity with each switch.</p>
+          </div>
+          
+          <div class="pain-card glass-panel rounded-2xl p-6" data-sd-id="81">
+            <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4" data-sd-id="82">
+              <iconify-icon icon="lucide:settings-2" class="text-xl text-red-400"></iconify-icon>
+            </div>
+            <h3 class="text-base font-semibold text-white mb-2" data-sd-id="83">Inconsistent tooling</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="84">Different ESLint configs, TS versions, and build setups across every repository.</p>
+          </div>
+          
+          <div class="pain-card glass-panel rounded-2xl p-6" data-sd-id="85">
+            <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4" data-sd-id="86">
+              <iconify-icon icon="lucide:unlink" class="text-xl text-red-400"></iconify-icon>
+            </div>
+            <h3 class="text-base font-semibold text-white mb-2" data-sd-id="87">No code sharing</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="88">Duplicate utilities across repos. Bug fixes required 15 separate PRs to propagate.</p>
+          </div>
+          
+          <div class="pain-card glass-panel rounded-2xl p-6" data-sd-id="89">
+            <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4" data-sd-id="90">
+              <iconify-icon icon="lucide:git-merge" class="text-xl text-red-400"></iconify-icon>
+            </div>
+            <h3 class="text-base font-semibold text-white mb-2" data-sd-id="91">Release coordination</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="92">Cross-repo releases required manual coordination across teams. Releases took days.</p>
+          </div>
+        </div>
+
+        <!-- Impact Metrics -->
+        <div class="glass-panel rounded-2xl p-6 md:p-8 grid grid-cols-2 lg:grid-cols-4 gap-6" data-sd-id="93">
+          <div class="reveal flex flex-col gap-1.5" data-sd-id="94">
+            <div class="flex items-center gap-2 text-red-400" data-sd-id="95">
+              <iconify-icon icon="lucide:clock" class="text-lg"></iconify-icon>
+              <span class="text-xs font-mono uppercase tracking-wider text-white/40" data-sd-id="96">Wasted</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="97">8 hrs</h3>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="98">per engineer / week</p>
+          </div>
+          
+          <div class="reveal flex flex-col gap-1.5 lg:border-l border-white/10 lg:pl-8" data-sd-id="99">
+            <div class="flex items-center gap-2 text-red-400" data-sd-id="100">
+              <iconify-icon icon="lucide:hourglass" class="text-lg"></iconify-icon>
+              <span class="text-xs font-mono uppercase tracking-wider text-white/40" data-sd-id="101">Build Time</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="102">45 min</h3>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="103">average CI/CD pipeline</p>
+          </div>
+          
+          <div class="reveal flex flex-col gap-1.5 lg:border-l border-white/10 lg:pl-8" data-sd-id="104">
+            <div class="flex items-center gap-2 text-red-400" data-sd-id="105">
+              <iconify-icon icon="lucide:package-x" class="text-lg"></iconify-icon>
+              <span class="text-xs font-mono uppercase tracking-wider text-white/40" data-sd-id="106">Shared Libs</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="107">0</h3>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="108">no shared code infrastructure</p>
+          </div>
+          
+          <div class="reveal flex flex-col gap-1.5 lg:border-l border-white/10 lg:pl-8" data-sd-id="109">
+            <div class="flex items-center gap-2 text-red-400" data-sd-id="110">
+              <iconify-icon icon="lucide:trending-down" class="text-lg"></iconify-icon>
+              <span class="text-xs font-mono uppercase tracking-wider text-white/40" data-sd-id="111">Velocity</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="112">Stalled</h3>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="113">feature shipping delayed</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- SOLUTION APPROACH -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="114">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="115">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="116"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="117">The Solution</span>
+        </div>
+        
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-6 max-w-3xl" data-sd-id="118">
+          One monorepo. <span class="neon-text" data-sd-id="119">Unified velocity.</span>
+        </h2>
+        
+        <p class="text-lg text-white/60 max-w-3xl leading-relaxed mb-12" data-sd-id="120">
+          Migrated 15 fragmented repositories into a single Nx-powered monorepo with shared libraries, distributed caching, and automated publishing — fundamentally transforming how 50+ engineers build and ship software.
+        </p>
+
+        <!-- Solution Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-sd-id="121">
+          <div class="solution-card glass-panel rounded-2xl p-6" data-sd-id="122">
+            <div class="flex items-center gap-3 mb-4" data-sd-id="123">
+              <div class="w-10 h-10 rounded-lg bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="124">
+                <iconify-icon icon="lucide:git-pull-request" class="text-xl text-[#ffd700]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/40" data-sd-id="125">Phase 1</span>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2" data-sd-id="126">Migrated 15 repos</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="127">Consolidated all 15 repositories into a single Nx workspace with preserved git history and zero downtime.</p>
+          </div>
+          
+          <div class="solution-card glass-panel rounded-2xl p-6" data-sd-id="128">
+            <div class="flex items-center gap-3 mb-4" data-sd-id="129">
+              <div class="w-10 h-10 rounded-lg bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="130">
+                <iconify-icon icon="lucide:layers" class="text-xl text-[#00f0ff]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/40" data-sd-id="131">Phase 2</span>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2" data-sd-id="132">Shared lib structure</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="133">Extracted 12 shared libraries (UI, utils, API, hooks) with clear boundaries and @company/* naming convention.</p>
+          </div>
+          
+          <div class="solution-card glass-panel rounded-2xl p-6" data-sd-id="134">
+            <div class="flex items-center gap-3 mb-4" data-sd-id="135">
+              <div class="w-10 h-10 rounded-lg bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="136">
+                <iconify-icon icon="lucide:zap" class="text-xl text-[#ff007f]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/40" data-sd-id="137">Phase 3</span>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2" data-sd-id="138">Incremental builds</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="139">Implemented Nx task graph with caching — only rebuilds what changed. 87% cache hit rate on average.</p>
+          </div>
+          
+          <div class="solution-card glass-panel rounded-2xl p-6" data-sd-id="140">
+            <div class="flex items-center gap-3 mb-4" data-sd-id="141">
+              <div class="w-10 h-10 rounded-lg bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center" data-sd-id="142">
+                <iconify-icon icon="lucide:cloud" class="text-xl text-[#83f36e]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/40" data-sd-id="143">Phase 3</span>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2" data-sd-id="144">GitHub Actions + Nx Cloud</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="145">Distributed CI with Nx Cloud for remote caching. Parallel task execution across agent pool.</p>
+          </div>
+          
+          <div class="solution-card glass-panel rounded-2xl p-6" data-sd-id="146">
+            <div class="flex items-center gap-3 mb-4" data-sd-id="147">
+              <div class="w-10 h-10 rounded-lg bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="148">
+                <iconify-icon icon="lucide:tag" class="text-xl text-[#ffd700]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/40" data-sd-id="149">Phase 4</span>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2" data-sd-id="150">Semantic versioning</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="151">Automated version bumping and changelog generation via semantic-release. Zero manual versioning.</p>
+          </div>
+          
+          <div class="solution-card glass-panel rounded-2xl p-6" data-sd-id="152">
+            <div class="flex items-center gap-3 mb-4" data-sd-id="153">
+              <div class="w-10 h-10 rounded-lg bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="154">
+                <iconify-icon icon="lucide:book-open" class="text-xl text-[#00f0ff]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/40" data-sd-id="155">Phase 5</span>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2" data-sd-id="156">Onboarding playbook</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="157">Comprehensive docs, generators, and workshops. New engineers ship code on day one.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- ARCHITECTURE BREAKDOWN -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="158">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="159">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="160"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="161">Architecture</span>
+        </div>
+        
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-12 max-w-3xl" data-sd-id="162">
+          The technical <span class="neon-text" data-sd-id="163">breakdown</span>
+        </h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8" data-sd-id="164">
+          
+          <!-- Left: Architecture Structure -->
+          <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="165">
+            <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2" data-sd-id="166">
+              <iconify-icon icon="lucide:folder-tree" class="text-[#ffd700]"></iconify-icon>
+              Workspace Structure
+            </h3>
+            
+            <div class="font-mono text-xs space-y-2 text-white/60" data-sd-id="167">
+              <div class="flex items-center gap-2" data-sd-id="168">
+                <iconify-icon icon="lucide:folder" class="text-[#ffd700]"></iconify-icon>
+                <span class="text-white" data-sd-id="169">nx-workspace/</span>
+              </div>
+              <div class="pl-6 space-y-1.5" data-sd-id="170">
+                <div class="flex items-center gap-2" data-sd-id="171">
+                  <iconify-icon icon="lucide:folder" class="text-[#00f0ff]"></iconify-icon>
+                  <span data-sd-id="172">apps/ <span class="text-white/30" data-sd-id="173">(8 applications)</span></span>
+                </div>
+                <div class="pl-6 space-y-1 text-white/40" data-sd-id="174">
+                  <div data-sd-id="175">├─ web-app/</div>
+                  <div data-sd-id="176">├─ admin-dashboard/</div>
+                  <div data-sd-id="177">├─ marketing-site/</div>
+                  <div data-sd-id="178">├─ api-gateway/</div>
+                  <div data-sd-id="179">├─ auth-service/</div>
+                  <div data-sd-id="180">├─ billing-app/</div>
+                  <div data-sd-id="181">├─ analytics-app/</div>
+                  <div data-sd-id="182">└─ mobile-app/</div>
+                </div>
+                <div class="flex items-center gap-2 pt-2" data-sd-id="183">
+                  <iconify-icon icon="lucide:folder" class="text-[#ff007f]"></iconify-icon>
+                  <span data-sd-id="184">libs/ <span class="text-white/30" data-sd-id="185">(12 shared libraries)</span></span>
+                </div>
+                <div class="pl-6 space-y-1 text-white/40" data-sd-id="186">
+                  <div data-sd-id="187">├─ shared-ui/</div>
+                  <div data-sd-id="188">├─ shared-utils/</div>
+                  <div data-sd-id="189">├─ shared-api-client/</div>
+                  <div data-sd-id="190">├─ shared-hooks/</div>
+                  <div data-sd-id="191">├─ shared-types/</div>
+                  <div data-sd-id="192">├─ shared-config/</div>
+                  <div data-sd-id="193">└─ ... (6 more)</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-white/10" data-sd-id="194">
+              <div data-sd-id="195">
+                <div class="text-2xl font-bold text-[#00f0ff]" data-sd-id="196">8</div>
+                <div class="text-xs text-white/40 font-mono" data-sd-id="197">Applications</div>
+              </div>
+              <div data-sd-id="198">
+                <div class="text-2xl font-bold text-[#ff007f]" data-sd-id="199">12</div>
+                <div class="text-xs text-white/40 font-mono" data-sd-id="200">Shared Libraries</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right: Build Performance Visualization -->
+          <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="201">
+            <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2" data-sd-id="202">
+              <iconify-icon icon="lucide:bar-chart-3" class="text-[#ffd700]"></iconify-icon>
+              Build Time Reduction
+            </h3>
+            
+            <!-- Before/After Bar Chart -->
+            <div class="space-y-6" data-sd-id="203">
+              <div data-sd-id="204">
+                <div class="flex justify-between items-center mb-2" data-sd-id="205">
+                  <span class="text-sm text-white/60 font-mono" data-sd-id="206">Before (Polyrepo)</span>
+                  <span class="text-sm font-bold text-red-400" data-sd-id="207">45 min</span>
+                </div>
+                <div class="h-3 rounded-full bg-white/5 overflow-hidden" data-sd-id="208">
+                  <div class="h-full bg-gradient-to-r from-red-500 to-red-400 rounded-full bar-fill" style="width: 100%; animation-delay: 0.2s;" data-sd-id="209"></div>
+                </div>
+              </div>
+              
+              <div data-sd-id="210">
+                <div class="flex justify-between items-center mb-2" data-sd-id="211">
+                  <span class="text-sm text-white/60 font-mono" data-sd-id="212">After (Nx + Caching)</span>
+                  <span class="text-sm font-bold text-[#ffd700]" data-sd-id="213">18 min</span>
+                </div>
+                <div class="h-3 rounded-full bg-white/5 overflow-hidden" data-sd-id="214">
+                  <div class="h-full bg-gradient-to-r from-[#ffd700] to-[#00f0ff] rounded-full bar-fill" style="width: 40%; animation-delay: 0.5s;" data-sd-id="215"></div>
+                </div>
+              </div>
+              
+              <div data-sd-id="216">
+                <div class="flex justify-between items-center mb-2" data-sd-id="217">
+                  <span class="text-sm text-white/60 font-mono" data-sd-id="218">With Cache Hit</span>
+                  <span class="text-sm font-bold text-[#27c93f]" data-sd-id="219">18 sec</span>
+                </div>
+                <div class="h-3 rounded-full bg-white/5 overflow-hidden" data-sd-id="220">
+                  <div class="h-full bg-gradient-to-r from-[#27c93f] to-[#83f36e] rounded-full bar-fill" style="width: 3%; animation-delay: 0.8s;" data-sd-id="221"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-white/10" data-sd-id="222">
+              <div data-sd-id="223">
+                <div class="text-2xl font-bold text-[#ffd700]" data-sd-id="224">87%</div>
+                <div class="text-xs text-white/40 font-mono" data-sd-id="225">Avg cache hit rate</div>
+              </div>
+              <div data-sd-id="226">
+                <div class="text-2xl font-bold text-[#27c93f]" data-sd-id="227">60%</div>
+                <div class="text-xs text-white/40 font-mono" data-sd-id="228">Build time reduction</div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- IMPLEMENTATION TIMELINE -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="229">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="230">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="231"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="232">Implementation</span>
+        </div>
+        
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-12 max-w-3xl" data-sd-id="233">
+          6-month <span class="neon-text" data-sd-id="234">rollout timeline</span>
+        </h2>
+        
+        <div class="relative pl-8 md:pl-12" data-sd-id="235">
+          <!-- Timeline vertical line -->
+          <div class="absolute left-2 md:left-3 top-2 bottom-2 w-px timeline-line" data-sd-id="236"></div>
+          
+          <div class="space-y-8" data-sd-id="237">
+            
+            <!-- Phase 1 -->
+            <div class="relative scroll-reveal" data-sd-id="238">
+              <div class="absolute -left-[1.85rem] md:-left-[2.35rem] top-1.5 w-4 h-4 rounded-full bg-[#ffd700] border-2 border-black shadow-[0_0_15px_rgba(255,215,0,0.5)]" data-sd-id="239"></div>
+              <div class="glass-panel rounded-xl p-6 hover:bg-white/5 transition-colors" data-sd-id="240">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3" data-sd-id="241">
+                  <div class="flex items-center gap-3" data-sd-id="242">
+                    <span class="font-mono text-xs text-[#ffd700] bg-[#ffd700]/10 px-3 py-1 rounded-full border border-[#ffd700]/20" data-sd-id="243">Month 1-2</span>
+                    <h3 class="text-lg font-semibold text-white" data-sd-id="244">Phase 1: Foundation</h3>
+                  </div>
+                  <span class="text-xs text-white/40 font-mono" data-sd-id="245">Monorepo scaffolding + migrate 5 repos</span>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed" data-sd-id="246">Set up Nx workspace, configured ESLint/Prettier/TS, established @company/* naming convention. Migrated first 5 repositories with full git history preserved.</p>
+              </div>
+            </div>
+            
+            <!-- Phase 2 -->
+            <div class="relative scroll-reveal" data-sd-id="247">
+              <div class="absolute -left-[1.85rem] md:-left-[2.35rem] top-1.5 w-4 h-4 rounded-full bg-[#00f0ff] border-2 border-black shadow-[0_0_15px_rgba(0,240,255,0.5)]" data-sd-id="248"></div>
+              <div class="glass-panel rounded-xl p-6 hover:bg-white/5 transition-colors" data-sd-id="249">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3" data-sd-id="250">
+                  <div class="flex items-center gap-3" data-sd-id="251">
+                    <span class="font-mono text-xs text-[#00f0ff] bg-[#00f0ff]/10 px-3 py-1 rounded-full border border-[#00f0ff]/20" data-sd-id="252">Month 2-3</span>
+                    <h3 class="text-lg font-semibold text-white" data-sd-id="253">Phase 2: Migration</h3>
+                  </div>
+                  <span class="text-xs text-white/40 font-mono" data-sd-id="254">Migrate 10 repos + extract shared libs</span>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed" data-sd-id="255">Migrated remaining 10 repositories. Extracted 12 shared libraries from duplicated code across repos. Established library boundaries and dependency graph.</p>
+              </div>
+            </div>
+            
+            <!-- Phase 3 -->
+            <div class="relative scroll-reveal" data-sd-id="256">
+              <div class="absolute -left-[1.85rem] md:-left-[2.35rem] top-1.5 w-4 h-4 rounded-full bg-[#ff007f] border-2 border-black shadow-[0_0_15px_rgba(255,0,127,0.5)]" data-sd-id="257"></div>
+              <div class="glass-panel rounded-xl p-6 hover:bg-white/5 transition-colors" data-sd-id="258">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3" data-sd-id="259">
+                  <div class="flex items-center gap-3" data-sd-id="260">
+                    <span class="font-mono text-xs text-[#ff007f] bg-[#ff007f]/10 px-3 py-1 rounded-full border border-[#ff007f]/20" data-sd-id="261">Month 3-4</span>
+                    <h3 class="text-lg font-semibold text-white" data-sd-id="262">Phase 3: CI/CD</h3>
+                  </div>
+                  <span class="text-xs text-white/40 font-mono" data-sd-id="263">Nx Cloud + distributed caching</span>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed" data-sd-id="264">Configured GitHub Actions with Nx Cloud for distributed task execution. Set up remote caching, parallel agent pool, and automated npm publishing pipeline.</p>
+              </div>
+            </div>
+            
+            <!-- Phase 4 -->
+            <div class="relative scroll-reveal" data-sd-id="265">
+              <div class="absolute -left-[1.85rem] md:-left-[2.35rem] top-1.5 w-4 h-4 rounded-full bg-[#83f36e] border-2 border-black shadow-[0_0_15px_rgba(131,243,110,0.5)]" data-sd-id="266"></div>
+              <div class="glass-panel rounded-xl p-6 hover:bg-white/5 transition-colors" data-sd-id="267">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3" data-sd-id="268">
+                  <div class="flex items-center gap-3" data-sd-id="269">
+                    <span class="font-mono text-xs text-[#83f36e] bg-[#83f36e]/10 px-3 py-1 rounded-full border border-[#83f36e]/20" data-sd-id="270">Month 4-5</span>
+                    <h3 class="text-lg font-semibold text-white" data-sd-id="271">Phase 4: Adoption</h3>
+                  </div>
+                  <span class="text-xs text-white/40 font-mono" data-sd-id="272">Team training + governance</span>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed" data-sd-id="273">Ran workshops for all 15 teams. Created governance docs, contribution guidelines, and code generator templates. Established RFC process for architectural changes.</p>
+              </div>
+            </div>
+            
+            <!-- Phase 5 -->
+            <div class="relative scroll-reveal" data-sd-id="274">
+              <div class="absolute -left-[1.85rem] md:-left-[2.35rem] top-1.5 w-4 h-4 rounded-full bg-[#ffd700] border-2 border-black shadow-[0_0_15px_rgba(255,215,0,0.5)]" data-sd-id="275"></div>
+              <div class="glass-panel rounded-xl p-6 hover:bg-white/5 transition-colors" data-sd-id="276">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3" data-sd-id="277">
+                  <div class="flex items-center gap-3" data-sd-id="278">
+                    <span class="font-mono text-xs text-[#ffd700] bg-[#ffd700]/10 px-3 py-1 rounded-full border border-[#ffd700]/20" data-sd-id="279">Month 5-6</span>
+                    <h3 class="text-lg font-semibold text-white" data-sd-id="280">Phase 5: Optimization</h3>
+                  </div>
+                  <span class="text-xs text-white/40 font-mono" data-sd-id="281">Performance tuning + handoff</span>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed" data-sd-id="282">Fine-tuned cache strategies, optimized task graph, and improved cache hit rate from 40% → 87%. Created internal tooling team for ongoing maintenance. Full handoff complete.</p>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- IMPACT RESULTS -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="283">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="284">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="285"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="286">Impact</span>
+        </div>
+        
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-12 max-w-3xl" data-sd-id="287">
+          Results that <span class="neon-text" data-sd-id="288">moved metrics</span>
+        </h2>
+        
+        <!-- Hero Metric -->
+        <div class="glass-panel rounded-3xl p-8 md:p-12 mb-6 relative overflow-hidden" data-sd-id="289">
+          <div class="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-[#ffd700]/10 blur-3xl pointer-events-none" data-sd-id="290"></div>
+          <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-center" data-sd-id="291">
+            <div data-sd-id="292">
+              <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70 mb-3 block" data-sd-id="293">Headline Result</span>
+              <h3 class="text-6xl md:text-7xl font-bold tracking-tighter text-white mb-2" data-sd-id="294">60%</h3>
+              <p class="text-xl text-white/60" data-sd-id="295">CI/CD time reduction</p>
+            </div>
+            <div class="space-y-4" data-sd-id="296">
+              <div class="flex items-center gap-3" data-sd-id="297">
+                <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center" data-sd-id="298">
+                  <iconify-icon icon="lucide:clock" class="text-xl text-red-400"></iconify-icon>
+                </div>
+                <div data-sd-id="299">
+                  <div class="text-sm text-white/40 font-mono" data-sd-id="300">Before</div>
+                  <div class="text-lg font-semibold text-white" data-sd-id="301">45 minutes</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3" data-sd-id="302">
+                <div class="w-12 h-12 rounded-lg bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="303">
+                  <iconify-icon icon="lucide:zap" class="text-xl text-[#ffd700]"></iconify-icon>
+                </div>
+                <div data-sd-id="304">
+                  <div class="text-sm text-white/40 font-mono" data-sd-id="305">After</div>
+                  <div class="text-lg font-semibold text-white" data-sd-id="306">18 minutes</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Supporting Metrics Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" data-sd-id="307">
+          <div class="glass-panel rounded-2xl p-6 hover:border-[#ffd700]/20 transition-all" data-sd-id="308">
+            <div class="w-10 h-10 rounded-lg bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center mb-3" data-sd-id="309">
+              <iconify-icon icon="lucide:users" class="text-lg text-[#ffd700]"></iconify-icon>
+            </div>
+            <h3 class="text-3xl font-bold tracking-tight text-white" data-sd-id="310">100%</h3>
+            <p class="text-xs text-white/50 font-mono mt-1" data-sd-id="311">team adoption (15 teams)</p>
+          </div>
+          
+          <div class="glass-panel rounded-2xl p-6 hover:border-[#00f0ff]/20 transition-all" data-sd-id="312">
+            <div class="w-10 h-10 rounded-lg bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center mb-3" data-sd-id="313">
+              <iconify-icon icon="lucide:package" class="text-lg text-[#00f0ff]"></iconify-icon>
+            </div>
+            <h3 class="text-3xl font-bold tracking-tight text-white" data-sd-id="314">12</h3>
+            <p class="text-xs text-white/50 font-mono mt-1" data-sd-id="315">shared libraries created</p>
+          </div>
+          
+          <div class="glass-panel rounded-2xl p-6 hover:border-[#ff007f]/20 transition-all" data-sd-id="316">
+            <div class="w-10 h-10 rounded-lg bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center mb-3" data-sd-id="317">
+              <iconify-icon icon="lucide:terminal" class="text-lg text-[#ff007f]"></iconify-icon>
+            </div>
+            <h3 class="text-3xl font-bold tracking-tight text-white" data-sd-id="318">1 cmd</h3>
+            <p class="text-xs text-white/50 font-mono mt-1" data-sd-id="319">deploy to 8 services</p>
+          </div>
+          
+          <div class="glass-panel rounded-2xl p-6 hover:border-[#83f36e]/20 transition-all" data-sd-id="320">
+            <div class="w-10 h-10 rounded-lg bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center mb-3" data-sd-id="321">
+              <iconify-icon icon="lucide:git-pull-request" class="text-lg text-[#83f36e]"></iconify-icon>
+            </div>
+            <h3 class="text-3xl font-bold tracking-tight text-white" data-sd-id="322">2,400+</h3>
+            <p class="text-xs text-white/50 font-mono mt-1" data-sd-id="323">PRs merged in 6 months</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- BEFORE/AFTER COMPARISON -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="324">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="325">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="326"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="327">Comparison</span>
+        </div>
+        
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-12 max-w-3xl" data-sd-id="328">
+          Before vs <span class="neon-text" data-sd-id="329">After</span>
+        </h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" data-sd-id="330">
+          
+          <!-- Build Time Chart -->
+          <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="331">
+            <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2" data-sd-id="332">
+              <iconify-icon icon="lucide:timer" class="text-[#ffd700]"></iconify-icon>
+              Build Time
+            </h3>
+            <div class="space-y-4" data-sd-id="333">
+              <div data-sd-id="334">
+                <div class="flex justify-between mb-2" data-sd-id="335">
+                  <span class="text-sm text-white/50 font-mono" data-sd-id="336">Before</span>
+                  <span class="text-sm font-bold text-red-400" data-sd-id="337">45 min</span>
+                </div>
+                <div class="h-4 rounded-full bg-white/5 overflow-hidden" data-sd-id="338">
+                  <div class="h-full bg-gradient-to-r from-red-500 to-red-400 rounded-full bar-fill" style="width: 100%; animation-delay: 0.2s;" data-sd-id="339"></div>
+                </div>
+              </div>
+              <div data-sd-id="340">
+                <div class="flex justify-between mb-2" data-sd-id="341">
+                  <span class="text-sm text-white/50 font-mono" data-sd-id="342">After</span>
+                  <span class="text-sm font-bold text-[#ffd700]" data-sd-id="343">18 min</span>
+                </div>
+                <div class="h-4 rounded-full bg-white/5 overflow-hidden" data-sd-id="344">
+                  <div class="h-full bg-gradient-to-r from-[#ffd700] to-[#00f0ff] rounded-full bar-fill" style="width: 40%; animation-delay: 0.5s;" data-sd-id="345"></div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-6 pt-6 border-t border-white/10" data-sd-id="346">
+              <div class="text-3xl font-bold text-[#27c93f]" data-sd-id="347">-60%</div>
+              <div class="text-xs text-white/40 font-mono mt-1" data-sd-id="348">improvement</div>
+            </div>
+          </div>
+          
+          <!-- Release Frequency -->
+          <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="349">
+            <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2" data-sd-id="350">
+              <iconify-icon icon="lucide:rocket" class="text-[#00f0ff]"></iconify-icon>
+              Release Frequency
+            </h3>
+            <div class="space-y-4" data-sd-id="351">
+              <div data-sd-id="352">
+                <div class="flex justify-between mb-2" data-sd-id="353">
+                  <span class="text-sm text-white/50 font-mono" data-sd-id="354">Before</span>
+                  <span class="text-sm font-bold text-red-400" data-sd-id="355">1 / week</span>
+                </div>
+                <div class="h-4 rounded-full bg-white/5 overflow-hidden" data-sd-id="356">
+                  <div class="h-full bg-gradient-to-r from-red-500 to-red-400 rounded-full bar-fill" style="width: 15%; animation-delay: 0.3s;" data-sd-id="357"></div>
+                </div>
+              </div>
+              <div data-sd-id="358">
+                <div class="flex justify-between mb-2" data-sd-id="359">
+                  <span class="text-sm text-white/50 font-mono" data-sd-id="360">After</span>
+                  <span class="text-sm font-bold text-[#00f0ff]" data-sd-id="361">7 / week</span>
+                </div>
+                <div class="h-4 rounded-full bg-white/5 overflow-hidden" data-sd-id="362">
+                  <div class="h-full bg-gradient-to-r from-[#00f0ff] to-[#83f36e] rounded-full bar-fill" style="width: 100%; animation-delay: 0.6s;" data-sd-id="363"></div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-6 pt-6 border-t border-white/10" data-sd-id="364">
+              <div class="text-3xl font-bold text-[#27c93f]" data-sd-id="365">7x</div>
+              <div class="text-xs text-white/40 font-mono mt-1" data-sd-id="366">more frequent releases</div>
+            </div>
+          </div>
+          
+          <!-- Developer Hours Saved -->
+          <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="367">
+            <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2" data-sd-id="368">
+              <iconify-icon icon="lucide:clock" class="text-[#ff007f]"></iconify-icon>
+              Dev Hours Saved / Week
+            </h3>
+            <div class="space-y-4" data-sd-id="369">
+              <div data-sd-id="370">
+                <div class="flex justify-between mb-2" data-sd-id="371">
+                  <span class="text-sm text-white/50 font-mono" data-sd-id="372">Before</span>
+                  <span class="text-sm font-bold text-red-400" data-sd-id="373">8 hrs wasted</span>
+                </div>
+                <div class="h-4 rounded-full bg-white/5 overflow-hidden" data-sd-id="374">
+                  <div class="h-full bg-gradient-to-r from-red-500 to-red-400 rounded-full bar-fill" style="width: 100%; animation-delay: 0.4s;" data-sd-id="375"></div>
+                </div>
+              </div>
+              <div data-sd-id="376">
+                <div class="flex justify-between mb-2" data-sd-id="377">
+                  <span class="text-sm text-white/50 font-mono" data-sd-id="378">After</span>
+                  <span class="text-sm font-bold text-[#ff007f]" data-sd-id="379">1 hr</span>
+                </div>
+                <div class="h-4 rounded-full bg-white/5 overflow-hidden" data-sd-id="380">
+                  <div class="h-full bg-gradient-to-r from-[#ff007f] to-[#ffd700] rounded-full bar-fill" style="width: 12%; animation-delay: 0.7s;" data-sd-id="381"></div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-6 pt-6 border-t border-white/10" data-sd-id="382">
+              <div class="text-3xl font-bold text-[#27c93f]" data-sd-id="383">350 hrs</div>
+              <div class="text-xs text-white/40 font-mono mt-1" data-sd-id="384">saved / week across 50 engineers</div>
+            </div>
+          </div>
+          
+          <!-- Feature Velocity -->
+          <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="385">
+            <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2" data-sd-id="386">
+              <iconify-icon icon="lucide:gauge" class="text-[#83f36e]"></iconify-icon>
+              Feature Velocity
+            </h3>
+            <div class="space-y-4" data-sd-id="387">
+              <div data-sd-id="388">
+                <div class="flex justify-between mb-2" data-sd-id="389">
+                  <span class="text-sm text-white/50 font-mono" data-sd-id="390">Before</span>
+                  <span class="text-sm font-bold text-red-400" data-sd-id="391">3 / sprint</span>
+                </div>
+                <div class="h-4 rounded-full bg-white/5 overflow-hidden" data-sd-id="392">
+                  <div class="h-full bg-gradient-to-r from-red-500 to-red-400 rounded-full bar-fill" style="width: 30%; animation-delay: 0.5s;" data-sd-id="393"></div>
+                </div>
+              </div>
+              <div data-sd-id="394">
+                <div class="flex justify-between mb-2" data-sd-id="395">
+                  <span class="text-sm text-white/50 font-mono" data-sd-id="396">After</span>
+                  <span class="text-sm font-bold text-[#83f36e]" data-sd-id="397">8 / sprint</span>
+                </div>
+                <div class="h-4 rounded-full bg-white/5 overflow-hidden" data-sd-id="398">
+                  <div class="h-full bg-gradient-to-r from-[#83f36e] to-[#00f0ff] rounded-full bar-fill" style="width: 100%; animation-delay: 0.8s;" data-sd-id="399"></div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-6 pt-6 border-t border-white/10" data-sd-id="400">
+              <div class="text-3xl font-bold text-[#27c93f]" data-sd-id="401">2.6x</div>
+              <div class="text-xs text-white/40 font-mono mt-1" data-sd-id="402">faster feature shipping</div>
+            </div>
+          </div>
+          
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- TECH STACK -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="403">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="404">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="405"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="406">Tech Stack</span>
+        </div>
+        
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-12 max-w-3xl" data-sd-id="407">
+          Tools that <span class="neon-text" data-sd-id="408">powered the build</span>
+        </h2>
+        
+        <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="409">
+          <div class="flex flex-wrap gap-3" data-sd-id="410">
+            <span class="tech-badge glass-panel px-4 py-2.5 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="411">
+              <iconify-icon icon="lucide:layers" class="text-[#ffd700]"></iconify-icon>
+              <div class="flex flex-col" data-sd-id="412">
+                <span class="font-medium" data-sd-id="413">Nx 17+</span>
+                <span class="text-[10px] text-white/40 font-mono" data-sd-id="414">Monorepo orchestration</span>
+              </div>
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2.5 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="415">
+              <iconify-icon icon="lucide:file-code" class="text-[#3178c6]"></iconify-icon>
+              <div class="flex flex-col" data-sd-id="416">
+                <span class="font-medium" data-sd-id="417">TypeScript</span>
+                <span class="text-[10px] text-white/40 font-mono" data-sd-id="418">Type safety everywhere</span>
+              </div>
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2.5 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="419">
+              <iconify-icon icon="lucide:github" class="text-white"></iconify-icon>
+              <div class="flex flex-col" data-sd-id="420">
+                <span class="font-medium" data-sd-id="421">GitHub Actions</span>
+                <span class="text-[10px] text-white/40 font-mono" data-sd-id="422">CI/CD pipelines</span>
+              </div>
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2.5 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="423">
+              <iconify-icon icon="lucide:cloud" class="text-[#00f0ff]"></iconify-icon>
+              <div class="flex flex-col" data-sd-id="424">
+                <span class="font-medium" data-sd-id="425">Nx Cloud</span>
+                <span class="text-[10px] text-white/40 font-mono" data-sd-id="426">Distributed caching</span>
+              </div>
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2.5 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="427">
+              <iconify-icon icon="lucide:container" class="text-[#2496ed]"></iconify-icon>
+              <div class="flex flex-col" data-sd-id="428">
+                <span class="font-medium" data-sd-id="429">Docker</span>
+                <span class="text-[10px] text-white/40 font-mono" data-sd-id="430">Containerization</span>
+              </div>
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2.5 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="431">
+              <iconify-icon icon="lucide:tag" class="text-[#ff007f]"></iconify-icon>
+              <div class="flex flex-col" data-sd-id="432">
+                <span class="font-medium" data-sd-id="433">semantic-release</span>
+                <span class="text-[10px] text-white/40 font-mono" data-sd-id="434">Automated versioning</span>
+              </div>
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2.5 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="435">
+              <iconify-icon icon="lucide:package" class="text-[#cb3837]"></iconify-icon>
+              <div class="flex flex-col" data-sd-id="436">
+                <span class="font-medium" data-sd-id="437">npm workspaces</span>
+                <span class="text-[10px] text-white/40 font-mono" data-sd-id="438">Package management</span>
+              </div>
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- KEY DECISIONS & TRADE-OFFS -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="439">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="440">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="441"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="442">Decisions</span>
+        </div>
+        
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-12 max-w-3xl" data-sd-id="443">
+          Key decisions &amp; <span class="neon-text" data-sd-id="444">trade-offs</span>
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-sd-id="445">
+          
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="446">
+            <div class="flex items-center gap-3 mb-4" data-sd-id="447">
+              <div class="w-10 h-10 rounded-lg bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="448">
+                <iconify-icon icon="lucide:git-compare" class="text-xl text-[#ffd700]"></iconify-icon>
+              </div>
+              <h3 class="text-lg font-semibold text-white" data-sd-id="449">Monorepo vs Polyrepo</h3>
+            </div>
+            <p class="text-sm text-white/60 leading-relaxed mb-3" data-sd-id="450">
+              <span class="text-white font-medium" data-sd-id="451">Decision:</span> Monorepo for 15-team org.
+            </p>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="452">
+              <span class="text-white/70 font-medium" data-sd-id="453">Rationale:</span> Code sharing, unified tooling, and atomic commits outweighed the complexity. At 30+ engineers, polyrepo coordination costs exceed monorepo overhead.
+            </p>
+          </div>
+          
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="454">
+            <div class="flex items-center gap-3 mb-4" data-sd-id="455">
+              <div class="w-10 h-10 rounded-lg bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="456">
+                <iconify-icon icon="lucide:naming" class="text-xl text-[#00f0ff]"></iconify-icon>
+              </div>
+              <h3 class="text-lg font-semibold text-white" data-sd-id="457">Shared libs naming</h3>
+            </div>
+            <p class="text-sm text-white/60 leading-relaxed mb-3" data-sd-id="458">
+              <span class="text-white font-medium" data-sd-id="459">Decision:</span> @company/* scoped packages.
+            </p>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="460">
+              <span class="text-white/70 font-medium" data-sd-id="461">Rationale:</span> Scoped naming prevents conflicts, signals ownership, and enables clean imports across all 8 apps. Convention over configuration.
+            </p>
+          </div>
+          
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="462">
+            <div class="flex items-center gap-3 mb-4" data-sd-id="463">
+              <div class="w-10 h-10 rounded-lg bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="464">
+                <iconify-icon icon="lucide:workflow" class="text-xl text-[#ff007f]"></iconify-icon>
+              </div>
+              <h3 class="text-lg font-semibold text-white" data-sd-id="465">CI strategy</h3>
+            </div>
+            <p class="text-sm text-white/60 leading-relaxed mb-3" data-sd-id="466">
+              <span class="text-white font-medium" data-sd-id="467">Decision:</span> Distributed builds via Nx Cloud.
+            </p>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="468">
+              <span class="text-white/70 font-medium" data-sd-id="469">Rationale:</span> Central orchestration couldn't handle 8 apps + 12 libs. Distributed agents with remote caching cut build times by 60% and scaled with the team.
+            </p>
+          </div>
+          
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="470">
+            <div class="flex items-center gap-3 mb-4" data-sd-id="471">
+              <div class="w-10 h-10 rounded-lg bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center" data-sd-id="472">
+                <iconify-icon icon="lucide:git-branch" class="text-xl text-[#83f36e]"></iconify-icon>
+              </div>
+              <h3 class="text-lg font-semibold text-white" data-sd-id="473">Versioning approach</h3>
+            </div>
+            <p class="text-sm text-white/60 leading-relaxed mb-3" data-sd-id="474">
+              <span class="text-white font-medium" data-sd-id="475">Decision:</span> Automated semantic versioning.
+            </p>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="476">
+              <span class="text-white/70 font-medium" data-sd-id="477">Rationale:</span> Manual versioning across 12 libraries was error-prone and slow. semantic-release + conventional commits eliminated human error and generated changelogs automatically.
+            </p>
+          </div>
+          
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- LESSONS LEARNED -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="478">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="479">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="480"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="481">Lessons</span>
+        </div>
+        
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-12 max-w-3xl" data-sd-id="482">
+          Hard-won <span class="neon-text" data-sd-id="483">lessons</span>
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-sd-id="484">
+          
+          <div class="glass-panel rounded-2xl p-8 relative overflow-hidden" data-sd-id="485">
+            <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#ffd700] to-transparent" data-sd-id="486"></div>
+            <iconify-icon icon="lucide:quote" class="text-3xl text-[#ffd700]/30 mb-4"></iconify-icon>
+            <p class="text-lg text-white/80 leading-relaxed mb-4" data-sd-id="487">
+              "Monorepos enable velocity at 30+ engineer scale. The coordination cost of polyrepos grows exponentially with team size."
+            </p>
+            <div class="flex items-center gap-3" data-sd-id="488">
+              <div class="w-8 h-8 rounded-full bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="489">
+                <span class="text-xs font-bold text-[#ffd700]" data-sd-id="490">RT</span>
+              </div>
+              <span class="text-sm text-white/50 font-mono" data-sd-id="491">— On scaling architecture</span>
+            </div>
+          </div>
+          
+          <div class="glass-panel rounded-2xl p-8 relative overflow-hidden" data-sd-id="492">
+            <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#00f0ff] to-transparent" data-sd-id="493"></div>
+            <iconify-icon icon="lucide:quote" class="text-3xl text-[#00f0ff]/30 mb-4"></iconify-icon>
+            <p class="text-lg text-white/80 leading-relaxed mb-4" data-sd-id="494">
+              "Caching strategy is 80% of performance gains. We spent more time on cache optimization than on the migration itself — and it paid off."
+            </p>
+            <div class="flex items-center gap-3" data-sd-id="495">
+              <div class="w-8 h-8 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="496">
+                <span class="text-xs font-bold text-[#00f0ff]" data-sd-id="497">RT</span>
+              </div>
+              <span class="text-sm text-white/50 font-mono" data-sd-id="498">— On CI/CD optimization</span>
+            </div>
+          </div>
+          
+          <div class="glass-panel rounded-2xl p-8 relative overflow-hidden" data-sd-id="499">
+            <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#ff007f] to-transparent" data-sd-id="500"></div>
+            <iconify-icon icon="lucide:quote" class="text-3xl text-[#ff007f]/30 mb-4"></iconify-icon>
+            <p class="text-lg text-white/80 leading-relaxed mb-4" data-sd-id="501">
+              "Team alignment on conventions saves months of dev time. Workshops and RFCs were more impactful than any tool we adopted."
+            </p>
+            <div class="flex items-center gap-3" data-sd-id="502">
+              <div class="w-8 h-8 rounded-full bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="503">
+                <span class="text-xs font-bold text-[#ff007f]" data-sd-id="504">RT</span>
+              </div>
+              <span class="text-sm text-white/50 font-mono" data-sd-id="505">— On team adoption</span>
+            </div>
+          </div>
+          
+          <div class="glass-panel rounded-2xl p-8 relative overflow-hidden" data-sd-id="506">
+            <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#83f36e] to-transparent" data-sd-id="507"></div>
+            <iconify-icon icon="lucide:quote" class="text-3xl text-[#83f36e]/30 mb-4"></iconify-icon>
+            <p class="text-lg text-white/80 leading-relaxed mb-4" data-sd-id="508">
+              "Documentation and governance &gt; tools. The teams that thrived were the ones with clear RFCs and contribution guides, not the fanciest configs."
+            </p>
+            <div class="flex items-center gap-3" data-sd-id="509">
+              <div class="w-8 h-8 rounded-full bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center" data-sd-id="510">
+                <span class="text-xs font-bold text-[#83f36e]" data-sd-id="511">RT</span>
+              </div>
+              <span class="text-sm text-white/50 font-mono" data-sd-id="512">— On long-term success</span>
+            </div>
+          </div>
+          
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- DEVELOPER VELOCITY METRICS -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="513">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="514">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="515"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="516">Velocity</span>
+        </div>
+        
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-12 max-w-3xl" data-sd-id="517">
+          Developer velocity <span class="neon-text" data-sd-id="518">transformed</span>
+        </h2>
+        
+        <div class="glass-panel rounded-2xl p-6 md:p-10" data-sd-id="519">
+          <!-- Velocity Chart Visualization -->
+          <div class="mb-10" data-sd-id="520">
+            <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2" data-sd-id="521">
+              <iconify-icon icon="lucide:trending-up" class="text-[#ffd700]"></iconify-icon>
+              Features Shipped Per Sprint (6-month trend)
+            </h3>
+            
+            <!-- Simple bar chart visualization -->
+            <div class="flex items-end justify-between h-40 gap-2 mb-4" data-sd-id="522">
+              <div class="flex-1 flex flex-col items-center gap-2" data-sd-id="523">
+                <div class="w-full rounded-t-lg bg-red-500/30 border border-red-500/20" style="height: 30%;" data-sd-id="524"></div>
+                <span class="text-[10px] text-white/40 font-mono" data-sd-id="525">M1</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-2" data-sd-id="526">
+                <div class="w-full rounded-t-lg bg-red-500/30 border border-red-500/20" style="height: 35%;" data-sd-id="527"></div>
+                <span class="text-[10px] text-white/40 font-mono" data-sd-id="528">M2</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-2" data-sd-id="529">
+                <div class="w-full rounded-t-lg bg-[#ffd700]/30 border border-[#ffd700]/20" style="height: 45%;" data-sd-id="530"></div>
+                <span class="text-[10px] text-white/40 font-mono" data-sd-id="531">M3</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-2" data-sd-id="532">
+                <div class="w-full rounded-t-lg bg-[#ffd700]/40 border border-[#ffd700]/20" style="height: 60%;" data-sd-id="533"></div>
+                <span class="text-[10px] text-white/40 font-mono" data-sd-id="534">M4</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-2" data-sd-id="535">
+                <div class="w-full rounded-t-lg bg-[#00f0ff]/50 border border-[#00f0ff]/20" style="height: 75%;" data-sd-id="536"></div>
+                <span class="text-[10px] text-white/40 font-mono" data-sd-id="537">M5</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-2" data-sd-id="538">
+                <div class="w-full rounded-t-lg bg-gradient-to-t from-[#83f36e] to-[#00f0ff] border border-[#83f36e]/30" style="height: 95%;" data-sd-id="539"></div>
+                <span class="text-[10px] text-white/40 font-mono" data-sd-id="540">M6</span>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-4 border-t border-white/10" data-sd-id="541">
+              <div data-sd-id="542">
+                <div class="text-2xl font-bold text-white" data-sd-id="543">3 → 8</div>
+                <div class="text-xs text-white/40 font-mono" data-sd-id="544">features per sprint</div>
+              </div>
+              <div class="text-right" data-sd-id="545">
+                <div class="text-2xl font-bold text-[#27c93f]" data-sd-id="546">+166%</div>
+                <div class="text-xs text-white/40 font-mono" data-sd-id="547">velocity improvement</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Velocity Metrics Grid -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-white/10" data-sd-id="548">
+            <div data-sd-id="549">
+              <div class="flex items-center gap-2 text-white/40 mb-2" data-sd-id="550">
+                <iconify-icon icon="lucide:git-commit" class="text-sm"></iconify-icon>
+                <span class="text-[10px] font-mono uppercase tracking-wider" data-sd-id="551">Release Cycle</span>
+              </div>
+              <div class="text-xl font-bold text-white" data-sd-id="552">3 days → 2 hrs</div>
+            </div>
+            <div data-sd-id="553">
+              <div class="flex items-center gap-2 text-white/40 mb-2" data-sd-id="554">
+                <iconify-icon icon="lucide:hand" class="text-sm"></iconify-icon>
+                <span class="text-[10px] font-mono uppercase tracking-wider" data-sd-id="555">Manual Steps</span>
+              </div>
+              <div class="text-xl font-bold text-white" data-sd-id="556">12 → 1</div>
+            </div>
+            <div data-sd-id="557">
+              <div class="flex items-center gap-2 text-white/40 mb-2" data-sd-id="558">
+                <iconify-icon icon="lucide:smile" class="text-sm"></iconify-icon>
+                <span class="text-[10px] font-mono uppercase tracking-wider" data-sd-id="559">Dev Satisfaction</span>
+              </div>
+              <div class="text-xl font-bold text-white" data-sd-id="560">6.2 → 9.1</div>
+            </div>
+            <div data-sd-id="561">
+              <div class="flex items-center gap-2 text-white/40 mb-2" data-sd-id="562">
+                <iconify-icon icon="lucide:users" class="text-sm"></iconify-icon>
+                <span class="text-[10px] font-mono uppercase tracking-wider" data-sd-id="563">Onboarding</span>
+              </div>
+              <div class="text-xl font-bold text-white" data-sd-id="564">2 wks → 2 days</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- RELATED PROJECTS -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="565">
+        <div class="flex items-center justify-between mb-6" data-sd-id="566">
+          <div data-sd-id="567">
+            <div class="flex items-center gap-3 mb-2" data-sd-id="568">
+              <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="569"></div>
+              <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="570">Related</span>
+            </div>
+            <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-white" data-sd-id="571">Explore more work</h2>
+          </div>
+          <a href="https://p.superdesign.dev/draft/36b48549-7be9-418d-b0c1-af81de96c79f" id="cta-view-all-related" class="text-sm text-white/50 hover:text-white transition-colors flex items-center gap-1" data-sd-id="572">
+            View all
+            <iconify-icon icon="lucide:arrow-right" class="text-xs"></iconify-icon>
+          </a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" data-sd-id="573">
+          
+          <a href="https://p.superdesign.dev/draft/74e6a149-e825-4c2d-b523-bfec727859bf" id="related-1" class="related-card glass-panel rounded-2xl p-6 space-y-4 block" data-sd-id="574">
+            <div class="flex items-center justify-between" data-sd-id="575">
+              <div class="w-10 h-10 rounded-lg bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="576">
+                <iconify-icon icon="lucide:palette" class="text-xl text-[#00f0ff]"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="related-arrow text-white/30 transition-all duration-300"></iconify-icon>
+            </div>
+            <div data-sd-id="577">
+              <h3 class="text-lg font-bold text-white" data-sd-id="578">Design System at Scale</h3>
+              <p class="text-sm text-white/50 mt-1" data-sd-id="579">200+ component React design system with Storybook, Chromatic, and automated visual regression.</p>
+            </div>
+            <div class="flex gap-2 font-mono text-[10px] text-white/40" data-sd-id="580">
+              <span data-sd-id="581">React</span> · <span data-sd-id="582">Storybook</span> · <span data-sd-id="583">Tailwind</span>
+            </div>
+          </a>
+          
+          <a href="https://p.superdesign.dev/draft/5d7e7e5e-bc4c-4493-894c-bac01a3d0657" id="related-2" class="related-card glass-panel rounded-2xl p-6 space-y-4 block" data-sd-id="584">
+            <div class="flex items-center justify-between" data-sd-id="585">
+              <div class="w-10 h-10 rounded-lg bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="586">
+                <iconify-icon icon="lucide:code-2" class="text-xl text-[#ff007f]"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="related-arrow text-white/30 transition-all duration-300"></iconify-icon>
+            </div>
+            <div data-sd-id="587">
+              <h3 class="text-lg font-bold text-white" data-sd-id="588">React Architecture</h3>
+              <p class="text-sm text-white/50 mt-1" data-sd-id="589">Enterprise React platform with server components, streaming, and performance-first patterns.</p>
+            </div>
+            <div class="flex gap-2 font-mono text-[10px] text-white/40" data-sd-id="590">
+              <span data-sd-id="591">React 18</span> · <span data-sd-id="592">Next.js</span> · <span data-sd-id="593">RSC</span>
+            </div>
+          </a>
+          
+          <a href="#case-study-team-leadership" id="related-3" class="related-card glass-panel rounded-2xl p-6 space-y-4 block" data-sd-id="594">
+            <div class="flex items-center justify-between" data-sd-id="595">
+              <div class="w-10 h-10 rounded-lg bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="596">
+                <iconify-icon icon="lucide:users" class="text-xl text-[#ffd700]"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="related-arrow text-white/30 transition-all duration-300"></iconify-icon>
+            </div>
+            <div data-sd-id="597">
+              <h3 class="text-lg font-bold text-white" data-sd-id="598">Team Leadership</h3>
+              <p class="text-sm text-white/50 mt-1" data-sd-id="599">Leading and mentoring teams of 8+ engineers. Establishing processes, RFCs, and engineering culture.</p>
+            </div>
+            <div class="flex gap-2 font-mono text-[10px] text-white/40" data-sd-id="600">
+              <span data-sd-id="601">Mentoring</span> · <span data-sd-id="602">RFCs</span> · <span data-sd-id="603">Process</span>
+            </div>
+          </a>
+          
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- FINAL CTA -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-8 scroll-reveal" data-sd-id="604">
+        <div class="glass-panel rounded-3xl p-8 md:p-12 lg:p-16 relative overflow-hidden" data-sd-id="605">
+          <!-- Decorative glows -->
+          <div class="absolute -top-40 -right-20 w-80 h-80 rounded-full bg-[#ffd700]/5 blur-3xl pointer-events-none" data-sd-id="606"></div>
+          <div class="absolute -bottom-40 -left-20 w-80 h-80 rounded-full bg-[#00f0ff]/5 blur-3xl pointer-events-none" data-sd-id="607"></div>
+          
+          <div class="relative max-w-3xl mx-auto text-center space-y-6" data-sd-id="608">
+            <div class="flex justify-center" data-sd-id="609">
+              <div class="glass-panel rounded-full px-4 py-1.5 border border-[#ffd700]/20 bg-[#ffd700]/5 flex items-center gap-2" data-sd-id="610">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#ffd700] animate-pulse" data-sd-id="611"></div>
+                <span class="font-mono text-[10px] uppercase tracking-widest text-[#ffd700]" data-sd-id="612">Available for consulting</span>
+              </div>
+            </div>
+            
+            <h2 class="text-4xl md:text-6xl font-bold tracking-tighter text-white" data-sd-id="613">
+              Scaling monorepo <span class="neon-text" data-sd-id="614">challenges?</span>
+            </h2>
+            
+            <p class="text-lg text-white/60 max-w-xl mx-auto leading-relaxed" data-sd-id="615">
+              I help engineering teams architect, migrate, and optimize monorepos for scale. From initial scaffolding to team-wide adoption — let's talk about your infrastructure.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4" data-sd-id="616">
+              <a href="https://p.superdesign.dev/draft/c906d6dd-0318-4f57-9ecd-0bd1b1280b06" id="cta-book-consulting" class="w-full sm:w-auto px-6 py-3 bg-[#ffd700] hover:bg-[#ffe54c] text-black font-semibold rounded-full flex items-center justify-center gap-2 transition-all duration-500 hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)]" data-sd-id="617">
+                Book architecture consulting
+                <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon>
+              </a>
+              <a href="https://p.superdesign.dev/draft/36b48549-7be9-418d-b0c1-af81de96c79f" id="cta-all-studies" class="w-full sm:w-auto px-6 py-3 glass-panel hover:bg-white/10 text-white font-medium rounded-full transition-all duration-500 hover:scale-105" data-sd-id="618">
+                View all case studies
+              </a>
+            </div>
+            
+            <p class="text-sm text-white/30 font-mono pt-4" data-sd-id="619">
+              30-minute discovery call · No obligation · Remote-friendly
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer Ticker -->
+    <div class="pointer-events-auto" style="view-transition-name: footer-ticker;" data-sd-id="620">
+      <!-- component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+<div v-scope="{ ...{&quot;showTicker&quot;:true}, $emit() {} }">
+<div v-if="showTicker" class="relative z-10 w-full overflow-hidden border-t border-white/5 bg-black/50 backdrop-blur-sm py-4 pointer-events-none"><style>@keyframes sd-ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } .sd-animate-ticker { animation: sd-ticker-scroll 30s linear infinite; }</style><div class="flex whitespace-nowrap sd-animate-ticker font-mono text-xs text-white/30 tracking-widest uppercase"><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div></div></div>
+</div>
+<!-- /component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+    </div>
+
+  </div>
+
+  <!-- Scroll reveal script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+      
+      setTimeout(() => {
+        document.querySelectorAll('.scroll-reveal').forEach((el) => observer.observe(el));
+      }, 200);
+    });
+  </script>
+
+</body></html>

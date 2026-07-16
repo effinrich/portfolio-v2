@@ -1,0 +1,521 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rich Tillman — Contact</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <script src="https://unpkg.com/petite-vue" defer="" init=""></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <script type="module">
+    import TubesCursor from 'https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const canvas = document.getElementById('bg-canvas');
+        if (!canvas) return;
+        
+        try {
+          const app = TubesCursor(canvas, {
+            tubes: {
+              colors: ['#00f0ff', '#ff007f', '#ffd700'],
+              lights: {
+                intensity: 150,
+                colors: ['#83f36e', '#00f0ff', '#ff008a', '#ffd700']
+              }
+            }
+          });
+          
+          const randomColors = (count) => {
+            return new Array(count)
+              .fill(0)
+              .map(() => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'));
+          };
+
+          const container = document.getElementById('bg-container');
+          if (container) {
+            container.addEventListener('click', (e) => {
+              if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input') || e.target.closest('textarea') || e.target.closest('select') || e.target.closest('label')) return;
+              const colors = randomColors(3);
+              const lightsColors = randomColors(4);
+              app.tubes.setColors(colors);
+              app.tubes.setLightsColors(lightsColors);
+            });
+          }
+        } catch (err) {
+          console.error('Failed to init tubes:', err);
+        }
+      }, 100);
+    });
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-panel {
+      background: rgba(20, 20, 20, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    }
+    .glass-input {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+    .glass-input:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .glass-input:focus {
+      outline: none;
+      border-color: rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1), 0 0 20px rgba(255, 215, 0, 0.08);
+      background: rgba(0,0,0, 0.5);
+    }
+    .glass-input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+    .neon-text {
+      background: linear-gradient(90deg, #00f0ff, #ffd700, #ff007f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shine 5s linear infinite;
+    }
+    @keyframes shine {
+      to { background-position: 200% center; }
+    }
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .form-field {
+      animation: fade-in-up 0.6s ease-out backwards;
+    }
+    .form-field:nth-child(1) { animation-delay: 0.1s; }
+    .form-field:nth-child(2) { animation-delay: 0.2s; }
+    .form-field:nth-child(3) { animation-delay: 0.3s; }
+    .form-field:nth-child(4) { animation-delay: 0.4s; }
+    .form-field:nth-child(5) { animation-delay: 0.5s; }
+    .contact-info-card {
+      animation: fade-in-up 0.6s ease-out backwards;
+      animation-delay: 0.6s;
+    }
+    .vertical-text {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+    }
+    select.glass-input option {
+      background: #0a0a0a;
+      color: #ffffff;
+    }
+    select.glass-input:focus option:hover {
+      background: rgba(255, 215, 0, 0.1);
+    }
+    input:invalid:not(:placeholder-shown) {
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+    input:invalid:not(:placeholder-shown):focus {
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+    @keyframes success-slide-down {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes success-slide-up {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-12px); }
+    }
+    .success-banner {
+      animation: success-slide-down 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+    .success-banner.hide {
+      animation: success-slide-up 0.3s ease-in both;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .neon-text { animation: none; }
+      .form-field, .contact-info-card { animation: none; }
+      .success-banner { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background -->
+  <div class="fixed inset-0 z-0" data-sd-id="1">
+    <!-- component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+<div v-scope="{ ...{&quot;canvasOpacity&quot;:0.9,&quot;showGrid&quot;:true,&quot;showGradient&quot;:true}, $emit() {} }">
+<div id="bg-container" class="relative min-h-screen w-full overflow-hidden bg-black flex flex-col cursor-crosshair" @click="$emit('backgroundClick', $event)"><canvas id="bg-canvas" class="absolute inset-0 w-full h-full block z-0" :style="{ opacity: canvasOpacity, touchAction: 'none' }"></canvas><div v-if="showGrid" class="absolute inset-0 pointer-events-none z-0" style="background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div><div v-if="showGradient" class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-0 pointer-events-none"></div></div>
+</div>
+<!-- /component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+  </div>
+
+  <!-- Main Wrapper -->
+  <div class="relative min-h-screen w-full flex flex-col cursor-crosshair z-10 pointer-events-none" data-sd-id="2">
+    
+    <!-- Navigation -->
+    <div class="pointer-events-auto" data-sd-id="3">
+      <!-- component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+<div v-scope="{ ...{&quot;activeItem&quot;:&quot;work&quot;,&quot;isAvailable&quot;:true,&quot;workHref&quot;:&quot;#work&quot;,&quot;projectsHref&quot;:&quot;#projects&quot;,&quot;stackHref&quot;:&quot;#stack&quot;,&quot;contactHref&quot;:&quot;#contact&quot;}, $emit() {} }">
+<nav class="fixed top-0 left-0 w-full z-40 border-x-0 border-t-0 border-b border-white/10 px-6 py-4" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-8 h-8 rounded bg-zinc-900 border border-white/20 flex items-center justify-center font-mono text-sm font-bold text-[#ffd700]">
+        R
+      </div>
+      <span class="font-medium tracking-tight text-white/90 hidden sm:inline-block">
+        Rich Tillman <span class="text-white/40 font-normal">/ Principal Frontend Engineer</span>
+      </span>
+    </div>
+    
+    <div class="hidden md:flex items-center gap-12 text-sm font-medium">
+      <a :href="workHref" :class="activeItem === 'work' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Work</a>
+      <a :href="projectsHref" :class="activeItem === 'projects' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Projects</a>
+      <a :href="stackHref" :class="activeItem === 'stack' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Stack</a>
+      <a :href="contactHref" :class="activeItem === 'contact' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Contact</a>
+    </div>
+
+    <div v-if="isAvailable" class="flex items-center gap-3 rounded-full px-3 py-1.5 border border-[#ffd700]/30 bg-[#ffd700]/5" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px);">
+      <div class="w-2 h-2 rounded-full bg-[#ffd700] animate-pulse"></div>
+      <span class="text-xs font-medium text-[#ffd700]">Available</span>
+    </div>
+  </div>
+</nav>
+</div>
+<!-- /component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+    </div>
+
+    <!-- Main Content -->
+    <main class="relative z-10 flex-1 flex flex-col justify-center max-w-5xl mx-auto w-full px-6 pt-32 pb-16" data-sd-id="4">
+      
+      <!-- Page Header -->
+      <header class="space-y-6 mb-12 pointer-events-auto" data-sd-id="5">
+        <div class="flex flex-wrap items-center gap-3 font-mono text-xs" data-sd-id="6">
+          <span class="glass-panel px-3 py-1.5 rounded-full flex items-center gap-2 text-white/70" data-sd-id="7">
+            <div class="w-1.5 h-1.5 rounded-full bg-[#ffd700]" data-sd-id="8"></div> Available for projects
+          </span>
+          <span class="glass-panel px-3 py-1.5 rounded-full text-white/70" data-sd-id="9">
+            Avg. response time: 24h
+          </span>
+        </div>
+        
+        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.05] text-white drop-shadow-2xl" data-sd-id="10">
+          Let's build <span class="neon-text" data-sd-id="11">something</span> great.
+        </h1>
+        
+        <p class="text-lg md:text-xl text-white/60 max-w-2xl leading-relaxed" data-sd-id="12">
+          Whether you need a design system from scratch, a React platform at scale, or a 0→1 MVP — I'd love to hear about it.
+        </p>
+      </header>
+
+      <!-- Contact Grid: Form + Info -->
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 pointer-events-auto" data-sd-id="13">
+        
+        <!-- Contact Form -->
+        <section class="lg:col-span-3" data-sd-id="14">
+          <!-- Success Banner (hidden by default) -->
+          <div id="success-banner" class="hidden glass-panel rounded-2xl p-6 mb-6 border-[#22c55e]/30 bg-[#22c55e]/5" data-sd-id="14a">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-[#22c55e]/20 border border-[#22c55e]/30 flex items-center justify-center flex-shrink-0">
+                <iconify-icon icon="lucide:check-circle-2" class="text-2xl text-[#22c55e]" aria-hidden="true"></iconify-icon>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-lg font-semibold text-white mb-1">Message sent successfully!</h3>
+                <p class="text-sm text-white/60">Thanks for reaching out. I'll get back to you within 24 hours. Check your inbox for a confirmation email.</p>
+              </div>
+              <button type="button" id="success-dismiss" class="text-white/40 hover:text-white transition-colors flex-shrink-0" aria-label="Dismiss">
+                <iconify-icon icon="lucide:x" class="text-lg"></iconify-icon>
+              </button>
+            </div>
+          </div>
+
+          <form id="contact-form" class="glass-panel rounded-2xl p-6 md:p-10 space-y-6" novalidate="" data-sd-id="15">
+            
+            <!-- Field: Name -->
+            <div class="form-field" data-sd-id="16">
+              <label for="name" class="block text-sm font-medium text-white/80 mb-2" data-sd-id="17">
+                Name <span class="text-[#ffd700]" data-sd-id="18">*</span>
+              </label>
+              <input type="text" id="name" name="name" required="" placeholder="Jane Doe" class="glass-input w-full rounded-xl px-4 py-3 text-white text-sm font-normal" aria-describedby="name-error" data-sd-id="19">
+              <p id="name-error" class="text-xs text-red-400 mt-1.5 hidden font-mono" data-sd-id="20">Please enter your name.</p>
+            </div>
+
+            <!-- Field: Email -->
+            <div class="form-field" data-sd-id="21">
+              <label for="email" class="block text-sm font-medium text-white/80 mb-2" data-sd-id="22">
+                Email <span class="text-[#ffd700]" data-sd-id="23">*</span>
+              </label>
+              <input type="email" id="email" name="email" required="" placeholder="jane@company.com" class="glass-input w-full rounded-xl px-4 py-3 text-white text-sm font-normal" aria-describedby="email-error" data-sd-id="24">
+              <p id="email-error" class="text-xs text-red-400 mt-1.5 hidden font-mono" data-sd-id="25">Please enter a valid email address.</p>
+            </div>
+
+            <!-- Field: Project Type -->
+            <div class="form-field" data-sd-id="26">
+              <label for="project-type" class="block text-sm font-medium text-white/80 mb-2" data-sd-id="27">
+                Project Type <span class="text-[#ffd700]" data-sd-id="28">*</span>
+              </label>
+              <div class="relative" data-sd-id="29">
+                <select id="project-type" name="project-type" required="" class="glass-input w-full rounded-xl px-4 py-3 pr-10 text-white text-sm font-normal appearance-none cursor-pointer" aria-describedby="project-error" data-sd-id="30">
+                  <option value="" disabled="" selected="" data-sd-id="31">Select a project type…</option>
+                  <option value="design-system" data-sd-id="32">Design System</option>
+                  <option value="web-app" data-sd-id="33">Web App</option>
+                  <option value="architecture" data-sd-id="34">Architecture</option>
+                  <option value="other" data-sd-id="35">Other</option>
+                </select>
+                <iconify-icon icon="lucide:chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none text-sm" aria-hidden="true"></iconify-icon>
+              </div>
+              <p id="project-error" class="text-xs text-red-400 mt-1.5 hidden font-mono" data-sd-id="36">Please select a project type.</p>
+            </div>
+
+            <!-- Field: Message -->
+            <div class="form-field" data-sd-id="37">
+              <label for="message" class="block text-sm font-medium text-white/80 mb-2" data-sd-id="38">
+                Message <span class="text-[#ffd700]" data-sd-id="39">*</span>
+              </label>
+              <textarea id="message" name="message" required="" rows="5" placeholder="Tell me about your project, timeline, and what you're looking to achieve…" class="glass-input w-full rounded-xl px-4 py-3 text-white text-sm font-normal resize-none" aria-describedby="message-error" data-sd-id="40"></textarea>
+              <p id="message-error" class="text-xs text-red-400 mt-1.5 hidden font-mono" data-sd-id="41">Please enter a message.</p>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-field pt-2" data-sd-id="42">
+              <button type="submit" id="contact-submit-btn" aria-label="Send message" class="w-full sm:w-auto px-8 py-3.5 bg-[#ffd700] hover:bg-[#ffe54c] text-black font-semibold rounded-full flex items-center justify-center gap-2 transition-all duration-500 hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffd700] cursor-pointer" data-sd-id="43">
+                Send message
+                <iconify-icon icon="lucide:send" aria-hidden="true"></iconify-icon>
+              </button>
+              <p class="text-xs text-white/30 mt-3 font-mono" data-sd-id="44">By submitting, you agree to be contacted via email regarding your inquiry.</p>
+            </div>
+
+          </form>
+        </section>
+
+        <!-- Contact Info Sidebar -->
+        <aside class="lg:col-span-2 space-y-4" data-sd-id="45">
+          
+          <!-- Direct Contact Card -->
+          <div class="contact-info-card glass-panel rounded-2xl p-6 md:p-8 space-y-5" data-sd-id="46">
+            <h2 class="text-lg font-semibold text-white/90" data-sd-id="47">Direct contact</h2>
+            
+            <a href="mailto:hello@richtillman.xyz" id="contact-email-link" class="group flex items-start gap-3 text-white/60 hover:text-white transition-colors" data-sd-id="48">
+              <div class="w-10 h-10 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:border-[#ffd700]/30 transition-colors" data-sd-id="49">
+                <iconify-icon icon="lucide:mail" class="text-[#ffd700]" aria-hidden="true"></iconify-icon>
+              </div>
+              <div class="flex flex-col" data-sd-id="50">
+                <span class="text-xs text-white/40 font-mono uppercase tracking-wider" data-sd-id="51">Email</span>
+                <span class="text-sm font-medium" data-sd-id="52">hello@richtillman.xyz</span>
+              </div>
+            </a>
+
+            <div class="flex items-start gap-3 text-white/60" data-sd-id="53">
+              <div class="w-10 h-10 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="54">
+                <iconify-icon icon="lucide:map-pin" class="text-[#ffd700]" aria-hidden="true"></iconify-icon>
+              </div>
+              <div class="flex flex-col" data-sd-id="55">
+                <span class="text-xs text-white/40 font-mono uppercase tracking-wider" data-sd-id="56">Location</span>
+                <span class="text-sm font-medium" data-sd-id="57">Remote · PST timezone</span>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3 text-white/60" data-sd-id="58">
+              <div class="w-10 h-10 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="59">
+                <iconify-icon icon="lucide:clock" class="text-[#ffd700]" aria-hidden="true"></iconify-icon>
+              </div>
+              <div class="flex flex-col" data-sd-id="60">
+                <span class="text-xs text-white/40 font-mono uppercase tracking-wider" data-sd-id="61">Availability</span>
+                <span class="text-sm font-medium flex items-center gap-2" data-sd-id="62">
+                  <span class="w-2 h-2 rounded-full bg-[#ffd700] animate-pulse" data-sd-id="63"></span>
+                  Currently taking new projects
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Social Links Card -->
+          <div class="contact-info-card glass-panel rounded-2xl p-6 md:p-8 space-y-5" data-sd-id="64">
+            <h2 class="text-lg font-semibold text-white/90" data-sd-id="65">Find me online</h2>
+            
+            <div class="grid grid-cols-1 gap-3" data-sd-id="66">
+              <a href="https://github.com/richtillman" id="social-github" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-white/15 hover:bg-white/5 transition-all" data-sd-id="67">
+                <iconify-icon icon="lucide:github" class="text-lg text-white/60 group-hover:text-white transition-colors" aria-hidden="true"></iconify-icon>
+                <span class="text-sm font-medium text-white/70 group-hover:text-white transition-colors" data-sd-id="68">GitHub</span>
+                <iconify-icon icon="lucide:arrow-up-right" class="ml-auto text-xs text-white/30 group-hover:text-white/60 transition-colors" aria-hidden="true"></iconify-icon>
+              </a>
+
+              <a href="https://linkedin.com/in/richtillman" id="social-linkedin" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-white/15 hover:bg-white/5 transition-all" data-sd-id="69">
+                <iconify-icon icon="lucide:linkedin" class="text-lg text-white/60 group-hover:text-white transition-colors" aria-hidden="true"></iconify-icon>
+                <span class="text-sm font-medium text-white/70 group-hover:text-white transition-colors" data-sd-id="70">LinkedIn</span>
+                <iconify-icon icon="lucide:arrow-up-right" class="ml-auto text-xs text-white/30 group-hover:text-white/60 transition-colors" aria-hidden="true"></iconify-icon>
+              </a>
+
+              <a href="https://x.com/richtillman" id="social-twitter" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-white/15 hover:bg-white/5 transition-all" data-sd-id="71">
+                <iconify-icon icon="lucide:twitter" class="text-lg text-white/60 group-hover:text-white transition-colors" aria-hidden="true"></iconify-icon>
+                <span class="text-sm font-medium text-white/70 group-hover:text-white transition-colors" data-sd-id="72">X / Twitter</span>
+                <iconify-icon icon="lucide:arrow-up-right" class="ml-auto text-xs text-white/30 group-hover:text-white/60 transition-colors" aria-hidden="true"></iconify-icon>
+              </a>
+
+              <a href="https://forgekit.cloud" id="social-forgekit" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-white/15 hover:bg-white/5 transition-all" data-sd-id="73">
+                <iconify-icon icon="lucide:globe" class="text-lg text-white/60 group-hover:text-white transition-colors" aria-hidden="true"></iconify-icon>
+                <span class="text-sm font-medium text-white/70 group-hover:text-white transition-colors" data-sd-id="74">forgekit.cloud</span>
+                <iconify-icon icon="lucide:arrow-up-right" class="ml-auto text-xs text-white/30 group-hover:text-white/60 transition-colors" aria-hidden="true"></iconify-icon>
+              </a>
+            </div>
+          </div>
+
+          <!-- Quick Stats Card -->
+          <div class="contact-info-card glass-panel rounded-2xl p-6 md:p-8 space-y-3" data-sd-id="75">
+            <h2 class="text-lg font-semibold text-white/90 mb-3" data-sd-id="76">What to expect</h2>
+            <div class="flex items-center gap-3 text-sm text-white/50" data-sd-id="77">
+              <iconify-icon icon="lucide:check-circle-2" class="text-[#ffd700] flex-shrink-0" aria-hidden="true"></iconify-icon>
+              <span data-sd-id="78">Personal reply within 24 hours</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm text-white/50" data-sd-id="79">
+              <iconify-icon icon="lucide:check-circle-2" class="text-[#ffd700] flex-shrink-0" aria-hidden="true"></iconify-icon>
+              <span data-sd-id="80">Discovery call to align on scope</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm text-white/50" data-sd-id="81">
+              <iconify-icon icon="lucide:check-circle-2" class="text-[#ffd700] flex-shrink-0" aria-hidden="true"></iconify-icon>
+              <span data-sd-id="82">Detailed proposal &amp; timeline</span>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+
+      <!-- Interactive Hint -->
+      <div class="absolute right-8 bottom-32 hidden lg:flex flex-col items-center gap-3 text-white/30 animate-pulse pointer-events-none" data-sd-id="83">
+        <iconify-icon icon="lucide:mouse-pointer-click" class="text-2xl" aria-hidden="true"></iconify-icon>
+        <span class="vertical-text font-mono text-[10px] uppercase tracking-widest" data-sd-id="84">Click bg to randomize</span>
+      </div>
+
+    </main>
+
+    <!-- Footer Ticker -->
+    <div class="pointer-events-auto" data-sd-id="85">
+      <!-- component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+<div v-scope="{ ...{&quot;showTicker&quot;:true}, $emit() {} }">
+<div v-if="showTicker" class="relative z-10 w-full overflow-hidden border-t border-white/5 bg-black/50 backdrop-blur-sm py-4 pointer-events-none"><style>@keyframes sd-ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } .sd-animate-ticker { animation: sd-ticker-scroll 30s linear infinite; }</style><div class="flex whitespace-nowrap sd-animate-ticker font-mono text-xs text-white/30 tracking-widest uppercase"><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div></div></div>
+</div>
+<!-- /component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+    </div>
+  </div>
+
+  <!-- Form Validation Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('contact-form');
+      const successBanner = document.getElementById('success-banner');
+      const dismissBtn = document.getElementById('success-dismiss');
+      if (!form) return;
+
+      const showError = (fieldId, show) => {
+        const errorEl = document.getElementById(fieldId + '-error');
+        if (errorEl) {
+          errorEl.classList.toggle('hidden', !show);
+        }
+      };
+
+      const validateField = (field) => {
+        let valid = true;
+        
+        if (field.id === 'name') {
+          valid = field.value.trim().length >= 2;
+        } else if (field.id === 'email') {
+          valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value.trim());
+        } else if (field.id === 'project-type') {
+          valid = field.value !== '';
+        } else if (field.id === 'message') {
+          valid = field.value.trim().length >= 10;
+        }
+        
+        showError(field.id, !valid);
+        return valid;
+      };
+
+      // Real-time validation on blur
+      ['name', 'email', 'project-type', 'message'].forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+          field.addEventListener('blur', () => validateField(field));
+          field.addEventListener('input', () => {
+            if (field.value.trim()) showError(id, false);
+          });
+        }
+      });
+
+      // Dismiss success banner
+      if (dismissBtn) {
+        dismissBtn.addEventListener('click', () => {
+          successBanner.classList.add('hide');
+          setTimeout(() => {
+            successBanner.classList.add('hidden');
+            successBanner.classList.remove('hide');
+          }, 300);
+        });
+      }
+
+      // Form submit
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        let allValid = true;
+        ['name', 'email', 'project-type', 'message'].forEach(id => {
+          const field = document.getElementById(id);
+          if (field && !validateField(field)) {
+            allValid = false;
+          }
+        });
+
+        if (allValid) {
+          const btn = document.getElementById('contact-submit-btn');
+          const originalContent = btn.innerHTML;
+          btn.innerHTML = '<span>Sending…</span>';
+          btn.disabled = true;
+          btn.style.opacity = '0.7';
+          
+          setTimeout(() => {
+            // Show success banner
+            successBanner.classList.remove('hidden');
+            successBanner.classList.add('success-banner');
+            
+            // Update button to success state
+            btn.innerHTML = '<span>Message sent!</span><iconify-icon icon="lucide:check" aria-hidden="true"></iconify-icon>';
+            btn.style.background = '#22c55e';
+            btn.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.3)';
+            btn.style.color = '#ffffff';
+            
+            // Scroll to success banner
+            successBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Reset after 4 seconds
+            setTimeout(() => {
+              form.reset();
+              btn.innerHTML = originalContent;
+              btn.disabled = false;
+              btn.style.opacity = '1';
+              btn.style.background = '';
+              btn.style.boxShadow = '';
+              btn.style.color = '';
+              // Auto-hide banner after reset
+              successBanner.classList.add('hide');
+              setTimeout(() => {
+                successBanner.classList.add('hidden');
+                successBanner.classList.remove('hide', 'success-banner');
+              }, 300);
+            }, 4000);
+          }, 1200);
+        }
+      });
+    });
+  </script>
+
+</body></html>

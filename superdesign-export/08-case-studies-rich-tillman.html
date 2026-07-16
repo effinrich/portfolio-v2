@@ -1,0 +1,726 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="view-transition" content="same-origin">
+  <title>Case Studies — Rich Tillman</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <script src="https://unpkg.com/petite-vue" defer="" init=""></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <script type="module">
+    import TubesCursor from 'https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const canvas = document.getElementById('bg-canvas');
+        if (!canvas) return;
+        
+        try {
+          const app = TubesCursor(canvas, {
+            tubes: {
+              colors: ['#00f0ff', '#ff007f', '#ffd700'],
+              lights: {
+                intensity: 150,
+                colors: ['#83f36e', '#00f0ff', '#ff008a', '#ffd700']
+              }
+            }
+          });
+          
+          const randomColors = (count) => {
+            return new Array(count)
+              .fill(0)
+              .map(() => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'));
+          };
+
+          const container = document.getElementById('bg-container');
+          if (container) {
+            container.addEventListener('click', (e) => {
+              if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input')) return;
+              const colors = randomColors(3);
+              const lightsColors = randomColors(4);
+              app.tubes.setColors(colors);
+              app.tubes.setLightsColors(lightsColors);
+            });
+          }
+        } catch (err) {
+          console.error('Failed to init tubes:', err);
+        }
+      }, 100);
+    });
+  </script>
+  <style>
+    html { background-color: #000000; }
+    @view-transition { navigation: auto; }
+    ::view-transition { background-color: #000000; }
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+    ::view-transition-old(main-content) { animation: 0.25s ease-out both fade-out; }
+    ::view-transition-new(main-content) { animation: 0.25s ease-in 0.1s both fade-in; }
+    @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    .glass-panel {
+      background: rgba(20, 20, 20, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    }
+    
+    .neon-text {
+      background: linear-gradient(90deg, #00f0ff, #ffd700, #ff007f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shine 5s linear infinite;
+    }
+    @keyframes shine { to { background-position: 200% center; } }
+    
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .reveal { animation: fade-in-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+    .reveal-1 { animation-delay: 0.1s; }
+    .reveal-2 { animation-delay: 0.25s; }
+    .reveal-3 { animation-delay: 0.4s; }
+    .reveal-4 { animation-delay: 0.55s; }
+    
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+    }
+    .scroll-reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .case-card {
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .case-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255, 215, 0, 0.3);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 30px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px -10px rgba(255, 215, 0, 0.15);
+    }
+    .case-card:hover .case-icon-wrap {
+      transform: scale(1.1) rotate(-3deg);
+    }
+    .case-card:hover .case-title {
+      background: linear-gradient(90deg, #00f0ff, #ffd700, #ff007f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+    }
+    .case-card:hover .case-arrow {
+      transform: translateX(4px);
+      color: #ffd700;
+    }
+    .case-card:hover .case-overlay {
+      opacity: 0.15;
+    }
+    
+    .filter-btn {
+      transition: all 0.3s ease;
+    }
+    .filter-btn.active {
+      background: rgba(255, 215, 0, 0.1);
+      border-color: rgba(255, 215, 0, 0.4);
+      color: #ffd700;
+    }
+    
+    .search-input {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+    .search-input:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1), 0 0 20px rgba(255, 215, 0, 0.08);
+      background: rgba(0, 0, 0, 0.5);
+    }
+    .search-input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+    
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #000000; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 215, 0, 0.3); }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+      
+      setTimeout(() => {
+        document.querySelectorAll('.scroll-reveal').forEach((el) => observer.observe(el));
+      }, 200);
+
+      // Filter functionality
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      const caseCards = document.querySelectorAll('.case-card-wrap');
+      
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          
+          const filter = btn.dataset.filter;
+          caseCards.forEach(card => {
+            const category = card.dataset.category;
+            if (filter === 'all' || category === filter) {
+              card.style.display = '';
+              setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+              }, 50);
+            } else {
+              card.style.opacity = '0';
+              card.style.transform = 'translateY(20px)';
+              setTimeout(() => {
+                card.style.display = 'none';
+              }, 300);
+            }
+          });
+        });
+      });
+
+      // Search functionality
+      const searchInput = document.getElementById('case-search');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const query = e.target.value.toLowerCase();
+          caseCards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            if (text.includes(query)) {
+              card.style.display = '';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        });
+      }
+    });
+  </script>
+</head>
+<body>
+  <!-- Background -->
+  <div class="fixed inset-0 z-0" data-sd-id="1">
+    <!-- component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+<div v-scope="{ ...{&quot;canvasOpacity&quot;:0.9,&quot;showGrid&quot;:true,&quot;showGradient&quot;:true}, $emit() {} }">
+<div id="bg-container" class="relative min-h-screen w-full overflow-hidden bg-black flex flex-col cursor-crosshair" @click="$emit('backgroundClick', $event)"><canvas id="bg-canvas" class="absolute inset-0 w-full h-full block z-0" :style="{ opacity: canvasOpacity, touchAction: 'none' }"></canvas><div v-if="showGrid" class="absolute inset-0 pointer-events-none z-0" style="background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div><div v-if="showGradient" class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-0 pointer-events-none"></div></div>
+</div>
+<!-- /component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+  </div>
+
+  <!-- Main Wrapper -->
+  <div class="relative min-h-screen w-full flex flex-col cursor-crosshair z-10 pointer-events-none" data-sd-id="2">
+    
+    <!-- Navigation -->
+    <div class="pointer-events-auto" data-sd-id="3">
+      <!-- component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+<div v-scope="{ ...{&quot;activeItem&quot;:&quot;work&quot;,&quot;isAvailable&quot;:true,&quot;workHref&quot;:&quot;#work&quot;,&quot;projectsHref&quot;:&quot;#projects&quot;,&quot;stackHref&quot;:&quot;#stack&quot;,&quot;contactHref&quot;:&quot;#contact&quot;}, $emit() {} }">
+<nav class="fixed top-0 left-0 w-full z-40 border-x-0 border-t-0 border-b border-white/10 px-6 py-4" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-8 h-8 rounded bg-zinc-900 border border-white/20 flex items-center justify-center font-mono text-sm font-bold text-[#ffd700]">
+        R
+      </div>
+      <span class="font-medium tracking-tight text-white/90 hidden sm:inline-block">
+        Rich Tillman <span class="text-white/40 font-normal">/ Principal Frontend Engineer</span>
+      </span>
+    </div>
+    
+    <div class="hidden md:flex items-center gap-12 text-sm font-medium">
+      <a :href="workHref" :class="activeItem === 'work' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Work</a>
+      <a :href="projectsHref" :class="activeItem === 'projects' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Projects</a>
+      <a :href="stackHref" :class="activeItem === 'stack' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Stack</a>
+      <a :href="contactHref" :class="activeItem === 'contact' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Contact</a>
+    </div>
+
+    <div v-if="isAvailable" class="flex items-center gap-3 rounded-full px-3 py-1.5 border border-[#ffd700]/30 bg-[#ffd700]/5" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px);">
+      <div class="w-2 h-2 rounded-full bg-[#ffd700] animate-pulse"></div>
+      <span class="text-xs font-medium text-[#ffd700]">Available</span>
+    </div>
+  </div>
+</nav>
+</div>
+<!-- /component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+    </div>
+
+    <!-- Main Content -->
+    <main style="view-transition-name: main-content;" class="relative z-10 flex-1 max-w-7xl mx-auto w-full px-6 pt-32 pb-16 pointer-events-auto" data-sd-id="4">
+      
+      <!-- ═══════════════════════════════════════ -->
+      <!-- HERO SECTION -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-16 reveal reveal-1" data-sd-id="5">
+        <!-- Breadcrumb -->
+        <div class="flex items-center gap-2 text-sm font-mono text-white/40 mb-8" data-sd-id="6">
+          <a href="https://p.superdesign.dev/draft/4ee229bd-e341-4e90-b88c-54789c125b7a" class="hover:text-white/80 transition-colors" data-sd-id="7">Home</a>
+          <iconify-icon icon="lucide:chevron-right" class="text-xs"></iconify-icon>
+          <span class="text-white/70" data-sd-id="8">Case Studies</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-end" data-sd-id="9">
+          <div class="lg:col-span-2 space-y-6" data-sd-id="10">
+            <h1 class="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tighter leading-[1.05] text-white" data-sd-id="11">
+              Project <span class="neon-text" data-sd-id="12">Case Studies</span>
+            </h1>
+            <p class="text-lg md:text-xl text-white/60 max-w-2xl leading-relaxed" data-sd-id="13">
+              Deep dives into production systems that scaled. Real architecture decisions, measurable impact, and the engineering trade-offs that got us there.
+            </p>
+          </div>
+
+          <!-- Stats -->
+          <div class="grid grid-cols-3 gap-4 lg:gap-6" data-sd-id="14">
+            <div class="glass-panel rounded-xl p-4 md:p-5 text-center" data-sd-id="15">
+              <div class="text-2xl md:text-3xl font-bold text-[#ffd700] tracking-tight" data-sd-id="16">50+</div>
+              <div class="text-[10px] md:text-xs text-white/40 font-mono uppercase tracking-wider mt-1" data-sd-id="17">Projects</div>
+            </div>
+            <div class="glass-panel rounded-xl p-4 md:p-5 text-center" data-sd-id="18">
+              <div class="text-2xl md:text-3xl font-bold text-[#00f0ff] tracking-tight" data-sd-id="19">500K+</div>
+              <div class="text-[10px] md:text-xs text-white/40 font-mono uppercase tracking-wider mt-1" data-sd-id="20">Users</div>
+            </div>
+            <div class="glass-panel rounded-xl p-4 md:p-5 text-center" data-sd-id="21">
+              <div class="text-2xl md:text-3xl font-bold text-[#ff007f] tracking-tight" data-sd-id="22">98%</div>
+              <div class="text-[10px] md:text-xs text-white/40 font-mono uppercase tracking-wider mt-1" data-sd-id="23">Satisfaction</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- SEARCH & FILTER -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-12 reveal reveal-2" data-sd-id="24">
+        <div class="glass-panel rounded-2xl p-4 md:p-6 flex flex-col md:flex-row items-stretch md:items-center gap-4" data-sd-id="25">
+          <!-- Search -->
+          <div class="relative flex-1" data-sd-id="26">
+            <iconify-icon icon="lucide:search" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 text-sm" aria-hidden="true"></iconify-icon>
+            <input type="text" id="case-search" placeholder="Search by keyword, tech, or project name…" class="search-input w-full rounded-xl pl-11 pr-4 py-3 text-white text-sm font-normal" aria-label="Search case studies" data-sd-id="27">
+          </div>
+          
+          <!-- Filter Buttons -->
+          <div class="flex flex-wrap items-center gap-2" data-sd-id="28">
+            <button class="filter-btn active px-4 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wider border border-white/10 text-white/60 hover:text-white cursor-pointer" data-filter="all" data-sd-id="29">
+              All
+            </button>
+            <button class="filter-btn px-4 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wider border border-white/10 text-white/60 hover:text-white cursor-pointer" data-filter="design-system" data-sd-id="30">
+              Design Systems
+            </button>
+            <button class="filter-btn px-4 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wider border border-white/10 text-white/60 hover:text-white cursor-pointer" data-filter="architecture" data-sd-id="31">
+              Architecture
+            </button>
+            <button class="filter-btn px-4 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wider border border-white/10 text-white/60 hover:text-white cursor-pointer" data-filter="product" data-sd-id="32">
+              Products
+            </button>
+            <button class="filter-btn px-4 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wider border border-white/10 text-white/60 hover:text-white cursor-pointer" data-filter="devtools" data-sd-id="33">
+              DevTools
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- CASE STUDIES GRID -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-16" data-sd-id="34">
+        
+        <!-- ─── CASE STUDY 1: Enterprise Design System ─── -->
+        <a href="#" class="case-card-wrap scroll-reveal block" data-category="design-system" data-sd-id="35">
+          <article class="case-card glass-panel rounded-2xl overflow-hidden group block h-full" data-sd-id="36">
+            <!-- Card Header with Icon -->
+            <div class="relative p-6 md:p-8 border-b border-white/5 overflow-hidden" data-sd-id="37">
+              <div class="case-overlay absolute inset-0 bg-gradient-to-br from-[#00f0ff]/10 to-transparent opacity-5 transition-opacity duration-500" data-sd-id="38"></div>
+              <div class="relative flex items-start justify-between" data-sd-id="39">
+                <div class="case-icon-wrap transition-all duration-500 w-14 h-14 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="40">
+                  <iconify-icon icon="lucide:component" class="text-2xl text-[#00f0ff]"></iconify-icon>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/20 text-[10px] font-mono uppercase tracking-wider text-[#00f0ff]" data-sd-id="41">Design System</span>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-6 md:p-8 space-y-5" data-sd-id="42">
+              <div data-sd-id="43">
+                <h2 class="case-title text-2xl font-bold text-white tracking-tight mb-2 transition-all duration-500" data-sd-id="44">
+                  Enterprise Design System
+                </h2>
+                <p class="text-sm text-white/50 leading-relaxed" data-sd-id="45">
+                  Design-engineering friction, component duplication across 5 teams, slow feature shipping. Built a single source of truth.
+                </p>
+              </div>
+
+              <!-- Key Metrics -->
+              <div class="grid grid-cols-3 gap-3 py-4 border-y border-white/5" data-sd-id="46">
+                <div data-sd-id="47">
+                  <div class="text-xl font-bold text-[#ffd700] tracking-tight" data-sd-id="48">200+</div>
+                  <div class="text-[10px] text-white/40 font-mono uppercase tracking-wider mt-0.5" data-sd-id="49">Components</div>
+                </div>
+                <div data-sd-id="50">
+                  <div class="text-xl font-bold text-[#ffd700] tracking-tight" data-sd-id="51">40%</div>
+                  <div class="text-[10px] text-white/40 font-mono uppercase tracking-wider mt-0.5" data-sd-id="52">Faster Ships</div>
+                </div>
+                <div data-sd-id="53">
+                  <div class="text-xl font-bold text-[#ffd700] tracking-tight" data-sd-id="54">100%</div>
+                  <div class="text-[10px] text-white/40 font-mono uppercase tracking-wider mt-0.5" data-sd-id="55">Consistency</div>
+                </div>
+              </div>
+
+              <!-- Tech Tags -->
+              <div class="flex flex-wrap gap-2" data-sd-id="56">
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="57">Storybook</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="58">React</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="59">TypeScript</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="60">Chromatic</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="61">Figma</span>
+              </div>
+
+              <!-- Meta Info -->
+              <div class="flex flex-wrap items-center gap-4 text-xs text-white/40 font-mono" data-sd-id="62">
+                <span class="flex items-center gap-1.5" data-sd-id="63">
+                  <iconify-icon icon="lucide:clock" class="text-sm"></iconify-icon>
+                  8 months
+                </span>
+                <span class="flex items-center gap-1.5" data-sd-id="64">
+                  <iconify-icon icon="lucide:users" class="text-sm"></iconify-icon>
+                  1 Principal + 2 Junior
+                </span>
+                <span class="flex items-center gap-1.5" data-sd-id="65">
+                  <iconify-icon icon="lucide:building" class="text-sm"></iconify-icon>
+                  5 product teams
+                </span>
+              </div>
+
+              <!-- Impact -->
+              <p class="text-sm text-white/60 leading-relaxed border-l-2 border-[#00f0ff]/30 pl-4" data-sd-id="66">
+                Transformed how 5 teams ship features. Established single source of truth. Design and engineering now move in lockstep.
+              </p>
+
+              <!-- CTA -->
+              <div class="flex items-center gap-2 text-sm font-medium text-white/70 group-hover:text-[#ffd700] transition-colors pt-2" data-sd-id="67">
+                <span data-sd-id="68">View full case study</span>
+                <iconify-icon icon="lucide:arrow-right" class="case-arrow text-sm transition-all duration-300"></iconify-icon>
+              </div>
+            </div>
+          </article>
+        </a>
+
+        <!-- ─── CASE STUDY 2: React Monorepo Architecture ─── -->
+        <a href="https://p.superdesign.dev/draft/4e864225-9dd3-4004-9997-9b8e595f9a90" class="case-card-wrap scroll-reveal block" data-category="architecture" data-sd-id="69">
+          <article class="case-card glass-panel rounded-2xl overflow-hidden group block h-full" data-sd-id="70">
+            <!-- Card Header with Icon -->
+            <div class="relative p-6 md:p-8 border-b border-white/5 overflow-hidden" data-sd-id="71">
+              <div class="case-overlay absolute inset-0 bg-gradient-to-br from-[#ffd700]/10 to-transparent opacity-5 transition-opacity duration-500" data-sd-id="72"></div>
+              <div class="relative flex items-start justify-between" data-sd-id="73">
+                <div class="case-icon-wrap transition-all duration-500 w-14 h-14 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="74">
+                  <iconify-icon icon="lucide:layers" class="text-2xl text-[#ffd700]"></iconify-icon>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-[#ffd700]/10 border border-[#ffd700]/20 text-[10px] font-mono uppercase tracking-wider text-[#ffd700]" data-sd-id="75">Architecture</span>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-6 md:p-8 space-y-5" data-sd-id="76">
+              <div data-sd-id="77">
+                <h2 class="case-title text-2xl font-bold text-white tracking-tight mb-2 transition-all duration-500" data-sd-id="78">
+                  React Monorepo Architecture
+                </h2>
+                <p class="text-sm text-white/50 leading-relaxed" data-sd-id="79">
+                  Polyrepo chaos — 15 separate repos, fragmented dependencies, 45-minute builds, no code sharing. Unified under one roof.
+                </p>
+              </div>
+
+              <!-- Key Metrics -->
+              <div class="grid grid-cols-3 gap-3 py-4 border-y border-white/5" data-sd-id="80">
+                <div data-sd-id="81">
+                  <div class="text-xl font-bold text-[#ffd700] tracking-tight" data-sd-id="82">60%</div>
+                  <div class="text-[10px] text-white/40 font-mono uppercase tracking-wider mt-0.5" data-sd-id="83">CI/CD Cut</div>
+                </div>
+                <div data-sd-id="84">
+                  <div class="text-xl font-bold text-[#ffd700] tracking-tight" data-sd-id="85">12</div>
+                  <div class="text-[10px] text-white/40 font-mono uppercase tracking-wider mt-0.5" data-sd-id="86">Shared Libs</div>
+                </div>
+                <div data-sd-id="87">
+                  <div class="text-xl font-bold text-[#ffd700] tracking-tight" data-sd-id="88">100%</div>
+                  <div class="text-[10px] text-white/40 font-mono uppercase tracking-wider mt-0.5" data-sd-id="89">Adoption</div>
+                </div>
+              </div>
+
+              <!-- Tech Tags -->
+              <div class="flex flex-wrap gap-2" data-sd-id="90">
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="91">Nx 17+</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="92">TypeScript</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="93">GitHub Actions</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="94">Nx Cloud</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="95">Docker</span>
+              </div>
+
+              <!-- Meta Info -->
+              <div class="flex flex-wrap items-center gap-4 text-xs text-white/40 font-mono" data-sd-id="96">
+                <span class="flex items-center gap-1.5" data-sd-id="97">
+                  <iconify-icon icon="lucide:clock" class="text-sm"></iconify-icon>
+                  6 months
+                </span>
+                <span class="flex items-center gap-1.5" data-sd-id="98">
+                  <iconify-icon icon="lucide:users" class="text-sm"></iconify-icon>
+                  1 Principal
+                </span>
+                <span class="flex items-center gap-1.5" data-sd-id="99">
+                  <iconify-icon icon="lucide:building" class="text-sm"></iconify-icon>
+                  15 teams (50+ eng)
+                </span>
+              </div>
+
+              <!-- Impact -->
+              <p class="text-sm text-white/60 leading-relaxed border-l-2 border-[#ffd700]/30 pl-4" data-sd-id="100">
+                Unified development experience. Enabled shipping velocity at 50-engineer scale. Reduced context-switching and dependency hell.
+              </p>
+
+              <!-- CTA -->
+              <div class="flex items-center gap-2 text-sm font-medium text-white/70 group-hover:text-[#ffd700] transition-colors pt-2" data-sd-id="101">
+                <span data-sd-id="102">View full case study</span>
+                <iconify-icon icon="lucide:arrow-right" class="case-arrow text-sm transition-all duration-300"></iconify-icon>
+              </div>
+            </div>
+          </article>
+        </a>
+
+        <!-- ─── CASE STUDY 3: React Native Platform Scale ─── -->
+        <a href="https://p.superdesign.dev/draft/5d7e7e5e-bc4c-4493-894c-bac01a3d0657" class="case-card-wrap scroll-reveal block" data-category="product" data-sd-id="103">
+          <article class="case-card glass-panel rounded-2xl overflow-hidden group block h-full" data-sd-id="104">
+            <!-- Card Header with Icon -->
+            <div class="relative p-6 md:p-8 border-b border-white/5 overflow-hidden" data-sd-id="105">
+              <div class="case-overlay absolute inset-0 bg-gradient-to-br from-[#ff007f]/10 to-transparent opacity-5 transition-opacity duration-500" data-sd-id="106"></div>
+              <div class="relative flex items-start justify-between" data-sd-id="107">
+                <div class="case-icon-wrap transition-all duration-500 w-14 h-14 rounded-xl bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="108">
+                  <iconify-icon icon="lucide:smartphone" class="text-2xl text-[#ff007f]"></iconify-icon>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-[#ff007f]/10 border border-[#ff007f]/20 text-[10px] font-mono uppercase tracking-wider text-[#ff007f]" data-sd-id="109">Product</span>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-6 md:p-8 space-y-5" data-sd-id="110">
+              <div data-sd-id="111">
+                <h2 class="case-title text-2xl font-bold text-white tracking-tight mb-2 transition-all duration-500" data-sd-id="112">
+                  React Native Platform Scale
+                </h2>
+                <p class="text-sm text-white/50 leading-relaxed" data-sd-id="113">
+                  MVP hitting limits at 100K users — performance issues, navigation broken, state management chaos, crashes. Rebuilt for scale.
+                </p>
+              </div>
+
+              <!-- Key Metrics -->
+              <div class="grid grid-cols-3 gap-3 py-4 border-y border-white/5" data-sd-id="114">
+                <div data-sd-id="115">
+                  <div class="text-xl font-bold text-[#ffd700] tracking-tight" data-sd-id="116">500K+</div>
+                  <div class="text-[10px] text-white/40 font-mono uppercase tracking-wider mt-0.5" data-sd-id="117">MAU</div>
+                </div>
+                <div data-sd-id="118">
+                  <div class="text-xl font-bold text-[#ffd700] tracking-tight" data-sd-id="119">95%</div>
+                  <div class="text-[10px] text-white/40 font-mono uppercase tracking-wider mt-0.5" data-sd-id="120">Crash Cut</div>
+                </div>
+                <div data-sd-id="121">
+                  <div class="text-xl font-bold text-[#ffd700] tracking-tight" data-sd-id="122">4.7★</div>
+                  <div class="text-[10px] text-white/40 font-mono uppercase tracking-wider mt-0.5" data-sd-id="123">Store Rating</div>
+                </div>
+              </div>
+
+              <!-- Tech Tags -->
+              <div class="flex flex-wrap gap-2" data-sd-id="124">
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="125">React Native</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="126">Expo</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="127">TanStack Query</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="128">Zustand</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="129">Sentry</span>
+              </div>
+
+              <!-- Meta Info -->
+              <div class="flex flex-wrap items-center gap-4 text-xs text-white/40 font-mono" data-sd-id="130">
+                <span class="flex items-center gap-1.5" data-sd-id="131">
+                  <iconify-icon icon="lucide:clock" class="text-sm"></iconify-icon>
+                  14 months
+                </span>
+                <span class="flex items-center gap-1.5" data-sd-id="132">
+                  <iconify-icon icon="lucide:users" class="text-sm"></iconify-icon>
+                  1 Principal + 4 Eng
+                </span>
+                <span class="flex items-center gap-1.5" data-sd-id="133">
+                  <iconify-icon icon="lucide:refresh-cw" class="text-sm"></iconify-icon>
+                  Ongoing
+                </span>
+              </div>
+
+              <!-- Impact -->
+              <p class="text-sm text-white/60 leading-relaxed border-l-2 border-[#ff007f]/30 pl-4" data-sd-id="134">
+                Transformed mobile product from failing to thriving. 5M+ installs. Shipping velocity increased 2x while improving quality 10x.
+              </p>
+
+              <!-- CTA -->
+              <div class="flex items-center gap-2 text-sm font-medium text-white/70 group-hover:text-[#ffd700] transition-colors pt-2" data-sd-id="135">
+                <span data-sd-id="136">View full case study</span>
+                <iconify-icon icon="lucide:arrow-right" class="case-arrow text-sm transition-all duration-300"></iconify-icon>
+              </div>
+            </div>
+          </article>
+        </a>
+
+        <!-- ─── CASE STUDY 4: ForgeKit MCP ─── -->
+        <a href="#" class="case-card-wrap scroll-reveal block" data-category="devtools" data-sd-id="137">
+          <article class="case-card glass-panel rounded-2xl overflow-hidden group block h-full" data-sd-id="138">
+            <!-- Card Header with Icon -->
+            <div class="relative p-6 md:p-8 border-b border-white/5 overflow-hidden" data-sd-id="139">
+              <div class="case-overlay absolute inset-0 bg-gradient-to-br from-[#83f36e]/10 to-transparent opacity-5 transition-opacity duration-500" data-sd-id="140"></div>
+              <div class="relative flex items-start justify-between" data-sd-id="141">
+                <div class="case-icon-wrap transition-all duration-500 w-14 h-14 rounded-xl bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center" data-sd-id="142">
+                  <iconify-icon icon="lucide:cpu" class="text-2xl text-[#83f36e]"></iconify-icon>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-[#83f36e]/10 border border-[#83f36e]/20 text-[10px] font-mono uppercase tracking-wider text-[#83f36e]" data-sd-id="143">DevTools</span>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-6 md:p-8 space-y-5" data-sd-id="144">
+              <div data-sd-id="145">
+                <h2 class="case-title text-2xl font-bold text-white tracking-tight mb-2 transition-all duration-500" data-sd-id="146">
+                  ForgeKit MCP
+                </h2>
+                <p class="text-sm text-white/50 leading-relaxed" data-sd-id="147">
+                  Design-to-code handoff bottleneck. AI coding assistants lacked structured Figma context. Built an MCP server to bridge the gap.
+                </p>
+              </div>
+
+              <!-- Key Metrics -->
+              <div class="grid grid-cols-3 gap-3 py-4 border-y border-white/5" data-sd-id="148">
+                <div data-sd-id="149">
+                  <div class="text-xl font-bold text-[#ffd700] tracking-tight" data-sd-id="150">5,703+</div>
+                  <div class="text-[10px] text-white/40 font-mono uppercase tracking-wider mt-0.5" data-sd-id="151">npm Installs</div>
+                </div>
+                <div data-sd-id="152">
+                  <div class="text-xl font-bold text-[#ffd700] tracking-tight" data-sd-id="153">3.2k</div>
+                  <div class="text-[10px] text-white/40 font-mono uppercase tracking-wider mt-0.5" data-sd-id="154">GitHub Stars</div>
+                </div>
+                <div data-sd-id="155">
+                  <div class="text-xl font-bold text-[#ffd700] tracking-tight" data-sd-id="156">120+</div>
+                  <div class="text-[10px] text-white/40 font-mono uppercase tracking-wider mt-0.5" data-sd-id="157">Teams</div>
+                </div>
+              </div>
+
+              <!-- Tech Tags -->
+              <div class="flex flex-wrap gap-2" data-sd-id="158">
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="159">TypeScript</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="160">React</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="161">Node.js</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="162">Figma API</span>
+                <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="163">MCP SDK</span>
+              </div>
+
+              <!-- Meta Info -->
+              <div class="flex flex-wrap items-center gap-4 text-xs text-white/40 font-mono" data-sd-id="164">
+                <span class="flex items-center gap-1.5" data-sd-id="165">
+                  <iconify-icon icon="lucide:clock" class="text-sm"></iconify-icon>
+                  14 months
+                </span>
+                <span class="flex items-center gap-1.5" data-sd-id="166">
+                  <iconify-icon icon="lucide:users" class="text-sm"></iconify-icon>
+                  Solo → 47 contributors
+                </span>
+                <span class="flex items-center gap-1.5" data-sd-id="167">
+                  <iconify-icon icon="lucide:git-branch" class="text-sm"></iconify-icon>
+                  Open Source
+                </span>
+              </div>
+
+              <!-- Impact -->
+              <p class="text-sm text-white/60 leading-relaxed border-l-2 border-[#83f36e]/30 pl-4" data-sd-id="168">
+                Eliminated design-to-code handoff for AI-native development. Proven demand with 5K+ weekly installs. Growing open source community.
+              </p>
+
+              <!-- CTA -->
+              <div class="flex items-center gap-2 text-sm font-medium text-white/70 group-hover:text-[#ffd700] transition-colors pt-2" data-sd-id="169">
+                <span data-sd-id="170">View full case study</span>
+                <iconify-icon icon="lucide:arrow-right" class="case-arrow text-sm transition-all duration-300"></iconify-icon>
+              </div>
+            </div>
+          </article>
+        </a>
+
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- CTA SECTION -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="scroll-reveal" data-sd-id="171">
+        <div class="glass-panel rounded-3xl p-8 md:p-12 lg:p-16 relative overflow-hidden" data-sd-id="172">
+          <!-- Decorative glows -->
+          <div class="absolute -top-40 -right-20 w-80 h-80 rounded-full bg-[#ffd700]/5 blur-3xl pointer-events-none" data-sd-id="173"></div>
+          <div class="absolute -bottom-40 -left-20 w-80 h-80 rounded-full bg-[#00f0ff]/5 blur-3xl pointer-events-none" data-sd-id="174"></div>
+          
+          <div class="relative max-w-3xl mx-auto text-center space-y-6" data-sd-id="175">
+            <div class="flex justify-center" data-sd-id="176">
+              <div class="glass-panel rounded-full px-4 py-1.5 border border-[#ffd700]/20 bg-[#ffd700]/5 flex items-center gap-2" data-sd-id="177">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#ffd700] animate-pulse" data-sd-id="178"></div>
+                <span class="font-mono text-[10px] uppercase tracking-widest text-[#ffd700]" data-sd-id="179">Available for new projects</span>
+              </div>
+            </div>
+            
+            <h2 class="text-4xl md:text-6xl font-bold tracking-tighter text-white" data-sd-id="180">
+              Ready to <span class="neon-text" data-sd-id="181">scale?</span>
+            </h2>
+            
+            <p class="text-lg text-white/60 max-w-xl mx-auto leading-relaxed" data-sd-id="182">
+              Whether you need a design system, monorepo architecture, or a 0→1 product build — let's talk about your next project.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4" data-sd-id="183">
+              <a href="https://p.superdesign.dev/draft/c906d6dd-0318-4f57-9ecd-0bd1b1280b06" id="cta-book-call" aria-label="Book a discovery call" class="w-full sm:w-auto px-6 py-3 bg-[#ffd700] hover:bg-[#ffe54c] text-black font-semibold rounded-full flex items-center justify-center gap-2 transition-all duration-500 hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffd700]" data-sd-id="184">
+                Book a discovery call
+                <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon>
+              </a>
+              <a href="https://p.superdesign.dev/draft/ec14a340-aae5-411e-becb-8135c3ac07ca" id="cta-view-services" aria-label="View services" class="w-full sm:w-auto px-6 py-3 glass-panel hover:bg-white/10 text-white font-medium rounded-full transition-all duration-500 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50" data-sd-id="185">
+                View services
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer Ticker -->
+    <div class="pointer-events-auto" style="view-transition-name: footer-ticker;" data-sd-id="186">
+      <!-- component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+<div v-scope="{ ...{&quot;showTicker&quot;:true}, $emit() {} }">
+<div v-if="showTicker" class="relative z-10 w-full overflow-hidden border-t border-white/5 bg-black/50 backdrop-blur-sm py-4 pointer-events-none"><style>@keyframes sd-ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } .sd-animate-ticker { animation: sd-ticker-scroll 30s linear infinite; }</style><div class="flex whitespace-nowrap sd-animate-ticker font-mono text-xs text-white/30 tracking-widest uppercase"><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div></div></div>
+</div>
+<!-- /component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+    </div>
+  </div>
+
+</body></html>

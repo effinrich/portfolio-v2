@@ -1,0 +1,699 @@
+<!DOCTYPE html><html lang="en" style="background-color: #000000;"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="view-transition" content="same-origin">
+<title>Resume — Rich Tillman, Principal Frontend Engineer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #000000;
+    --gold: #ffd700;
+    --cyan: #00f0ff;
+    --magenta: #ff007f;
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.6);
+    --text-muted: rgba(255, 255, 255, 0.5);
+    --text-hint: rgba(255, 255, 255, 0.3);
+    --border: rgba(255, 255, 255, 0.08);
+    --glass-bg: rgba(20, 20, 20, 0.4);
+  }
+
+  * { font-family: 'Inter', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+  body { background: var(--bg); }
+
+  .glass-panel {
+    background: rgba(20, 20, 20, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+  }
+
+  .neon-text {
+    background: linear-gradient(90deg, #00f0ff, #ffd700, #ff007f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% auto;
+    animation: shine 5s linear infinite;
+  }
+  @keyframes shine { to { background-position: 200% center; } }
+
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in-up { animation: fade-in-up 0.6s ease-out backwards; }
+  .fade-in-up:nth-child(1) { animation-delay: 0.05s; }
+  .fade-in-up:nth-child(2) { animation-delay: 0.15s; }
+  .fade-in-up:nth-child(3) { animation-delay: 0.25s; }
+  .fade-in-up:nth-child(4) { animation-delay: 0.35s; }
+  .fade-in-up:nth-child(5) { animation-delay: 0.45s; }
+  .fade-in-up:nth-child(6) { animation-delay: 0.55s; }
+
+  /* Grid background */
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* Radial glow */
+  .radial-glow {
+    background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 215, 0, 0.06), transparent 70%);
+  }
+
+  /* Timeline line */
+  .timeline-line {
+    background: linear-gradient(to bottom, rgba(255,215,0,0.4), rgba(255,215,0,0.05), transparent);
+  }
+
+  /* Skill tag hover */
+  .skill-tag {
+    transition: all 0.25s ease;
+  }
+  .skill-tag:hover {
+    border-color: rgba(255, 215, 0, 0.4);
+    background: rgba(255, 215, 0, 0.05);
+    color: #ffd700;
+  }
+
+  /* Card hover */
+  .card-hover {
+    transition: all 0.3s ease;
+  }
+  .card-hover:hover {
+    border-color: rgba(255, 215, 0, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.7), 0 0 20px rgba(255,215,0,0.05);
+  }
+
+  /* Print styles */
+  @media print {
+    .no-print { display: none !important; }
+    body { background: white; color: black; }
+  }
+
+  ::view-transition { background-color: #000000; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+  ::view-transition-old(main-content) { animation: 0.25s ease-out both fade-out; }
+  ::view-transition-new(main-content) { animation: 0.25s ease-in 0.1s both fade-in; }
+  @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+</style>
+  <style>sd-component { display: block; }</style>
+  <script src="https://cdn.jsdelivr.net/npm/petite-vue@0.4.1/dist/petite-vue.iife.js" defer init></script>
+</head>
+
+<body>
+<div class="min-h-screen bg-black text-white relative" data-sd-id="1">
+
+  <!-- Background layers -->
+  <div class="fixed inset-0 grid-bg pointer-events-none z-0" data-sd-id="2"></div>
+  <div class="fixed inset-0 radial-glow pointer-events-none z-0" data-sd-id="3"></div>
+
+  <!-- Navigation -->
+  <!-- component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+<div v-scope="{ ...{&quot;activeItem&quot;:&quot;work&quot;,&quot;isAvailable&quot;:true,&quot;workHref&quot;:&quot;#work&quot;,&quot;projectsHref&quot;:&quot;#projects&quot;,&quot;stackHref&quot;:&quot;#stack&quot;,&quot;contactHref&quot;:&quot;#contact&quot;}, $emit() {} }">
+<nav class="fixed top-0 left-0 w-full z-40 border-x-0 border-t-0 border-b border-white/10 px-6 py-4" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-8 h-8 rounded bg-zinc-900 border border-white/20 flex items-center justify-center font-mono text-sm font-bold text-[#ffd700]">
+        R
+      </div>
+      <span class="font-medium tracking-tight text-white/90 hidden sm:inline-block">
+        Rich Tillman <span class="text-white/40 font-normal">/ Principal Frontend Engineer</span>
+      </span>
+    </div>
+    
+    <div class="hidden md:flex items-center gap-12 text-sm font-medium">
+      <a :href="workHref" :class="activeItem === 'work' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Work</a>
+      <a :href="projectsHref" :class="activeItem === 'projects' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Projects</a>
+      <a :href="stackHref" :class="activeItem === 'stack' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Stack</a>
+      <a :href="contactHref" :class="activeItem === 'contact' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Contact</a>
+    </div>
+
+    <div v-if="isAvailable" class="flex items-center gap-3 rounded-full px-3 py-1.5 border border-[#ffd700]/30 bg-[#ffd700]/5" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px);">
+      <div class="w-2 h-2 rounded-full bg-[#ffd700] animate-pulse"></div>
+      <span class="text-xs font-medium text-[#ffd700]">Available</span>
+    </div>
+  </div>
+</nav>
+</div>
+<!-- /component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+
+  <!-- Main Content -->
+  <main style="view-transition-name: main-content" class="relative z-10 pt-28 md:pt-32 pb-20 px-6" data-sd-id="4">
+    <div class="max-w-7xl mx-auto" data-sd-id="5">
+
+      <!-- ===== HEADER SECTION ===== -->
+      <section class="fade-in-up mb-16 md:mb-20" data-sd-id="6">
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8" data-sd-id="7">
+          <div class="flex-1" data-sd-id="8">
+            <!-- Breadcrumb / section label -->
+            <div class="flex items-center gap-3 mb-6" data-sd-id="9">
+              <div class="w-8 h-[1px] bg-[#ffd700]/40" data-sd-id="10"></div>
+              <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="11">Resume / CV</span>
+            </div>
+
+            <!-- Name & Title -->
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.05] text-white mb-4" data-sd-id="12">
+              Rich Tillman
+            </h1>
+            <p class="text-xl md:text-2xl text-white/50 font-light tracking-tight mb-6" data-sd-id="13">
+              Principal Frontend Engineer <span class="text-white/30 mx-2" data-sd-id="14">·</span> Design Systems <span class="text-white/30 mx-2" data-sd-id="15">·</span> AI-Native Tooling
+            </p>
+
+            <!-- Summary line -->
+            <p class="text-lg text-white/60 max-w-2xl leading-relaxed" data-sd-id="16">
+              10+ years building production-grade interfaces at scale. Currently bridging design systems and AI-native developer tooling. Shipped React Native apps to 500K+ users, maintain 200+ component design system, and author ForgeKit MCP with 5,700+ weekly installs.
+            </p>
+          </div>
+
+          <!-- Download PDF Button -->
+          <div class="flex flex-col sm:flex-row gap-3 lg:flex-col xl:flex-row shrink-0" data-sd-id="17">
+            <button id="resume-download-pdf" type="button" onclick="window.print()" class="px-6 py-3.5 bg-[#ffd700] hover:bg-[#ffe54c] text-black font-semibold rounded-full flex items-center justify-center gap-2.5 transition-all shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] hover:scale-105" data-sd-id="18">
+              <iconify-icon icon="lucide:download" class="text-lg"></iconify-icon>
+              Download PDF
+            </button>
+            <button id="resume-print-btn" type="button" onclick="window.print()" class="px-6 py-3.5 glass-panel hover:bg-white/10 text-white font-medium rounded-full flex items-center justify-center gap-2.5 transition-all hover:scale-105" data-sd-id="19">
+              <iconify-icon icon="lucide:printer" class="text-lg"></iconify-icon>
+              Print
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick contact bar -->
+        <div class="mt-8 flex flex-wrap items-center gap-4 text-sm text-white/40 font-mono" data-sd-id="20">
+          <a id="resume-email-link" href="mailto:rich@richtillman.dev" class="flex items-center gap-2 hover:text-[#ffd700] transition-colors" data-sd-id="21">
+            <iconify-icon icon="lucide:mail" class="text-base"></iconify-icon>
+            rich@richtillman.dev
+          </a>
+          <span class="text-white/20" data-sd-id="22">·</span>
+          <a id="resume-github-link" href="https://github.com/richtillman" class="flex items-center gap-2 hover:text-[#ffd700] transition-colors" data-sd-id="23">
+            <iconify-icon icon="lucide:github" class="text-base"></iconify-icon>
+            github.com/richtillman
+          </a>
+          <span class="text-white/20" data-sd-id="24">·</span>
+          <a id="resume-linkedin-link" href="https://linkedin.com/in/richtillman" class="flex items-center gap-2 hover:text-[#ffd700] transition-colors" data-sd-id="25">
+            <iconify-icon icon="lucide:linkedin" class="text-base"></iconify-icon>
+            LinkedIn
+          </a>
+          <span class="text-white/20" data-sd-id="26">·</span>
+          <span class="flex items-center gap-2" data-sd-id="27">
+            <iconify-icon icon="lucide:map-pin" class="text-base"></iconify-icon>
+            San Francisco, CA (Remote)
+          </span>
+        </div>
+      </section>
+
+      <!-- ===== QUICK STATS BAR ===== -->
+      <section class="fade-in-up mb-16 md:mb-20" data-sd-id="28">
+        <div class="glass-panel rounded-2xl p-6 md:p-8 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8" data-sd-id="29">
+          <div class="flex flex-col gap-1" data-sd-id="30">
+            <div class="flex items-center gap-2" data-sd-id="31">
+              <iconify-icon icon="lucide:briefcase" class="text-[#ffd700] text-lg"></iconify-icon>
+              <span class="font-mono text-xs uppercase tracking-widest text-white/40" data-sd-id="32">Experience</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="33">10+</h3>
+            <p class="text-sm text-white/40" data-sd-id="34">years in production</p>
+          </div>
+
+          <div class="flex flex-col gap-1 md:border-l border-white/10 md:pl-8" data-sd-id="35">
+            <div class="flex items-center gap-2" data-sd-id="36">
+              <iconify-icon icon="lucide:users" class="text-[#ffd700] text-lg"></iconify-icon>
+              <span class="font-mono text-xs uppercase tracking-widest text-white/40" data-sd-id="37">Users Reached</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="38">500K+</h3>
+            <p class="text-sm text-white/40" data-sd-id="39">on shipped RN apps</p>
+          </div>
+
+          <div class="flex flex-col gap-1 md:border-l border-white/10 md:pl-8" data-sd-id="40">
+            <div class="flex items-center gap-2" data-sd-id="41">
+              <iconify-icon icon="lucide:package" class="text-[#ffd700] text-lg"></iconify-icon>
+              <span class="font-mono text-xs uppercase tracking-widest text-white/40" data-sd-id="42">Open Source</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="43">5,703+</h3>
+            <p class="text-sm text-white/40" data-sd-id="44">weekly npm installs</p>
+          </div>
+
+          <div class="flex flex-col gap-1 md:border-l border-white/10 md:pl-8" data-sd-id="45">
+            <div class="flex items-center gap-2" data-sd-id="46">
+              <iconify-icon icon="lucide:layers" class="text-[#ffd700] text-lg"></iconify-icon>
+              <span class="font-mono text-xs uppercase tracking-widest text-white/40" data-sd-id="47">Components</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="48">200+</h3>
+            <p class="text-sm text-white/40" data-sd-id="49">design system</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== TWO COLUMN: EXPERIENCE + SKILLS ===== -->
+      <div class="grid lg:grid-cols-3 gap-8 lg:gap-10 mb-16 md:mb-20" data-sd-id="50">
+
+        <!-- ===== WORK EXPERIENCE (2 cols) ===== -->
+        <section class="lg:col-span-2 fade-in-up" data-sd-id="51">
+          <div class="flex items-center gap-3 mb-8" data-sd-id="52">
+            <iconify-icon icon="lucide:git-branch" class="text-[#ffd700] text-xl"></iconify-icon>
+            <h2 class="text-2xl font-bold tracking-tight text-white" data-sd-id="53">Work Experience</h2>
+            <div class="flex-1 h-[1px] bg-white/8" data-sd-id="54"></div>
+          </div>
+
+          <div class="space-y-0" data-sd-id="55">
+
+            <!-- Job 1 -->
+            <div class="relative pl-8 pb-10" data-sd-id="56">
+              <!-- Timeline dot & line -->
+              <div class="absolute left-0 top-2 w-2.5 h-2.5 rounded-full bg-[#ffd700] shadow-[0_0_12px_rgba(255,215,0,0.6)] z-10" data-sd-id="57"></div>
+              <div class="absolute left-[4.5px] top-5 bottom-0 w-px timeline-line" data-sd-id="58"></div>
+
+              <div class="glass-panel card-hover rounded-xl p-6" data-sd-id="59">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3" data-sd-id="60">
+                  <div data-sd-id="61">
+                    <h3 class="text-lg font-semibold text-white tracking-tight" data-sd-id="62">Principal Frontend Engineer</h3>
+                    <p class="text-[#ffd700] text-sm font-medium" data-sd-id="63">Vercel</p>
+                  </div>
+                  <span class="font-mono text-xs text-white/40 bg-white/5 px-3 py-1 rounded-full whitespace-nowrap" data-sd-id="64">2022 — Present</span>
+                </div>
+                <p class="text-sm text-white/50 leading-relaxed mb-4" data-sd-id="65">
+                  Leading design systems and AI-native developer tooling initiatives. Architected ForgeKit MCP for LLM-driven component generation. Drove adoption of TanStack Start across 4 product teams.
+                </p>
+                <div class="flex flex-wrap gap-2" data-sd-id="66">
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="67">Next.js</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="68">TanStack Start</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="69">MCP Protocol</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="70">Nx Monorepo</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="71">TypeScript</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Job 2 -->
+            <div class="relative pl-8 pb-10" data-sd-id="72">
+              <div class="absolute left-0 top-2 w-2.5 h-2.5 rounded-full bg-[#ffd700]/60 z-10" data-sd-id="73"></div>
+              <div class="absolute left-[4.5px] top-5 bottom-0 w-px timeline-line" data-sd-id="74"></div>
+
+              <div class="glass-panel card-hover rounded-xl p-6" data-sd-id="75">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3" data-sd-id="76">
+                  <div data-sd-id="77">
+                    <h3 class="text-lg font-semibold text-white tracking-tight" data-sd-id="78">Senior Frontend Engineer</h3>
+                    <p class="text-[#ffd700] text-sm font-medium" data-sd-id="79">Stripe</p>
+                  </div>
+                  <span class="font-mono text-xs text-white/40 bg-white/5 px-3 py-1 rounded-full whitespace-nowrap" data-sd-id="80">2019 — 2022</span>
+                </div>
+                <p class="text-sm text-white/50 leading-relaxed mb-4" data-sd-id="81">
+                  Built payment UI infrastructure powering $10B+ in transactions. Led migration from Webpack to Vite across 12 frontend apps. Shipped 200+ component design system adopted by 6 product teams.
+                </p>
+                <div class="flex flex-wrap gap-2" data-sd-id="82">
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="83">React</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="84">TypeScript</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="85">Storybook</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="86">Vite</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="87">CSS Modules</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Job 3 -->
+            <div class="relative pl-8 pb-10" data-sd-id="88">
+              <div class="absolute left-0 top-2 w-2.5 h-2.5 rounded-full bg-[#ffd700]/40 z-10" data-sd-id="89"></div>
+              <div class="absolute left-[4.5px] top-5 bottom-0 w-px timeline-line" data-sd-id="90"></div>
+
+              <div class="glass-panel card-hover rounded-xl p-6" data-sd-id="91">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3" data-sd-id="92">
+                  <div data-sd-id="93">
+                    <h3 class="text-lg font-semibold text-white tracking-tight" data-sd-id="94">Frontend Engineer</h3>
+                    <p class="text-[#ffd700] text-sm font-medium" data-sd-id="95">Airbnb</p>
+                  </div>
+                  <span class="font-mono text-xs text-white/40 bg-white/5 px-3 py-1 rounded-full whitespace-nowrap" data-sd-id="96">2017 — 2019</span>
+                </div>
+                <p class="text-sm text-white/50 leading-relaxed mb-4" data-sd-id="97">
+                  Developed host dashboard and booking flow experiences for 4M+ active listings. Contributed to DLS (Design Language System) used across 15+ product surfaces. Optimized Lighthouse scores from 62 to 94+.
+                </p>
+                <div class="flex flex-wrap gap-2" data-sd-id="98">
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="99">React</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="100">GraphQL</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="101">Redux</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="102">Styled Components</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Job 4 -->
+            <div class="relative pl-8" data-sd-id="103">
+              <div class="absolute left-0 top-2 w-2.5 h-2.5 rounded-full bg-white/20 z-10" data-sd-id="104"></div>
+
+              <div class="glass-panel card-hover rounded-xl p-6" data-sd-id="105">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3" data-sd-id="106">
+                  <div data-sd-id="107">
+                    <h3 class="text-lg font-semibold text-white tracking-tight" data-sd-id="108">Software Engineer</h3>
+                    <p class="text-white/40 text-sm font-medium" data-sd-id="109">Fast-growing startup (acquired)</p>
+                  </div>
+                  <span class="font-mono text-xs text-white/40 bg-white/5 px-3 py-1 rounded-full whitespace-nowrap" data-sd-id="110">2015 — 2017</span>
+                </div>
+                <p class="text-sm text-white/50 leading-relaxed mb-4" data-sd-id="111">
+                  First frontend hire. Built React Native mobile app from scratch, reaching 100K+ users in year one. Established testing culture with 80%+ coverage. Company acquired by public tech firm.
+                </p>
+                <div class="flex flex-wrap gap-2" data-sd-id="112">
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="113">React Native</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="114">Node.js</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="115">Jest</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-white/50" data-sd-id="116">Firebase</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ===== TECHNICAL SKILLS (1 col sidebar) ===== -->
+        <section class="lg:col-span-1 fade-in-up" data-sd-id="117">
+          <div class="sticky top-28" data-sd-id="118">
+            <div class="flex items-center gap-3 mb-8" data-sd-id="119">
+              <iconify-icon icon="lucide:code-2" class="text-[#ffd700] text-xl"></iconify-icon>
+              <h2 class="text-2xl font-bold tracking-tight text-white" data-sd-id="120">Skills</h2>
+              <div class="flex-1 h-[1px] bg-white/8" data-sd-id="121"></div>
+            </div>
+
+            <div class="space-y-5" data-sd-id="122">
+
+              <!-- Languages -->
+              <div class="glass-panel rounded-xl p-5" data-sd-id="123">
+                <div class="flex items-center gap-2 mb-3" data-sd-id="124">
+                  <iconify-icon icon="lucide:braces" class="text-[#00f0ff] text-base"></iconify-icon>
+                  <h3 class="font-mono text-xs uppercase tracking-widest text-white/50" data-sd-id="125">Languages</h3>
+                </div>
+                <div class="flex flex-wrap gap-2" data-sd-id="126">
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="127">TypeScript</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="128">JavaScript</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="129">Python</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="130">Rust</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="131">HTML5</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="132">CSS3</span>
+                </div>
+              </div>
+
+              <!-- Frameworks -->
+              <div class="glass-panel rounded-xl p-5" data-sd-id="133">
+                <div class="flex items-center gap-2 mb-3" data-sd-id="134">
+                  <iconify-icon icon="lucide:atom" class="text-[#ff007f] text-base"></iconify-icon>
+                  <h3 class="font-mono text-xs uppercase tracking-widest text-white/50" data-sd-id="135">Frameworks</h3>
+                </div>
+                <div class="flex flex-wrap gap-2" data-sd-id="136">
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="137">React</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="138">Next.js</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="139">TanStack Start</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="140">React Native</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="141">Vue</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="142">Remix</span>
+                </div>
+              </div>
+
+              <!-- Build & Tooling -->
+              <div class="glass-panel rounded-xl p-5" data-sd-id="143">
+                <div class="flex items-center gap-2 mb-3" data-sd-id="144">
+                  <iconify-icon icon="lucide:wrench" class="text-[#ffd700] text-base"></iconify-icon>
+                  <h3 class="font-mono text-xs uppercase tracking-widest text-white/50" data-sd-id="145">Build &amp; Tooling</h3>
+                </div>
+                <div class="flex flex-wrap gap-2" data-sd-id="146">
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="147">Nx</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="148">Vite</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="149">Turbopack</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="150">Webpack</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="151">Turborepo</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="152">esbuild</span>
+                </div>
+              </div>
+
+              <!-- Styling -->
+              <div class="glass-panel rounded-xl p-5" data-sd-id="153">
+                <div class="flex items-center gap-2 mb-3" data-sd-id="154">
+                  <iconify-icon icon="lucide:palette" class="text-[#00f0ff] text-base"></iconify-icon>
+                  <h3 class="font-mono text-xs uppercase tracking-widest text-white/50" data-sd-id="155">Styling &amp; Design</h3>
+                </div>
+                <div class="flex flex-wrap gap-2" data-sd-id="156">
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="157">Tailwind CSS</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="158">CSS Modules</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="159">Storybook</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="160">Figma</span>
+                </div>
+              </div>
+
+              <!-- Testing & CI -->
+              <div class="glass-panel rounded-xl p-5" data-sd-id="161">
+                <div class="flex items-center gap-2 mb-3" data-sd-id="162">
+                  <iconify-icon icon="lucide:shield-check" class="text-[#ff007f] text-base"></iconify-icon>
+                  <h3 class="font-mono text-xs uppercase tracking-widest text-white/50" data-sd-id="163">Testing &amp; CI/CD</h3>
+                </div>
+                <div class="flex flex-wrap gap-2" data-sd-id="164">
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="165">Vitest</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="166">Playwright</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="167">Testing Library</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="168">GitHub Actions</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="169">Docker</span>
+                </div>
+              </div>
+
+              <!-- AI & DevTools -->
+              <div class="glass-panel rounded-xl p-5" data-sd-id="170">
+                <div class="flex items-center gap-2 mb-3" data-sd-id="171">
+                  <iconify-icon icon="lucide:sparkles" class="text-[#ffd700] text-base"></iconify-icon>
+                  <h3 class="font-mono text-xs uppercase tracking-widest text-white/50" data-sd-id="172">AI &amp; DevTools</h3>
+                </div>
+                <div class="flex flex-wrap gap-2" data-sd-id="173">
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="174">MCP Protocol</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="175">LLM APIs</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="176">Copilot Extensions</span>
+                  <span class="skill-tag font-mono text-xs px-2.5 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/70" data-sd-id="177">Prompt Engineering</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== OPEN SOURCE CONTRIBUTIONS ===== -->
+      <section class="fade-in-up mb-16 md:mb-20" data-sd-id="178">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="179">
+          <iconify-icon icon="lucide:github" class="text-[#ffd700] text-xl"></iconify-icon>
+          <h2 class="text-2xl font-bold tracking-tight text-white" data-sd-id="180">Open Source Contributions</h2>
+          <div class="flex-1 h-[1px] bg-white/8" data-sd-id="181"></div>
+          <a id="resume-github-all" href="https://github.com/richtillman" class="font-mono text-xs text-white/40 hover:text-[#ffd700] transition-colors flex items-center gap-1.5 whitespace-nowrap" data-sd-id="182">
+            View all <iconify-icon icon="lucide:arrow-up-right" class="text-sm"></iconify-icon>
+          </a>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5" data-sd-id="183">
+
+          <!-- Project 1 -->
+          <a id="resume-os-forgekit" href="https://github.com/richtillman/forgekit-mcp" class="glass-panel card-hover rounded-2xl p-6 group block" data-sd-id="184">
+            <div class="flex items-start justify-between mb-4" data-sd-id="185">
+              <div class="w-11 h-11 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="186">
+                <iconify-icon icon="lucide:zap" class="text-[#ffd700] text-xl"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="text-white/20 group-hover:text-[#ffd700] group-hover:rotate-12 transition-all text-lg"></iconify-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-white tracking-tight mb-1" data-sd-id="187">ForgeKit MCP</h3>
+            <p class="text-sm text-white/40 leading-relaxed mb-4" data-sd-id="188">Model Context Protocol server for LLM-driven React component generation with design system awareness.</p>
+            <div class="flex items-center gap-4 font-mono text-xs text-white/40" data-sd-id="189">
+              <span class="flex items-center gap-1.5" data-sd-id="190"><iconify-icon icon="lucide:star" class="text-[#ffd700]"></iconify-icon> 1.2k</span>
+              <span class="flex items-center gap-1.5" data-sd-id="191"><iconify-icon icon="lucide:download" class="text-[#00f0ff]"></iconify-icon> 5,703/wk</span>
+              <span class="flex items-center gap-1.5" data-sd-id="192"><iconify-icon icon="lucide:git-fork" class="text-[#ff007f]"></iconify-icon> 89</span>
+            </div>
+          </a>
+
+          <!-- Project 2 -->
+          <a id="resume-os-designsystem" href="https://github.com/richtillman/design-system" class="glass-panel card-hover rounded-2xl p-6 group block" data-sd-id="193">
+            <div class="flex items-start justify-between mb-4" data-sd-id="194">
+              <div class="w-11 h-11 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="195">
+                <iconify-icon icon="lucide:layout-grid" class="text-[#00f0ff] text-xl"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="text-white/20 group-hover:text-[#ffd700] group-hover:rotate-12 transition-all text-lg"></iconify-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-white tracking-tight mb-1" data-sd-id="196">Design System Core</h3>
+            <p class="text-sm text-white/40 leading-relaxed mb-4" data-sd-id="197">200+ accessible, headless React components with full TypeScript support. Tree-shakeable. SSR-ready.</p>
+            <div class="flex items-center gap-4 font-mono text-xs text-white/40" data-sd-id="198">
+              <span class="flex items-center gap-1.5" data-sd-id="199"><iconify-icon icon="lucide:star" class="text-[#ffd700]"></iconify-icon> 847</span>
+              <span class="flex items-center gap-1.5" data-sd-id="200"><iconify-icon icon="lucide:download" class="text-[#00f0ff]"></iconify-icon> 12k/wk</span>
+              <span class="flex items-center gap-1.5" data-sd-id="201"><iconify-icon icon="lucide:git-fork" class="text-[#ff007f]"></iconify-icon> 124</span>
+            </div>
+          </a>
+
+          <!-- Project 3 -->
+          <a id="resume-os-rnperf" href="https://github.com/richtillman/rn-perf-monitor" class="glass-panel card-hover rounded-2xl p-6 group block" data-sd-id="202">
+            <div class="flex items-start justify-between mb-4" data-sd-id="203">
+              <div class="w-11 h-11 rounded-xl bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="204">
+                <iconify-icon icon="lucide:smartphone" class="text-[#ff007f] text-xl"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="text-white/20 group-hover:text-[#ffd700] group-hover:rotate-12 transition-all text-lg"></iconify-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-white tracking-tight mb-1" data-sd-id="205">RN Perf Monitor</h3>
+            <p class="text-sm text-white/40 leading-relaxed mb-4" data-sd-id="206">Real-time performance profiling toolkit for React Native apps. Used by 500K+ user apps in production.</p>
+            <div class="flex items-center gap-4 font-mono text-xs text-white/40" data-sd-id="207">
+              <span class="flex items-center gap-1.5" data-sd-id="208"><iconify-icon icon="lucide:star" class="text-[#ffd700]"></iconify-icon> 432</span>
+              <span class="flex items-center gap-1.5" data-sd-id="209"><iconify-icon icon="lucide:download" class="text-[#00f0ff]"></iconify-icon> 3.1k/wk</span>
+              <span class="flex items-center gap-1.5" data-sd-id="210"><iconify-icon icon="lucide:git-fork" class="text-[#ff007f]"></iconify-icon> 56</span>
+            </div>
+          </a>
+
+          <!-- Project 4 -->
+          <a id="resume-os-tailwind-plugin" href="https://github.com/richtillman/tw-animate" class="glass-panel card-hover rounded-2xl p-6 group block" data-sd-id="211">
+            <div class="flex items-start justify-between mb-4" data-sd-id="212">
+              <div class="w-11 h-11 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="213">
+                <iconify-icon icon="lucide:wand-2" class="text-[#ffd700] text-xl"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="text-white/20 group-hover:text-[#ffd700] group-hover:rotate-12 transition-all text-lg"></iconify-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-white tracking-tight mb-1" data-sd-id="214">tw-animate</h3>
+            <p class="text-sm text-white/40 leading-relaxed mb-4" data-sd-id="215">Tailwind CSS animation plugin with 60+ keyframe presets. Zero-config. Used in 8K+ projects.</p>
+            <div class="flex items-center gap-4 font-mono text-xs text-white/40" data-sd-id="216">
+              <span class="flex items-center gap-1.5" data-sd-id="217"><iconify-icon icon="lucide:star" class="text-[#ffd700]"></iconify-icon> 678</span>
+              <span class="flex items-center gap-1.5" data-sd-id="218"><iconify-icon icon="lucide:download" class="text-[#00f0ff]"></iconify-icon> 8.4k/wk</span>
+              <span class="flex items-center gap-1.5" data-sd-id="219"><iconify-icon icon="lucide:git-fork" class="text-[#ff007f]"></iconify-icon> 42</span>
+            </div>
+          </a>
+
+          <!-- Project 5 -->
+          <a id="resume-os-nx-preset" href="https://github.com/richtillman/nx-react-preset" class="glass-panel card-hover rounded-2xl p-6 group block" data-sd-id="220">
+            <div class="flex items-start justify-between mb-4" data-sd-id="221">
+              <div class="w-11 h-11 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="222">
+                <iconify-icon icon="lucide:boxes" class="text-[#00f0ff] text-xl"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="text-white/20 group-hover:text-[#ffd700] group-hover:rotate-12 transition-all text-lg"></iconify-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-white tracking-tight mb-1" data-sd-id="223">Nx React Preset</h3>
+            <p class="text-sm text-white/40 leading-relaxed mb-4" data-sd-id="224">Production-ready Nx monorepo preset with React, Tailwind, Storybook, and CI pre-configured.</p>
+            <div class="flex items-center gap-4 font-mono text-xs text-white/40" data-sd-id="225">
+              <span class="flex items-center gap-1.5" data-sd-id="226"><iconify-icon icon="lucide:star" class="text-[#ffd700]"></iconify-icon> 295</span>
+              <span class="flex items-center gap-1.5" data-sd-id="227"><iconify-icon icon="lucide:download" class="text-[#00f0ff]"></iconify-icon> 2.2k/wk</span>
+              <span class="flex items-center gap-1.5" data-sd-id="228"><iconify-icon icon="lucide:git-fork" class="text-[#ff007f]"></iconify-icon> 38</span>
+            </div>
+          </a>
+
+          <!-- Project 6 -->
+          <a id="resume-os-mcp-tools" href="https://github.com/richtillman/devtools-mcp" class="glass-panel card-hover rounded-2xl p-6 group block" data-sd-id="229">
+            <div class="flex items-start justify-between mb-4" data-sd-id="230">
+              <div class="w-11 h-11 rounded-xl bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="231">
+                <iconify-icon icon="lucide:terminal" class="text-[#ff007f] text-xl"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="text-white/20 group-hover:text-[#ffd700] group-hover:rotate-12 transition-all text-lg"></iconify-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-white tracking-tight mb-1" data-sd-id="232">DevTools MCP</h3>
+            <p class="text-sm text-white/40 leading-relaxed mb-4" data-sd-id="233">MCP server exposing browser DevTools, network inspector, and performance metrics to LLM agents.</p>
+            <div class="flex items-center gap-4 font-mono text-xs text-white/40" data-sd-id="234">
+              <span class="flex items-center gap-1.5" data-sd-id="235"><iconify-icon icon="lucide:star" class="text-[#ffd700]"></iconify-icon> 521</span>
+              <span class="flex items-center gap-1.5" data-sd-id="236"><iconify-icon icon="lucide:download" class="text-[#00f0ff]"></iconify-icon> 1.8k/wk</span>
+              <span class="flex items-center gap-1.5" data-sd-id="237"><iconify-icon icon="lucide:git-fork" class="text-[#ff007f]"></iconify-icon> 67</span>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- ===== EDUCATION & CERTIFICATIONS (compact) ===== -->
+      <section class="fade-in-up mb-16 md:mb-20" data-sd-id="238">
+        <div class="grid md:grid-cols-2 gap-5" data-sd-id="239">
+          <!-- Education -->
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="240">
+            <div class="flex items-center gap-3 mb-5" data-sd-id="241">
+              <iconify-icon icon="lucide:graduation-cap" class="text-[#ffd700] text-lg"></iconify-icon>
+              <h2 class="text-lg font-bold tracking-tight text-white" data-sd-id="242">Education</h2>
+            </div>
+            <div class="space-y-4" data-sd-id="243">
+              <div data-sd-id="244">
+                <div class="flex items-start justify-between gap-4" data-sd-id="245">
+                  <div data-sd-id="246">
+                    <h3 class="text-sm font-semibold text-white" data-sd-id="247">B.S. Computer Science</h3>
+                    <p class="text-sm text-[#ffd700]/80" data-sd-id="248">University of California, Berkeley</p>
+                  </div>
+                  <span class="font-mono text-xs text-white/30 whitespace-nowrap" data-sd-id="249">2011 — 2015</span>
+                </div>
+                <p class="text-xs text-white/40 mt-1" data-sd-id="250">Magna Cum Laude · ACM ICPC World Finals</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Certifications & Awards -->
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="251">
+            <div class="flex items-center gap-3 mb-5" data-sd-id="252">
+              <iconify-icon icon="lucide:award" class="text-[#ffd700] text-lg"></iconify-icon>
+              <h2 class="text-lg font-bold tracking-tight text-white" data-sd-id="253">Certifications &amp; Awards</h2>
+            </div>
+            <div class="space-y-3" data-sd-id="254">
+              <div class="flex items-center gap-3" data-sd-id="255">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#ffd700] shrink-0" data-sd-id="256"></div>
+                <p class="text-sm text-white/60" data-sd-id="257">AWS Certified Solutions Architect — Associate</p>
+              </div>
+              <div class="flex items-center gap-3" data-sd-id="258">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#00f0ff] shrink-0" data-sd-id="259"></div>
+                <p class="text-sm text-white/60" data-sd-id="260">Google Cloud Professional Cloud Architect</p>
+              </div>
+              <div class="flex items-center gap-3" data-sd-id="261">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#ff007f] shrink-0" data-sd-id="262"></div>
+                <p class="text-sm text-white/60" data-sd-id="263">Stripe Speaker Series — "Design Systems at Scale" (2023)</p>
+              </div>
+              <div class="flex items-center gap-3" data-sd-id="264">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#ffd700] shrink-0" data-sd-id="265"></div>
+                <p class="text-sm text-white/60" data-sd-id="266">React Conf Contributor Spotlight (2022)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== BOTTOM CTA ===== -->
+      <section class="fade-in-up" data-sd-id="267">
+        <div class="glass-panel rounded-3xl p-10 md:p-14 text-center relative overflow-hidden" data-sd-id="268">
+          <!-- Glow effect -->
+          <div class="absolute inset-0 bg-gradient-to-br from-[#ffd700]/5 via-transparent to-[#00f0ff]/5 pointer-events-none" data-sd-id="269"></div>
+
+          <div class="relative z-10" data-sd-id="270">
+            <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-4" data-sd-id="271">
+              Let's build something <span class="neon-text" data-sd-id="272">exceptional</span>.
+            </h2>
+            <p class="text-lg text-white/50 max-w-xl mx-auto mb-8" data-sd-id="273">
+              Available for principal/staff-level frontend roles, design system consulting, and AI-native tooling projects.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center" data-sd-id="274">
+              <a id="resume-cta-contact" href="https://p.superdesign.dev/draft/c906d6dd-0318-4f57-9ecd-0bd1b1280b06" class="px-7 py-3.5 bg-[#ffd700] hover:bg-[#ffe54c] text-black font-semibold rounded-full flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] hover:scale-105" data-sd-id="275">
+                <iconify-icon icon="lucide:mail" class="text-lg"></iconify-icon>
+                Get in touch
+              </a>
+              <button id="resume-cta-download" type="button" onclick="window.print()" class="px-7 py-3.5 glass-panel hover:bg-white/10 text-white font-medium rounded-full flex items-center justify-center gap-2 transition-all hover:scale-105" data-sd-id="276">
+                <iconify-icon icon="lucide:file-down" class="text-lg"></iconify-icon>
+                Download PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer Ticker -->
+  <!-- component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+<div v-scope="{ ...{&quot;showTicker&quot;:true}, $emit() {} }">
+<div v-if="showTicker" class="relative z-10 w-full overflow-hidden border-t border-white/5 bg-black/50 backdrop-blur-sm py-4 pointer-events-none"><style>@keyframes sd-ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } .sd-animate-ticker { animation: sd-ticker-scroll 30s linear infinite; }</style><div class="flex whitespace-nowrap sd-animate-ticker font-mono text-xs text-white/30 tracking-widest uppercase"><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div></div></div>
+</div>
+<!-- /component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+
+</div>
+
+<script>
+  // Smooth print
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+      // Native print will handle this
+    }
+  });
+</script>
+
+</body></html>

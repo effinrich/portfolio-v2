@@ -1,0 +1,308 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Site Map Grid</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains%2BMono:wght@100;200;300;400;500;600;700;800;900&amp;display=swap">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #000000;
+      color: white;
+    }
+    
+    .glass-card {
+      background: rgba(20, 20, 20, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .glass-card:hover {
+      border-color: #ffd700;
+      background: rgba(255, 215, 0, 0.05);
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 10px 30px -10px rgba(255, 215, 0, 0.2), inset 0 0 10px rgba(255, 215, 0, 0.05);
+    }
+    
+    .neon-underline {
+      position: relative;
+    }
+    
+    .neon-underline::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background: #ffd700;
+      box-shadow: 0 0 10px #ffd700;
+    }
+    
+    .neon-glow-cyan:hover {
+      border-color: #00f0ff;
+      box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.2);
+    }
+    
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .grid-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 60px 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="min-h-screen bg-black" data-sd-id="1">
+    <!-- Navigation Hub Header -->
+    <div class="grid-container" data-sd-id="2">
+      <header class="mb-16" data-sd-id="3">
+        <div class="flex items-center gap-3 mb-4" data-sd-id="4">
+          <span class="px-3 py-1 bg-[#ffd700]/10 border border-[#ffd700]/30 text-[#ffd700] text-[10px] font-bold tracking-widest uppercase rounded" data-sd-id="5">Design Map</span>
+          <div class="h-[1px] flex-grow bg-white/10" data-sd-id="6"></div>
+        </div>
+        <h1 class="text-5xl md:text-6xl font-extrabold tracking-tighter text-white mb-4" data-sd-id="7">
+          Portfolio <span class="text-[#ffd700]" data-sd-id="8">Index</span>
+        </h1>
+        <p class="text-white/50 max-w-2xl text-lg" data-sd-id="9">
+          A comprehensive visualization of all 24 application screens and architectural components designed for the Rich Tillman brand ecosystem.
+        </p>
+      </header>
+
+      <!-- Section 1: Core Pages -->
+      <section class="mb-16" data-sd-id="10">
+        <h2 class="text-xs font-bold tracking-[0.2em] uppercase text-white/40 mb-8 neon-underline" data-sd-id="11">01 Core Experience</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-sd-id="12">
+          <a href="https://p.superdesign.dev/draft/4ee229bd-e341-4e90-b88c-54789c125b7a" id="core-hero-link" class="glass-card p-6 rounded-2xl group" data-sd-id="13">
+            <div class="flex justify-between items-start mb-12" data-sd-id="14">
+              <iconify-icon icon="lucide:home" class="text-2xl text-[#ffd700]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="15">4EE2</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#ffd700] transition-colors" data-sd-id="16">Interactive Neon Hero</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="17">Main entrance &amp; metrics</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/draft-variant-fa5c95c5-edf9-43ae-a7ef-71b4fc4d61ec" id="core-work-link" class="glass-card p-6 rounded-2xl group" data-sd-id="18">
+            <div class="flex justify-between items-start mb-12" data-sd-id="19">
+              <iconify-icon icon="lucide:briefcase" class="text-2xl text-[#ffd700]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="20">FA5C</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#ffd700] transition-colors" data-sd-id="21">Work Portfolio</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="22">Selected highlights</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/draft-variant-7bd5ae73-7a1f-4e3a-b4a3-eaf39aa79e1f" id="core-contact-link" class="glass-card p-6 rounded-2xl group" data-sd-id="23">
+            <div class="flex justify-between items-start mb-12" data-sd-id="24">
+              <iconify-icon icon="lucide:mail" class="text-2xl text-[#ffd700]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="25">7BD5</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#ffd700] transition-colors" data-sd-id="26">Contact Form</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="27">Interactive lead capture</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/draft-variant-b30b6cde-85c5-4aca-b64d-020a57740881" id="core-about-link" class="glass-card p-6 rounded-2xl group" data-sd-id="28">
+            <div class="flex justify-between items-start mb-12" data-sd-id="29">
+              <iconify-icon icon="lucide:user" class="text-2xl text-[#ffd700]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="30">B30B</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#ffd700] transition-colors" data-sd-id="31">About Profile</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="32">Personal narrative</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- Section 2: Project Showcase -->
+      <section class="mb-16" data-sd-id="33">
+        <h2 class="text-xs font-bold tracking-[0.2em] uppercase text-white/40 mb-8 neon-underline" data-sd-id="34">02 Engineering Showcase</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-sd-id="35">
+          <a href="https://p.superdesign.dev/draft/842ac3f0-3493-41fc-b33e-0b65dc7b1fac" id="proj-tokencast-link" class="glass-card p-6 rounded-2xl group" data-sd-id="36">
+            <div class="flex justify-between items-start mb-12" data-sd-id="37">
+              <iconify-icon icon="lucide:layers" class="text-2xl text-[#00f0ff]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="38">842A</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#00f0ff] transition-colors" data-sd-id="39">Portfolio Projects</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="40">TokenCast &amp; MCP Atlas</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/4e864225-9dd3-4004-9997-9b8e595f9a90" id="proj-nx-link" class="glass-card p-6 rounded-2xl group neon-glow-cyan" data-sd-id="41">
+            <div class="flex justify-between items-start mb-12" data-sd-id="42">
+              <iconify-icon icon="lucide:git-merge" class="text-2xl text-[#00f0ff]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="43">4E86</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#00f0ff] transition-colors" data-sd-id="44">Nx Monorepo Case</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="45">Architecture Deep Dive</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/928a56fb-f02e-4bf7-af60-2db384528185" id="proj-mcp-link" class="glass-card p-6 rounded-2xl group neon-glow-cyan" data-sd-id="46">
+            <div class="flex justify-between items-start mb-12" data-sd-id="47">
+              <iconify-icon icon="lucide:cpu" class="text-2xl text-[#00f0ff]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="48">928A</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#00f0ff] transition-colors" data-sd-id="49">MCP Article Detail</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="50">Model Context Protocol</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/e65af955-87bc-428c-ab30-97904a62cc10" id="proj-light-link" class="glass-card p-6 rounded-2xl group neon-glow-cyan" data-sd-id="51">
+            <div class="flex justify-between items-start mb-12" data-sd-id="52">
+              <iconify-icon icon="lucide:zap" class="text-2xl text-[#00f0ff]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="53">E65A</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#00f0ff] transition-colors" data-sd-id="54">Lighthouse Performance</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="55">Architecting for 100</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/11a4cf01-746e-445a-b6d8-ec452384ec41" id="proj-sb-link" class="glass-card p-6 rounded-2xl group neon-glow-cyan" data-sd-id="56">
+            <div class="flex justify-between items-start mb-12" data-sd-id="57">
+              <iconify-icon icon="lucide:layout-template" class="text-2xl text-[#00f0ff]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="58">11A4</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#00f0ff] transition-colors" data-sd-id="59">Storybook Playgrounds</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="60">Next.js Integration</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/815571f8-5142-488d-b3db-9f2b29132258" id="proj-t-link" class="glass-card p-6 rounded-2xl group neon-glow-cyan" data-sd-id="61">
+            <div class="flex justify-between items-start mb-12" data-sd-id="62">
+              <iconify-icon icon="lucide:shield-check" class="text-2xl text-[#00f0ff]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="63">8155</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#00f0ff] transition-colors" data-sd-id="64">T-Shaped Principal</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="65">Leadership Framework</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/0d628c16-6498-478c-9acf-c36be8f330de" id="proj-tanstack-link" class="glass-card p-6 rounded-2xl group neon-glow-cyan" data-sd-id="66">
+            <div class="flex justify-between items-start mb-12" data-sd-id="67">
+              <iconify-icon icon="lucide:rocket" class="text-2xl text-[#00f0ff]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="68">0D62</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#00f0ff] transition-colors" data-sd-id="69">TanStack Start</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="70">Advanced Mastering</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/7efe48e1-1691-4a11-b2e2-bf029faa23f4" id="proj-rn-link" class="glass-card p-6 rounded-2xl group neon-glow-cyan" data-sd-id="71">
+            <div class="flex justify-between items-start mb-12" data-sd-id="72">
+              <iconify-icon icon="lucide:smartphone" class="text-2xl text-[#00f0ff]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="73">7EFE</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#00f0ff] transition-colors" data-sd-id="74">React Native Scale</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="75">Enterprise Strategies</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- Section 3: Professional -->
+      <section class="mb-16" data-sd-id="76">
+        <h2 class="text-xs font-bold tracking-[0.2em] uppercase text-white/40 mb-8 neon-underline" data-sd-id="77">03 Trust &amp; Credentials</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-sd-id="78">
+          <a href="https://p.superdesign.dev/draft/ec14a340-aae5-411e-becb-8135c3ac07ca" id="prof-services-link" class="glass-card p-6 rounded-2xl group" data-sd-id="79">
+            <div class="flex justify-between items-start mb-12" data-sd-id="80">
+              <iconify-icon icon="lucide:award" class="text-2xl text-[#ffd700]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="81">EC14</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#ffd700] transition-colors" data-sd-id="82">Services &amp; Expertise</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="83">Offering Details</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/854c6625-18b8-4301-a487-7467880bab7d" id="prof-testimonials-link" class="glass-card p-6 rounded-2xl group" data-sd-id="84">
+            <div class="flex justify-between items-start mb-12" data-sd-id="85">
+              <iconify-icon icon="lucide:message-square" class="text-2xl text-[#ffd700]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="86">854C</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#ffd700] transition-colors" data-sd-id="87">Testimonials</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="88">Social Proof</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/2b4c8063-bad8-46a1-82bf-342313d619e8" id="prof-resume-link" class="glass-card p-6 rounded-2xl group" data-sd-id="89">
+            <div class="flex justify-between items-start mb-12" data-sd-id="90">
+              <iconify-icon icon="lucide:file-text" class="text-2xl text-[#ffd700]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="91">2B4C</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#ffd700] transition-colors" data-sd-id="92">Professional Resume</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="93">Interactive History</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/698370a6-dbfe-4eb2-ad2a-3f417f5f0204" id="prof-faq-link" class="glass-card p-6 rounded-2xl group" data-sd-id="94">
+            <div class="flex justify-between items-start mb-12" data-sd-id="95">
+              <iconify-icon icon="lucide:help-circle" class="text-2xl text-[#ffd700]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="96">6983</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#ffd700] transition-colors" data-sd-id="97">FAQ</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="98">Common Questions</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- Section 4: Resources -->
+      <section class="mb-16" data-sd-id="99">
+        <h2 class="text-xs font-bold tracking-[0.2em] uppercase text-white/40 mb-8 neon-underline" data-sd-id="100">04 Knowledge Base</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-sd-id="101">
+          <a href="https://p.superdesign.dev/draft/09fc29b5-265e-46c3-bc95-0233b3ee5c93" id="res-tools-link" class="glass-card p-6 rounded-2xl group" data-sd-id="102">
+            <div class="flex justify-between items-start mb-12" data-sd-id="103">
+              <iconify-icon icon="lucide:wrench" class="text-2xl text-[#ff007f]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="104">09FC</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#ff007f] transition-colors" data-sd-id="105">Resources &amp; Tools</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="106">Stacks &amp; Boilerplates</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/6f3a87fb-5d47-42e5-b6a6-abcf1b96c10b" id="res-articles-link" class="glass-card p-6 rounded-2xl group" data-sd-id="107">
+            <div class="flex justify-between items-start mb-12" data-sd-id="108">
+              <iconify-icon icon="lucide:library" class="text-2xl text-[#ff007f]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="109">6F3A</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#ff007f] transition-colors" data-sd-id="110">Insights &amp; Articles</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="111">Curated Feed</p>
+          </a>
+          <a href="https://p.superdesign.dev/draft/5d7e7e5e-bc4c-4493-894c-bac01a3d0657" id="res-nav-link" class="glass-card p-6 rounded-2xl group" data-sd-id="112">
+            <div class="flex justify-between items-start mb-12" data-sd-id="113">
+              <iconify-icon icon="lucide:navigation" class="text-2xl text-[#ff007f]"></iconify-icon>
+              <span class="mono text-[10px] text-white/20" data-sd-id="114">5D7E</span>
+            </div>
+            <h3 class="text-white font-semibold text-lg leading-tight group-hover:text-[#ff007f] transition-colors" data-sd-id="115">Blog Navigation</h3>
+            <p class="text-white/40 text-xs mt-2" data-sd-id="116">Link Updates</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- Section 5: Architectural Components -->
+      <section class="mb-24" data-sd-id="117">
+        <h2 class="text-xs font-bold tracking-[0.2em] uppercase text-white/40 mb-8 neon-underline" data-sd-id="118">05 Components Library</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-sd-id="119">
+          <div class="glass-card p-6 rounded-2xl border-white/5" data-sd-id="120">
+            <div class="flex items-center gap-3 mb-4" data-sd-id="121">
+              <div class="w-8 h-8 rounded bg-zinc-900 border border-white/10 flex items-center justify-center font-mono text-xs font-bold text-[#ffd700]" data-sd-id="122">N</div>
+              <h3 class="text-white font-medium" data-sd-id="123">NavigationBar</h3>
+            </div>
+            <p class="text-white/30 text-xs mb-4" data-sd-id="124">Global navigation system with availability status.</p>
+            <div class="px-3 py-1 bg-white/5 rounded-lg mono text-[10px] text-white/50 border border-white/5" data-sd-id="125">ID: 80D6-2EE2-98D9-4B52</div>
+          </div>
+          <div class="glass-card p-6 rounded-2xl border-white/5" data-sd-id="126">
+            <div class="flex items-center gap-3 mb-4" data-sd-id="127">
+              <div class="w-8 h-8 rounded bg-zinc-900 border border-white/10 flex items-center justify-center font-mono text-xs font-bold text-[#00f0ff]" data-sd-id="128">B</div>
+              <h3 class="text-white font-medium" data-sd-id="129">CanvasBackground</h3>
+            </div>
+            <p class="text-white/30 text-xs mb-4" data-sd-id="130">Interactive 3D neon tube system for atmosphere.</p>
+            <div class="px-3 py-1 bg-white/5 rounded-lg mono text-[10px] text-white/50 border border-white/5" data-sd-id="131">ID: DB5D-26AC-3682-42E6</div>
+          </div>
+          <div class="glass-card p-6 rounded-2xl border-white/5" data-sd-id="132">
+            <div class="flex items-center gap-3 mb-4" data-sd-id="133">
+              <div class="w-8 h-8 rounded bg-zinc-900 border border-white/10 flex items-center justify-center font-mono text-xs font-bold text-[#ff007f]" data-sd-id="134">T</div>
+              <h3 class="text-white font-medium" data-sd-id="135">HeroFooterTicker</h3>
+            </div>
+            <p class="text-white/30 text-xs mb-4" data-sd-id="136">Infinite horizontal tech stack scroll component.</p>
+            <div class="px-3 py-1 bg-white/5 rounded-lg mono text-[10px] text-white/50 border border-white/5" data-sd-id="137">ID: 5797-5466-4F82-4713</div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-6" data-sd-id="138">
+        <div class="flex items-center gap-4" data-sd-id="139">
+          <div class="w-10 h-10 rounded bg-zinc-900 border border-white/20 flex items-center justify-center font-mono text-lg font-bold text-[#ffd700]" data-sd-id="140">R</div>
+          <div data-sd-id="141">
+            <p class="text-sm font-bold text-white" data-sd-id="142">Rich Tillman Portfolio</p>
+            <p class="text-xs text-white/30" data-sd-id="143">Principal Frontend Engineer Ecosystem</p>
+          </div>
+        </div>
+        <div class="flex gap-8 text-xs font-mono text-white/20 uppercase tracking-widest" data-sd-id="144">
+          <span data-sd-id="145">v2.0.4 - Canary</span>
+          <span data-sd-id="146">Built with Tailwind + Petite-Vue</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+</body></html>

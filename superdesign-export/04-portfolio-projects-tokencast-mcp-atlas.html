@@ -1,0 +1,351 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work Portfolio - Rich Tillman</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <script src="https://unpkg.com/petite-vue" defer="" init=""></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <script type="module">
+    import TubesCursor from 'https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const canvas = document.getElementById('bg-canvas');
+        if (!canvas) return;
+        
+        try {
+          const app = TubesCursor(canvas, {
+            tubes: {
+              colors: ['#00f0ff', '#ff007f', '#ffd700'],
+              lights: {
+                intensity: 150,
+                colors: ['#83f36e', '#00f0ff', '#ff008a', '#ffd700']
+              }
+            }
+          });
+          
+          const randomColors = (count) => {
+            return new Array(count)
+              .fill(0)
+              .map(() => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'));
+          };
+
+          const container = document.getElementById('bg-container');
+          if (container) {
+            container.addEventListener('click', (e) => {
+              if (e.target.closest('a') || e.target.closest('button')) return;
+              const colors = randomColors(3);
+              const lightsColors = randomColors(4);
+              app.tubes.setColors(colors);
+              app.tubes.setLightsColors(lightsColors);
+            });
+          }
+        } catch (err) {
+          console.error('Failed to init tubes:', err);
+        }
+      }, 100);
+    });
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-panel {
+      background: rgba(20, 20, 20, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    }
+    .neon-text {
+      background: linear-gradient(90deg, #00f0ff, #ffd700, #ff007f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shine 5s linear infinite;
+    }
+    @keyframes shine {
+      to {
+        background-position: 200% center;
+      }
+    }
+    @keyframes fade-in-up {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .stagger-1 { animation: fade-in-up 0.6s ease-out 0.1s backwards; }
+    .stagger-2 { animation: fade-in-up 0.6s ease-out 0.2s backwards; }
+    .stagger-3 { animation: fade-in-up 0.6s ease-out 0.3s backwards; }
+    .stagger-4 { animation: fade-in-up 0.6s ease-out 0.4s backwards; }
+    .stagger-5 { animation: fade-in-up 0.6s ease-out 0.5s backwards; }
+    .stagger-6 { animation: fade-in-up 0.6s ease-out 0.6s backwards; }
+    
+    .project-card {
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .project-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: rgba(255, 215, 0, 0.4);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1), 0 20px 40px -10px rgba(255, 215, 0, 0.15), 0 0 20px rgba(255, 215, 0, 0.1);
+    }
+    .project-card:hover .project-img-overlay {
+      opacity: 0.6;
+    }
+    .project-card:hover .project-icon {
+      transform: scale(1.1);
+      color: #ffd700;
+    }
+  </style>
+</head>
+<body>
+  <div id="bg-container" class="relative min-h-screen w-full flex flex-col cursor-crosshair z-0" data-sd-id="1">
+    
+    <!-- Fixed Canvas Background Component -->
+    <div class="fixed inset-0 z-0 pointer-events-none" data-sd-id="2">
+      <!-- component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+<div v-scope="{ ...{&quot;canvasOpacity&quot;:0.9,&quot;showGrid&quot;:true,&quot;showGradient&quot;:true}, $emit() {} }">
+<div id="bg-container" class="relative min-h-screen w-full overflow-hidden bg-black flex flex-col cursor-crosshair" @click="$emit('backgroundClick', $event)"><canvas id="bg-canvas" class="absolute inset-0 w-full h-full block z-0" :style="{ opacity: canvasOpacity, touchAction: 'none' }"></canvas><div v-if="showGrid" class="absolute inset-0 pointer-events-none z-0" style="background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div><div v-if="showGradient" class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-0 pointer-events-none"></div></div>
+</div>
+<!-- /component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+    </div>
+
+    <!-- Navigation Component -->
+    <div class="fixed top-0 left-0 w-full z-50 pointer-events-auto" data-sd-id="3">
+      <!-- component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+<div v-scope="{ ...{&quot;activeItem&quot;:&quot;work&quot;,&quot;isAvailable&quot;:true,&quot;workHref&quot;:&quot;#work&quot;,&quot;projectsHref&quot;:&quot;#projects&quot;,&quot;stackHref&quot;:&quot;#stack&quot;,&quot;contactHref&quot;:&quot;#contact&quot;}, $emit() {} }">
+<nav class="fixed top-0 left-0 w-full z-40 border-x-0 border-t-0 border-b border-white/10 px-6 py-4" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-8 h-8 rounded bg-zinc-900 border border-white/20 flex items-center justify-center font-mono text-sm font-bold text-[#ffd700]">
+        R
+      </div>
+      <span class="font-medium tracking-tight text-white/90 hidden sm:inline-block">
+        Rich Tillman <span class="text-white/40 font-normal">/ Principal Frontend Engineer</span>
+      </span>
+    </div>
+    
+    <div class="hidden md:flex items-center gap-12 text-sm font-medium">
+      <a :href="workHref" :class="activeItem === 'work' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Work</a>
+      <a :href="projectsHref" :class="activeItem === 'projects' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Projects</a>
+      <a :href="stackHref" :class="activeItem === 'stack' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Stack</a>
+      <a :href="contactHref" :class="activeItem === 'contact' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Contact</a>
+    </div>
+
+    <div v-if="isAvailable" class="flex items-center gap-3 rounded-full px-3 py-1.5 border border-[#ffd700]/30 bg-[#ffd700]/5" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px);">
+      <div class="w-2 h-2 rounded-full bg-[#ffd700] animate-pulse"></div>
+      <span class="text-xs font-medium text-[#ffd700]">Available</span>
+    </div>
+  </div>
+</nav>
+</div>
+<!-- /component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+    </div>
+
+    <!-- Main Content -->
+    <main class="relative z-10 flex-1 flex flex-col w-full max-w-7xl mx-auto px-6 pt-32 pb-24 pointer-events-none" data-sd-id="4">
+      
+      <!-- Header -->
+      <div class="mb-16 pointer-events-auto" data-sd-id="5">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter text-white mb-4" data-sd-id="6">
+          Selected <span class="neon-text" data-sd-id="7">Work</span>
+        </h1>
+        <p class="text-lg text-white/60 max-w-2xl" data-sd-id="8">
+          A showcase of enterprise design systems, complex React architectures, and AI-native developer tools.
+        </p>
+      </div>
+
+      <!-- Projects Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pointer-events-auto" data-sd-id="9">
+        
+        <!-- Project 0a: TokenCast -->
+        <div class="project-card glass-panel rounded-2xl overflow-hidden group stagger-1 block" data-sd-id="71">
+          <div class="relative aspect-[16/9] bg-zinc-950 flex items-center justify-center overflow-hidden border-b border-white/5" data-sd-id="72">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#ffd700]/20 to-transparent project-img-overlay transition-opacity duration-500 opacity-30" data-sd-id="73"></div>
+            <iconify-icon icon="lucide:trending-up" class="text-5xl text-white/30 project-icon transition-all duration-500 relative z-10"></iconify-icon>
+          </div>
+          <div class="p-6" data-sd-id="74">
+            <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="75">TokenCast</h3>
+            <p class="text-sm text-white/60 mb-6 line-clamp-2 leading-relaxed" data-sd-id="76">
+              Real-time token metrics dashboard with live streaming data and interactive visualizations.
+            </p>
+            <div class="flex flex-wrap gap-2 mb-6" data-sd-id="77">
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider">React</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider">Next.js</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider">WebSockets</span>
+            </div>
+            <div class="flex gap-3">
+              <a id="cta-tokencast-live" href="https://tokencast.vercel.app/" class="flex-1 py-2 px-4 bg-[#ffd700] hover:bg-[#ffe54c] text-black text-xs font-bold rounded-lg text-center transition-all">Live Demo</a>
+              <a id="cta-tokencast-git" href="https://github.com/effinrich/tokencast/tree/main" class="flex-1 py-2 px-4 glass-panel hover:bg-white/10 text-white text-xs font-bold rounded-lg text-center transition-all">GitHub</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 0b: MCP Atlas -->
+        <div class="project-card glass-panel rounded-2xl overflow-hidden group stagger-1 block" data-sd-id="78">
+          <div class="relative aspect-[16/9] bg-zinc-950 flex items-center justify-center overflow-hidden border-b border-white/5" data-sd-id="79">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#00f0ff]/20 to-transparent project-img-overlay transition-opacity duration-500 opacity-30" data-sd-id="80"></div>
+            <iconify-icon icon="lucide:network" class="text-5xl text-white/30 project-icon transition-all duration-500 relative z-10"></iconify-icon>
+          </div>
+          <div class="p-6" data-sd-id="81">
+            <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="82">MCP Atlas</h3>
+            <p class="text-sm text-white/60 mb-6 line-clamp-2 leading-relaxed" data-sd-id="83">
+              Interactive Model Context Protocol explorer and documentation for AI-native developers.
+            </p>
+            <div class="flex flex-wrap gap-2 mb-6" data-sd-id="84">
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider">TypeScript</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider">MCP</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider">DevTools</span>
+            </div>
+            <div class="flex gap-3">
+              <a id="cta-atlas-live" href="https://mcp-atlas-orcin.vercel.app/" class="flex-1 py-2 px-4 bg-[#ffd700] hover:bg-[#ffe54c] text-black text-xs font-bold rounded-lg text-center transition-all">Live Demo</a>
+              <a id="cta-atlas-git" href="https://github.com/effinrich/mcp-atlas/tree/main" class="flex-1 py-2 px-4 glass-panel hover:bg-white/10 text-white text-xs font-bold rounded-lg text-center transition-all">GitHub</a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Project 1: ForgeKit MCP -->
+        <a href="https://p.superdesign.dev/draft/ca0ebbd5-efbb-4914-bca5-7a4c4ce409e6" class="project-card glass-panel rounded-2xl overflow-hidden group stagger-1 block" data-sd-id="10">
+          <div class="relative aspect-[16/9] bg-zinc-950 flex items-center justify-center overflow-hidden border-b border-white/5" data-sd-id="11">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#00f0ff]/20 to-transparent project-img-overlay transition-opacity duration-500 opacity-30" data-sd-id="12"></div>
+            <iconify-icon icon="lucide:cpu" class="text-5xl text-white/30 project-icon transition-all duration-500 relative z-10"></iconify-icon>
+          </div>
+          <div class="p-6" data-sd-id="13">
+            <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="14">ForgeKit MCP</h3>
+            <p class="text-sm text-white/60 mb-6 line-clamp-2 leading-relaxed" data-sd-id="15">
+              AI-native developer tooling connecting LLMs directly to enterprise React component libraries.
+            </p>
+            <div class="flex flex-wrap gap-2" data-sd-id="16">
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="17">React</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="18">AI/LLM</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="19">Node.js</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Project 2: Storybook Component System -->
+        <a href="https://p.superdesign.dev/draft/74e6a149-e825-4c2d-b523-bfec727859bf" class="project-card glass-panel rounded-2xl overflow-hidden group stagger-2 block" data-sd-id="20">
+          <div class="relative aspect-[16/9] bg-zinc-950 flex items-center justify-center overflow-hidden border-b border-white/5" data-sd-id="21">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#ff007f]/20 to-transparent project-img-overlay transition-opacity duration-500 opacity-30" data-sd-id="22"></div>
+            <iconify-icon icon="lucide:component" class="text-5xl text-white/30 project-icon transition-all duration-500 relative z-10"></iconify-icon>
+          </div>
+          <div class="p-6" data-sd-id="23">
+            <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="24">Storybook System</h3>
+            <p class="text-sm text-white/60 mb-6 line-clamp-2 leading-relaxed" data-sd-id="25">
+              Comprehensive UI component library with 200+ accessible, customizable elements for SaaS platforms.
+            </p>
+            <div class="flex flex-wrap gap-2" data-sd-id="26">
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="27">Storybook</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="28">TypeScript</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="29">Tailwind</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Project 3: React Native App -->
+        <a href="https://p.superdesign.dev/draft/5d7e7e5e-bc4c-4493-894c-bac01a3d0657" class="project-card glass-panel rounded-2xl overflow-hidden group stagger-3 block" data-sd-id="30">
+          <div class="relative aspect-[16/9] bg-zinc-950 flex items-center justify-center overflow-hidden border-b border-white/5" data-sd-id="31">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#ffd700]/20 to-transparent project-img-overlay transition-opacity duration-500 opacity-30" data-sd-id="32"></div>
+            <iconify-icon icon="lucide:smartphone" class="text-5xl text-white/30 project-icon transition-all duration-500 relative z-10"></iconify-icon>
+          </div>
+          <div class="p-6" data-sd-id="33">
+            <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="34">Flagship Mobile App</h3>
+            <p class="text-sm text-white/60 mb-6 line-clamp-2 leading-relaxed" data-sd-id="35">
+              High-performance React Native application serving 500K+ monthly active users with offline support.
+            </p>
+            <div class="flex flex-wrap gap-2" data-sd-id="36">
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="37">React Native</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="38">Expo</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="39">Reanimated</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Project 4: Nx Monorepo Architecture -->
+        <a href="https://p.superdesign.dev/draft/4e864225-9dd3-4004-9997-9b8e595f9a90" class="project-card glass-panel rounded-2xl overflow-hidden group stagger-4 block" data-sd-id="40">
+          <div class="relative aspect-[16/9] bg-zinc-950 flex items-center justify-center overflow-hidden border-b border-white/5" data-sd-id="41">
+            <div class="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-transparent project-img-overlay transition-opacity duration-500 opacity-30" data-sd-id="42"></div>
+            <iconify-icon icon="lucide:layers" class="text-5xl text-white/30 project-icon transition-all duration-500 relative z-10"></iconify-icon>
+          </div>
+          <div class="p-6" data-sd-id="43">
+            <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="44">Nx Monorepo Scale</h3>
+            <p class="text-sm text-white/60 mb-6 line-clamp-2 leading-relaxed" data-sd-id="45">
+              Architected multi-app infrastructure reducing CI/CD build times by 60% across 15 engineering teams.
+            </p>
+            <div class="flex flex-wrap gap-2" data-sd-id="46">
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="47">Nx</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="48">Turborepo</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="49">CI/CD</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Project 5: TanStack Start Migration -->
+        <a href="https://p.superdesign.dev/draft/36b48549-7be9-418d-b0c1-af81de96c79f" class="project-card glass-panel rounded-2xl overflow-hidden group stagger-5 block" data-sd-id="50">
+          <div class="relative aspect-[16/9] bg-zinc-950 flex items-center justify-center overflow-hidden border-b border-white/5" data-sd-id="51">
+            <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent project-img-overlay transition-opacity duration-500 opacity-30" data-sd-id="52"></div>
+            <iconify-icon icon="lucide:zap" class="text-5xl text-white/30 project-icon transition-all duration-500 relative z-10"></iconify-icon>
+          </div>
+          <div class="p-6" data-sd-id="53">
+            <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="54">TanStack Migration</h3>
+            <p class="text-sm text-white/60 mb-6 line-clamp-2 leading-relaxed" data-sd-id="55">
+              Led platform migration to TanStack Start, improving core web vitals and developer experience.
+            </p>
+            <div class="flex flex-wrap gap-2" data-sd-id="56">
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="57">TanStack</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="58">React Router</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="59">Vite</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Project 6: Figma MCP Integration -->
+        <a href="https://p.superdesign.dev/draft/09fc29b5-265e-46c3-bc95-0233b3ee5c93" class="project-card glass-panel rounded-2xl overflow-hidden group stagger-6 block" data-sd-id="60">
+          <div class="relative aspect-[16/9] bg-zinc-950 flex items-center justify-center overflow-hidden border-b border-white/5" data-sd-id="61">
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent project-img-overlay transition-opacity duration-500 opacity-30" data-sd-id="62"></div>
+            <iconify-icon icon="lucide:figma" class="text-5xl text-white/30 project-icon transition-all duration-500 relative z-10"></iconify-icon>
+          </div>
+          <div class="p-6" data-sd-id="63">
+            <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="64">Figma Design Pipeline</h3>
+            <p class="text-sm text-white/60 mb-6 line-clamp-2 leading-relaxed" data-sd-id="65">
+              Custom Figma plugin syncing design tokens automatically with code repositories and storybook.
+            </p>
+            <div class="flex flex-wrap gap-2" data-sd-id="66">
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="67">Figma API</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="68">TypeScript</span>
+              <span class="px-2.5 py-1 rounded-md border border-[#ffd700]/30 bg-[#ffd700]/5 text-[#ffd700] text-[10px] font-mono uppercase tracking-wider" data-sd-id="69">Tokens</span>
+            </div>
+          </div>
+        </a>
+
+      </div>
+    </main>
+
+    <!-- Ticker Component -->
+    <div class="mt-auto relative z-10 pointer-events-auto" data-sd-id="70">
+      <!-- component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+<div v-scope="{ ...{&quot;showTicker&quot;:true}, $emit() {} }">
+<div v-if="showTicker" class="relative z-10 w-full overflow-hidden border-t border-white/5 bg-black/50 backdrop-blur-sm py-4 pointer-events-none"><style>@keyframes sd-ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } .sd-animate-ticker { animation: sd-ticker-scroll 30s linear infinite; }</style><div class="flex whitespace-nowrap sd-animate-ticker font-mono text-xs text-white/30 tracking-widest uppercase"><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div></div></div>
+</div>
+<!-- /component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+    </div>
+
+  </div>
+
+</body></html>

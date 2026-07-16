@@ -1,0 +1,921 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="view-transition" content="same-origin">
+  <title>FAQ — Rich Tillman, Principal Frontend Engineer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <script src="https://unpkg.com/petite-vue" defer="" init=""></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <script type="module">
+    import TubesCursor from 'https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js';
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const canvas = document.getElementById('bg-canvas');
+        if (!canvas) return;
+        try {
+          const app = TubesCursor(canvas, {
+            tubes: {
+              colors: ['#00f0ff', '#ff007f', '#ffd700'],
+              lights: { intensity: 150, colors: ['#83f36e', '#00f0ff', '#ff008a', '#ffd700'] }
+            }
+          });
+          const randomColors = (count) => new Array(count).fill(0).map(() => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'));
+          const container = document.getElementById('bg-container');
+          if (container) {
+            container.addEventListener('click', (e) => {
+              if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input') || e.target.closest('summary')) return;
+              app.tubes.setColors(randomColors(3));
+              app.tubes.setLightsColors(randomColors(4));
+            });
+          }
+        } catch (err) { console.error('Failed to init tubes:', err); }
+      }, 100);
+    });
+  </script>
+  <style>
+    html { background-color: #000000; }
+    @view-transition { navigation: auto; }
+    ::view-transition { background-color: #000000; }
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+    ::view-transition-old(main-content) { animation: 0.25s ease-out both fade-out; }
+    ::view-transition-new(main-content) { animation: 0.25s ease-in 0.1s both fade-in; }
+    @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    .glass-panel {
+      background: rgba(20, 20, 20, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    }
+    .glass-input {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+    .glass-input:focus {
+      outline: none;
+      border-color: rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1), 0 0 20px rgba(255, 215, 0, 0.08);
+      background: rgba(0, 0, 0, 0.5);
+    }
+    .glass-input::placeholder { color: rgba(255, 255, 255, 0.3); }
+    
+    .neon-text {
+      background: linear-gradient(90deg, #00f0ff, #ffd700, #ff007f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shine 5s linear infinite;
+    }
+    @keyframes shine { to { background-position: 200% center; } }
+    
+    .grid-bg {
+      background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), 
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    
+    /* Scroll reveal */
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+    }
+    .scroll-reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* Accordion styles */
+    .faq-item {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .faq-item:hover {
+      border-color: rgba(255, 215, 0, 0.2);
+    }
+    .faq-item[open] {
+      border-color: rgba(255, 215, 0, 0.3);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 30px -10px rgba(255, 215, 0, 0.15);
+    }
+    .faq-item[open] .faq-icon {
+      transform: rotate(180deg);
+      color: #ffd700;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary { list-style: none; }
+    .faq-icon {
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    
+    /* Category badge hover */
+    .category-badge {
+      transition: all 0.3s ease;
+    }
+    .category-badge:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px -10px rgba(255, 215, 0, 0.2);
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #000000; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 215, 0, 0.3); }
+    
+    @media (prefers-reduced-motion: reduce) {
+      .neon-text { animation: none; }
+      .scroll-reveal { transition: none; opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Fixed Canvas Background -->
+  <div class="fixed inset-0 z-0" style="view-transition-name: canvas-bg;" data-sd-id="1">
+    <!-- component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+<div v-scope="{ ...{&quot;canvasOpacity&quot;:0.9,&quot;showGrid&quot;:true,&quot;showGradient&quot;:true}, $emit() {} }">
+<div id="bg-container" class="relative min-h-screen w-full overflow-hidden bg-black flex flex-col cursor-crosshair" @click="$emit('backgroundClick', $event)"><canvas id="bg-canvas" class="absolute inset-0 w-full h-full block z-0" :style="{ opacity: canvasOpacity, touchAction: 'none' }"></canvas><div v-if="showGrid" class="absolute inset-0 pointer-events-none z-0" style="background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div><div v-if="showGradient" class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-0 pointer-events-none"></div></div>
+</div>
+<!-- /component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+  </div>
+
+  <!-- Main Wrapper -->
+  <div class="relative min-h-screen w-full flex flex-col cursor-crosshair z-10 pointer-events-none" data-sd-id="2">
+    
+    <!-- Navigation -->
+    <div class="pointer-events-auto" style="view-transition-name: main-nav;" data-sd-id="3">
+      <!-- component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+<div v-scope="{ ...{&quot;activeItem&quot;:&quot;work&quot;,&quot;isAvailable&quot;:true,&quot;workHref&quot;:&quot;#work&quot;,&quot;projectsHref&quot;:&quot;#projects&quot;,&quot;stackHref&quot;:&quot;#stack&quot;,&quot;contactHref&quot;:&quot;#contact&quot;}, $emit() {} }">
+<nav class="fixed top-0 left-0 w-full z-40 border-x-0 border-t-0 border-b border-white/10 px-6 py-4" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-8 h-8 rounded bg-zinc-900 border border-white/20 flex items-center justify-center font-mono text-sm font-bold text-[#ffd700]">
+        R
+      </div>
+      <span class="font-medium tracking-tight text-white/90 hidden sm:inline-block">
+        Rich Tillman <span class="text-white/40 font-normal">/ Principal Frontend Engineer</span>
+      </span>
+    </div>
+    
+    <div class="hidden md:flex items-center gap-12 text-sm font-medium">
+      <a :href="workHref" :class="activeItem === 'work' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Work</a>
+      <a :href="projectsHref" :class="activeItem === 'projects' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Projects</a>
+      <a :href="stackHref" :class="activeItem === 'stack' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Stack</a>
+      <a :href="contactHref" :class="activeItem === 'contact' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Contact</a>
+    </div>
+
+    <div v-if="isAvailable" class="flex items-center gap-3 rounded-full px-3 py-1.5 border border-[#ffd700]/30 bg-[#ffd700]/5" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px);">
+      <div class="w-2 h-2 rounded-full bg-[#ffd700] animate-pulse"></div>
+      <span class="text-xs font-medium text-[#ffd700]">Available</span>
+    </div>
+  </div>
+</nav>
+</div>
+<!-- /component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+    </div>
+
+    <!-- Main Content -->
+    <main style="view-transition-name: main-content;" class="relative z-10 flex-1 max-w-4xl mx-auto w-full px-6 pt-32 pb-16 pointer-events-auto" data-sd-id="4">
+      
+      <!-- Hero Header -->
+      <header class="mb-16 scroll-reveal" data-sd-id="5">
+        <div class="flex flex-wrap items-center gap-3 font-mono text-xs mb-6" data-sd-id="6">
+          <span class="glass-panel px-3 py-1.5 rounded-full flex items-center gap-2 text-white/70" data-sd-id="7">
+            <div class="w-1.5 h-1.5 rounded-full bg-[#ffd700] animate-pulse" data-sd-id="8"></div> Available for projects
+          </span>
+          <span class="glass-panel px-3 py-1.5 rounded-full text-white/70" data-sd-id="9">
+            Avg. response: 24h
+          </span>
+        </div>
+        
+        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.05] text-white mb-6" data-sd-id="10">
+          Frequently asked <span class="neon-text" data-sd-id="11">questions</span>
+        </h1>
+        
+        <p class="text-lg md:text-xl text-white/60 max-w-2xl leading-relaxed mb-8" data-sd-id="12">
+          Everything you need to know about working with me — from process and pricing to technical expertise and engagement models.
+        </p>
+        
+        <!-- Search Bar -->
+        <div class="relative max-w-xl" data-sd-id="13">
+          <iconify-icon icon="lucide:search" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 text-sm" aria-hidden="true"></iconify-icon>
+          <input type="text" id="faq-search" placeholder="Search questions…" class="glass-input w-full rounded-full pl-11 pr-4 py-3 text-white text-sm font-normal" aria-label="Search FAQ" data-sd-id="14">
+        </div>
+      </header>
+
+      <!-- Quick Category Nav -->
+      <nav class="flex flex-wrap gap-2 mb-12 scroll-reveal" aria-label="FAQ categories" data-sd-id="15">
+        <a href="#about" class="category-badge glass-panel px-4 py-2 rounded-full text-xs font-mono text-white/60 hover:text-white flex items-center gap-2" data-sd-id="16">
+          <iconify-icon icon="lucide:user" class="text-sm"></iconify-icon> About
+        </a>
+        <a href="#process" class="category-badge glass-panel px-4 py-2 rounded-full text-xs font-mono text-white/60 hover:text-white flex items-center gap-2" data-sd-id="17">
+          <iconify-icon icon="lucide:workflow" class="text-sm"></iconify-icon> Process
+        </a>
+        <a href="#technical" class="category-badge glass-panel px-4 py-2 rounded-full text-xs font-mono text-white/60 hover:text-white flex items-center gap-2" data-sd-id="18">
+          <iconify-icon icon="lucide:code" class="text-sm"></iconify-icon> Technical
+        </a>
+        <a href="#rates" class="category-badge glass-panel px-4 py-2 rounded-full text-xs font-mono text-white/60 hover:text-white flex items-center gap-2" data-sd-id="19">
+          <iconify-icon icon="lucide:dollar-sign" class="text-sm"></iconify-icon> Rates
+        </a>
+        <a href="#working" class="category-badge glass-panel px-4 py-2 rounded-full text-xs font-mono text-white/60 hover:text-white flex items-center gap-2" data-sd-id="20">
+          <iconify-icon icon="lucide:handshake" class="text-sm"></iconify-icon> Working Together
+        </a>
+      </nav>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- ABOUT RICH & EXPERIENCE -->
+      <!-- ═══════════════════════════════════════ -->
+      <section id="about" class="mb-16 scroll-reveal" data-sd-id="21">
+        <div class="flex items-center gap-3 mb-6" data-sd-id="22">
+          <div class="w-10 h-10 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="23">
+            <iconify-icon icon="lucide:user" class="text-lg text-[#ffd700]"></iconify-icon>
+          </div>
+          <div data-sd-id="24">
+            <h2 class="text-xl font-bold text-white" data-sd-id="25">About Rich &amp; Experience</h2>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="26">Background, expertise, and what sets me apart</p>
+          </div>
+        </div>
+        
+        <div class="space-y-3" data-sd-id="27">
+          
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" open="" data-sd-id="28">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="29">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="30">What's your background and experience?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="31">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="32">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed" data-sd-id="33">
+                10+ years shipping production React at scale. Started with early-stage startup ($1B+ valuation), led teams at high-growth SaaS (500K+ users), architected enterprise systems. Creator of <span class="text-[#ffd700] font-medium" data-sd-id="34">ForgeKit MCP</span> (5,700+ npm installs). Speaker at React Summit. Certified in system design and performance optimization.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="35">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="36">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="37">What makes you different from other React engineers?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="38">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="39">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed" data-sd-id="40">
+                Most devs code. I design <span class="text-white font-medium" data-sd-id="41">systems</span>. Focus on long-term maintainability, team velocity, and engineering culture. I think about monorepos, design system governance, and how to unblock teams. Not just features—infrastructure that scales.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="42">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="43">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="44">What industries and company types have you worked with?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="45">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="46">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed" data-sd-id="47">
+                Fintech, EdTech, SaaS, DevTools, consumer mobile. From 3-person startups to Fortune 500 companies. I understand how to ship in different contexts—startup velocity vs enterprise stability.
+              </p>
+              <div class="flex flex-wrap gap-2 mt-4" data-sd-id="48">
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50 uppercase tracking-wider" data-sd-id="49">Fintech</span>
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50 uppercase tracking-wider" data-sd-id="50">EdTech</span>
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50 uppercase tracking-wider" data-sd-id="51">SaaS</span>
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50 uppercase tracking-wider" data-sd-id="52">DevTools</span>
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50 uppercase tracking-wider" data-sd-id="53">Consumer Mobile</span>
+              </div>
+            </div>
+          </details>
+
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- ENGAGEMENT & PROCESS -->
+      <!-- ═══════════════════════════════════════ -->
+      <section id="process" class="mb-16 scroll-reveal" data-sd-id="54">
+        <div class="flex items-center gap-3 mb-6" data-sd-id="55">
+          <div class="w-10 h-10 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="56">
+            <iconify-icon icon="lucide:workflow" class="text-lg text-[#00f0ff]"></iconify-icon>
+          </div>
+          <div data-sd-id="57">
+            <h2 class="text-xl font-bold text-white" data-sd-id="58">Engagement &amp; Process</h2>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="59">How we start, timelines, and working models</p>
+          </div>
+        </div>
+        
+        <div class="space-y-3" data-sd-id="60">
+          
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="61">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="62">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="63">How do engagements typically start?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="64">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="65">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed" data-sd-id="66">
+                30-min discovery call (free, no obligation). We discuss your challenge, goals, and constraints. I ask hard questions. Then I scope work with a proposal, timeline, and transparent pricing. Only proceed if it's a good fit for both of us.
+              </p>
+              <div class="mt-4 flex items-center gap-2 text-xs text-[#00f0ff] font-mono" data-sd-id="67">
+                <iconify-icon icon="lucide:arrow-right" class="text-sm"></iconify-icon>
+                <span data-sd-id="68">Discovery → Scope → Proposal → Kickoff</span>
+              </div>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="69">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="70">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="71">What's your current availability?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="72">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="73">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed" data-sd-id="74">
+                Selective. I take <span class="text-[#ffd700] font-medium" data-sd-id="75">2-3 projects per year</span> to maintain depth. Typical: fractional (retainer), full-time for 3-6 months, or time-boxed consulting. Happy to discuss what works for your team.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="76">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="77">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="78">Do you do fractional or part-time roles?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="79">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="80">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed" data-sd-id="81">
+                Yes. Retainer models work well (16-20 hrs/week over 3-6 months). Code review sessions, architecture consulting, or pairing with your team. Flexible based on your needs.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="82">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="83">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="84">What's your typical project timeline?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="85">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="86">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed mb-4" data-sd-id="87">
+                Depends on scope and team size, but typical ranges:
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" data-sd-id="88">
+                <div class="bg-white/5 rounded-lg p-3 border border-white/5" data-sd-id="89">
+                  <div class="text-xs font-mono text-[#ffd700] mb-1" data-sd-id="90">DESIGN SYSTEM</div>
+                  <div class="text-sm text-white/80" data-sd-id="91">8-12 weeks</div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-3 border border-white/5" data-sd-id="92">
+                  <div class="text-xs font-mono text-[#00f0ff] mb-1" data-sd-id="93">ARCHITECTURE</div>
+                  <div class="text-sm text-white/80" data-sd-id="94">4-8 weeks</div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-3 border border-white/5" data-sd-id="95">
+                  <div class="text-xs font-mono text-[#ff007f] mb-1" data-sd-id="96">CODE REVIEW</div>
+                  <div class="text-sm text-white/80" data-sd-id="97">Ongoing (retainer)</div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-3 border border-white/5" data-sd-id="98">
+                  <div class="text-xs font-mono text-[#83f36e] mb-1" data-sd-id="99">0→1 PRODUCT</div>
+                  <div class="text-sm text-white/80" data-sd-id="100">12-16 weeks</div>
+                </div>
+              </div>
+            </div>
+          </details>
+
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- TECHNICAL -->
+      <!-- ═══════════════════════════════════════ -->
+      <section id="technical" class="mb-16 scroll-reveal" data-sd-id="101">
+        <div class="flex items-center gap-3 mb-6" data-sd-id="102">
+          <div class="w-10 h-10 rounded-xl bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="103">
+            <iconify-icon icon="lucide:code" class="text-lg text-[#ff007f]"></iconify-icon>
+          </div>
+          <div data-sd-id="104">
+            <h2 class="text-xl font-bold text-white" data-sd-id="105">Technical</h2>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="106">Stack, codebase work, and mentoring approach</p>
+          </div>
+        </div>
+        
+        <div class="space-y-3" data-sd-id="107">
+          
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="108">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="109">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="110">What tech stack do you specialize in?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="111">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="112">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed mb-4" data-sd-id="113">
+                Frontend: React, Next.js, TypeScript, TanStack ecosystem. Styling: Tailwind, styled-components. State: TanStack Query, Zustand. Mobile: React Native, Expo. DevOps: Nx, Turborepo, GitHub Actions. You pick—I adapt.
+              </p>
+              <div class="flex flex-wrap gap-2" data-sd-id="114">
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="115">React</span>
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="116">Next.js</span>
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="117">TypeScript</span>
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="118">TanStack</span>
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="119">Tailwind</span>
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="120">React Native</span>
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="121">Expo</span>
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="122">Nx</span>
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="123">Turborepo</span>
+              </div>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="124">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="125">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="126">Can you work with my existing codebase?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="127">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="128">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed" data-sd-id="129">
+                Absolutely. Code audits, refactoring, modernization. I've taken Angular codebases to React, migrated Webpack to Vite, restructured monorepos. I understand technical debt and realistic migration paths.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="130">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="131">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="132">Do you mentor junior engineers as part of engagements?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="133">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="134">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed" data-sd-id="135">
+                Yes, core value-add. Code reviews, pair programming sessions, architecture discussion. Goal: <span class="text-[#ffd700] font-medium" data-sd-id="136">level up your team</span> so you don't need me in 6 months.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="137">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="138">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="139">Will you be hands-on or advisory?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="140">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="141">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed mb-4" data-sd-id="142">
+                Both. I code, I design systems, I lead. Depends on engagement type:
+              </p>
+              <div class="space-y-2" data-sd-id="143">
+                <div class="flex items-center gap-3 text-sm text-white/60" data-sd-id="144">
+                  <div class="w-2 h-2 rounded-full bg-[#ffd700]" data-sd-id="145"></div>
+                  <span data-sd-id="146"><span class="text-white font-medium" data-sd-id="147">Full-time:</span> 70% hands-on, 30% advising</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-white/60" data-sd-id="148">
+                  <div class="w-2 h-2 rounded-full bg-[#00f0ff]" data-sd-id="149"></div>
+                  <span data-sd-id="150"><span class="text-white font-medium" data-sd-id="151">Consulting:</span> 30% hands-on, 70% advising</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-white/60" data-sd-id="152">
+                  <div class="w-2 h-2 rounded-full bg-[#ff007f]" data-sd-id="153"></div>
+                  <span data-sd-id="154"><span class="text-white font-medium" data-sd-id="155">Always:</span> Collaborative</span>
+                </div>
+              </div>
+            </div>
+          </details>
+
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- RATES & INVESTMENT -->
+      <!-- ═══════════════════════════════════════ -->
+      <section id="rates" class="mb-16 scroll-reveal" data-sd-id="156">
+        <div class="flex items-center gap-3 mb-6" data-sd-id="157">
+          <div class="w-10 h-10 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="158">
+            <iconify-icon icon="lucide:dollar-sign" class="text-lg text-[#ffd700]"></iconify-icon>
+          </div>
+          <div data-sd-id="159">
+            <h2 class="text-xl font-bold text-white" data-sd-id="160">Rates &amp; Investment</h2>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="161">Transparent pricing and what's included</p>
+          </div>
+        </div>
+        
+        <div class="space-y-3" data-sd-id="162">
+          
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="163">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="164">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="165">What are your rates?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="166">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="167">
+              <div class="space-y-3 mb-4" data-sd-id="168">
+                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5" data-sd-id="169">
+                  <div data-sd-id="170">
+                    <div class="text-sm font-medium text-white" data-sd-id="171">Hourly Consulting</div>
+                    <div class="text-xs text-white/40 font-mono" data-sd-id="172">Reviews, calls, small tasks</div>
+                  </div>
+                  <div class="text-lg font-bold text-[#ffd700]" data-sd-id="173">$250-350/hr</div>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5" data-sd-id="174">
+                  <div data-sd-id="175">
+                    <div class="text-sm font-medium text-white" data-sd-id="176">Project-Based</div>
+                    <div class="text-xs text-white/40 font-mono" data-sd-id="177">Design systems, architecture</div>
+                  </div>
+                  <div class="text-lg font-bold text-[#ffd700]" data-sd-id="178">$25-75K</div>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5" data-sd-id="179">
+                  <div data-sd-id="180">
+                    <div class="text-sm font-medium text-white" data-sd-id="181">Retainer</div>
+                    <div class="text-xs text-white/40 font-mono" data-sd-id="182">16-20 hrs/week</div>
+                  </div>
+                  <div class="text-lg font-bold text-[#ffd700]" data-sd-id="183">$8-15K/mo</div>
+                </div>
+              </div>
+              <p class="text-xs text-white/40 font-mono" data-sd-id="184">All rates negotiable based on impact and project fit.</p>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="185">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="186">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="187">What's the typical budget range for different project types?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="188">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="189">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" data-sd-id="190">
+                <div class="p-3 rounded-lg bg-white/5 border border-white/5" data-sd-id="191">
+                  <div class="text-xs font-mono text-[#ffd700] mb-1" data-sd-id="192">DESIGN SYSTEM</div>
+                  <div class="text-sm text-white/80" data-sd-id="193">$40-75K · 8-12 weeks</div>
+                </div>
+                <div class="p-3 rounded-lg bg-white/5 border border-white/5" data-sd-id="194">
+                  <div class="text-xs font-mono text-[#00f0ff] mb-1" data-sd-id="195">ARCHITECTURE</div>
+                  <div class="text-sm text-white/80" data-sd-id="196">$20-35K · 4-8 weeks</div>
+                </div>
+                <div class="p-3 rounded-lg bg-white/5 border border-white/5" data-sd-id="197">
+                  <div class="text-xs font-mono text-[#ff007f] mb-1" data-sd-id="198">0→1 PRODUCT</div>
+                  <div class="text-sm text-white/80" data-sd-id="199">$60-120K · 12-16 weeks</div>
+                </div>
+                <div class="p-3 rounded-lg bg-white/5 border border-white/5" data-sd-id="200">
+                  <div class="text-xs font-mono text-[#83f36e] mb-1" data-sd-id="201">MONOREPO SETUP</div>
+                  <div class="text-sm text-white/80" data-sd-id="202">$15-30K</div>
+                </div>
+                <div class="p-3 rounded-lg bg-white/5 border border-white/5" data-sd-id="203">
+                  <div class="text-xs font-mono text-[#ffd700] mb-1" data-sd-id="204">RN SCALING</div>
+                  <div class="text-sm text-white/80" data-sd-id="205">$50-100K</div>
+                </div>
+              </div>
+              <p class="text-xs text-white/40 font-mono mt-4" data-sd-id="206">These are ranges—happy to discuss your budget.</p>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="207">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="208">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="209">Do you offer payment plans?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="210">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="211">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed mb-4" data-sd-id="212">
+                Yes. Flexible options:
+              </p>
+              <div class="space-y-2" data-sd-id="213">
+                <div class="flex items-center gap-3 text-sm text-white/60" data-sd-id="214">
+                  <iconify-icon icon="lucide:check" class="text-[#ffd700] text-sm"></iconify-icon>
+                  <span data-sd-id="215"><span class="text-white font-medium" data-sd-id="216">Retainer:</span> Paid monthly</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-white/60" data-sd-id="217">
+                  <iconify-icon icon="lucide:check" class="text-[#ffd700] text-sm"></iconify-icon>
+                  <span data-sd-id="218"><span class="text-white font-medium" data-sd-id="219">Project-based:</span> 50/50 (kickoff/completion)</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-white/60" data-sd-id="220">
+                  <iconify-icon icon="lucide:check" class="text-[#ffd700] text-sm"></iconify-icon>
+                  <span data-sd-id="221"><span class="text-white font-medium" data-sd-id="222">Or:</span> 33/33/33 (thirds)</span>
+                </div>
+              </div>
+              <p class="text-xs text-white/40 font-mono mt-3" data-sd-id="223">Work with your accounting. No surprise invoices.</p>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="224">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="225">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="226">What's included in deliverables?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="227">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="228">
+              <div class="space-y-2 mb-4" data-sd-id="229">
+                <div class="flex items-center gap-3 text-sm text-white/60" data-sd-id="230">
+                  <iconify-icon icon="lucide:check-circle-2" class="text-[#ffd700] text-sm"></iconify-icon>
+                  <span data-sd-id="231">Production-ready code (typed, tested, documented)</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-white/60" data-sd-id="232">
+                  <iconify-icon icon="lucide:check-circle-2" class="text-[#ffd700] text-sm"></iconify-icon>
+                  <span data-sd-id="233">Architecture decisions documented</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-white/60" data-sd-id="234">
+                  <iconify-icon icon="lucide:check-circle-2" class="text-[#ffd700] text-sm"></iconify-icon>
+                  <span data-sd-id="235">Handoff: runbooks, decisions log, setup guides</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-white/60" data-sd-id="236">
+                  <iconify-icon icon="lucide:check-circle-2" class="text-[#ffd700] text-sm"></iconify-icon>
+                  <span data-sd-id="237">Your team can maintain it without me</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-white/60" data-sd-id="238">
+                  <iconify-icon icon="lucide:check-circle-2" class="text-[#ffd700] text-sm"></iconify-icon>
+                  <span data-sd-id="239">Training sessions if needed</span>
+                </div>
+              </div>
+            </div>
+          </details>
+
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- WORK TOGETHER -->
+      <!-- ═══════════════════════════════════════ -->
+      <section id="working" class="mb-16 scroll-reveal" data-sd-id="240">
+        <div class="flex items-center gap-3 mb-6" data-sd-id="241">
+          <div class="w-10 h-10 rounded-xl bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center" data-sd-id="242">
+            <iconify-icon icon="lucide:handshake" class="text-lg text-[#83f36e]"></iconify-icon>
+          </div>
+          <div data-sd-id="243">
+            <h2 class="text-xl font-bold text-white" data-sd-id="244">Working Together</h2>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="245">Next steps, trials, and logistics</p>
+          </div>
+        </div>
+        
+        <div class="space-y-3" data-sd-id="246">
+          
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="247">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="248">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="249">How do I book a consultation?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="250">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="251">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed" data-sd-id="252">
+                Hit the contact form on this site. 30 seconds. I'll reply within 24 hours. Or email <a href="https://p.superdesign.dev/draft/c906d6dd-0318-4f57-9ecd-0bd1b1280b06" class="text-[#ffd700] hover:underline" data-sd-id="253">hello@richtillman.xyz</a> directly.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="254">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="255">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="256">What happens in the initial call?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="257">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="258">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed" data-sd-id="259">
+                30 minutes. I ask about your biggest pain point, team size, timeline, and goals. You ask me anything. <span class="text-white font-medium" data-sd-id="260">No sales pitch.</span> Goal: figure out if we're aligned. If not, I'll suggest someone better suited.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="261">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="262">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="263">Can I see examples of your work?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="264">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="265">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed mb-4" data-sd-id="266">
+                Absolutely. Check out case studies:
+              </p>
+              <div class="space-y-2 mb-4" data-sd-id="267">
+                <div class="flex items-center gap-3 text-sm text-white/60 p-2 rounded-lg bg-white/5" data-sd-id="268">
+                  <iconify-icon icon="lucide:layers" class="text-[#00f0ff] text-sm"></iconify-icon>
+                  <span data-sd-id="269">Enterprise Design System (200+ components, 5 teams)</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-white/60 p-2 rounded-lg bg-white/5" data-sd-id="270">
+                  <iconify-icon icon="lucide:git-branch" class="text-[#ff007f] text-sm"></iconify-icon>
+                  <span data-sd-id="271">Nx Monorepo (50 engineers, 60% faster builds)</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-white/60 p-2 rounded-lg bg-white/5" data-sd-id="272">
+                  <iconify-icon icon="lucide:smartphone" class="text-[#ffd700] text-sm"></iconify-icon>
+                  <span data-sd-id="273">React Native scaling (100K→500K users)</span>
+                </div>
+              </div>
+              <p class="text-xs text-white/40 font-mono" data-sd-id="274">Or view the work page for 6 featured projects.</p>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="275">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="276">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="277">What if I want to try working together on a small task first?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="278">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="279">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed mb-4" data-sd-id="280">
+                Great idea. Low-risk, high-signal options:
+              </p>
+              <div class="space-y-2" data-sd-id="281">
+                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5" data-sd-id="282">
+                  <div class="flex items-center gap-3" data-sd-id="283">
+                    <iconify-icon icon="lucide:code" class="text-[#ffd700] text-sm"></iconify-icon>
+                    <span class="text-sm text-white/80" data-sd-id="284">Code review session</span>
+                  </div>
+                  <span class="text-sm font-bold text-[#ffd700]" data-sd-id="285">$500</span>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5" data-sd-id="286">
+                  <div class="flex items-center gap-3" data-sd-id="287">
+                    <iconify-icon icon="lucide:zap" class="text-[#00f0ff] text-sm"></iconify-icon>
+                    <span class="text-sm text-white/80" data-sd-id="288">2-week architecture spike</span>
+                  </div>
+                  <span class="text-sm font-bold text-[#ffd700]" data-sd-id="289">$5K</span>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5" data-sd-id="290">
+                  <div class="flex items-center gap-3" data-sd-id="291">
+                    <iconify-icon icon="lucide:search" class="text-[#ff007f] text-sm"></iconify-icon>
+                    <span class="text-sm text-white/80" data-sd-id="292">Design system audit</span>
+                  </div>
+                  <span class="text-sm font-bold text-[#ffd700]" data-sd-id="293">$3K</span>
+                </div>
+              </div>
+              <p class="text-xs text-white/40 font-mono mt-3" data-sd-id="294">Lots of teams start here.</p>
+            </div>
+          </details>
+
+          <details class="faq-item glass-panel rounded-2xl overflow-hidden group" data-sd-id="295">
+            <summary class="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer" data-sd-id="296">
+              <h3 class="text-base md:text-lg font-semibold text-white pr-4" data-sd-id="297">Do you have NDA/IP agreements ready?</h3>
+              <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0" data-sd-id="298">
+                <iconify-icon icon="lucide:chevron-down" class="faq-icon text-sm text-white/50"></iconify-icon>
+              </div>
+            </summary>
+            <div class="px-5 md:px-6 pb-5 md:pb-6 pt-0" data-sd-id="299">
+              <p class="text-sm md:text-base text-white/60 leading-relaxed" data-sd-id="300">
+                Yes. Standard IP agreement: <span class="text-white font-medium" data-sd-id="301">you own all work product</span>. I can use learnings for talks/writing (anonymized). I'm comfortable with strict NDAs for sensitive work.
+              </p>
+            </div>
+          </details>
+
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- CTA SECTION -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="scroll-reveal mb-12" data-sd-id="302">
+        <div class="glass-panel rounded-3xl p-8 md:p-12 relative overflow-hidden" data-sd-id="303">
+          <!-- Decorative glows -->
+          <div class="absolute -top-40 -right-20 w-80 h-80 rounded-full bg-[#ffd700]/5 blur-3xl pointer-events-none" data-sd-id="304"></div>
+          <div class="absolute -bottom-40 -left-20 w-80 h-80 rounded-full bg-[#00f0ff]/5 blur-3xl pointer-events-none" data-sd-id="305"></div>
+          
+          <div class="relative max-w-3xl mx-auto text-center space-y-6" data-sd-id="306">
+            <div class="flex justify-center" data-sd-id="307">
+              <div class="glass-panel rounded-full px-4 py-1.5 border border-[#ffd700]/20 bg-[#ffd700]/5 flex items-center gap-2" data-sd-id="308">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#ffd700] animate-pulse" data-sd-id="309"></div>
+                <span class="font-mono text-[10px] uppercase tracking-widest text-[#ffd700]" data-sd-id="310">Still have questions?</span>
+              </div>
+            </div>
+            
+            <h2 class="text-3xl md:text-5xl font-bold tracking-tighter text-white" data-sd-id="311">
+              Let's <span class="neon-text" data-sd-id="312">talk</span>
+            </h2>
+            
+            <p class="text-base md:text-lg text-white/60 max-w-xl mx-auto leading-relaxed" data-sd-id="313">
+              The best way to get answers is a 30-minute discovery call. Free, no obligation, no sales pitch.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4" data-sd-id="314">
+              <a href="https://p.superdesign.dev/draft/c906d6dd-0318-4f57-9ecd-0bd1b1280b06" id="faq-cta-book-call" aria-label="Book a discovery call" class="w-full sm:w-auto px-6 py-3 bg-[#ffd700] hover:bg-[#ffe54c] text-black font-semibold rounded-full flex items-center justify-center gap-2 transition-all duration-500 hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffd700]" data-sd-id="315">
+                Book a discovery call
+                <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon>
+              </a>
+              <a href="https://p.superdesign.dev/draft/c906d6dd-0318-4f57-9ecd-0bd1b1280b06" id="faq-cta-view-case-studies" aria-label="View case studies" class="w-full sm:w-auto px-6 py-3 glass-panel hover:bg-white/10 text-white font-medium rounded-full transition-all duration-500 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50" data-sd-id="316">
+                View case studies
+              </a>
+              <a href="https://p.superdesign.dev/draft/c906d6dd-0318-4f57-9ecd-0bd1b1280b06" id="faq-cta-email" aria-label="Email directly" class="px-4 py-3 text-white/50 hover:text-white text-sm font-mono transition-colors flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/30 rounded-lg" data-sd-id="317">
+                <iconify-icon icon="lucide:mail" class="text-sm"></iconify-icon>
+                hello@richtillman.xyz
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer Ticker -->
+    <div class="pointer-events-auto" style="view-transition-name: footer-ticker;" data-sd-id="318">
+      <!-- component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+<div v-scope="{ ...{&quot;showTicker&quot;:true}, $emit() {} }">
+<div v-if="showTicker" class="relative z-10 w-full overflow-hidden border-t border-white/5 bg-black/50 backdrop-blur-sm py-4 pointer-events-none"><style>@keyframes sd-ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } .sd-animate-ticker { animation: sd-ticker-scroll 30s linear infinite; }</style><div class="flex whitespace-nowrap sd-animate-ticker font-mono text-xs text-white/30 tracking-widest uppercase"><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div></div></div>
+</div>
+<!-- /component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+    </div>
+
+  </div>
+
+  <!-- FAQ Search & Scroll Reveal Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Scroll reveal animation
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+      
+      setTimeout(() => {
+        document.querySelectorAll('.scroll-reveal').forEach((el) => observer.observe(el));
+      }, 200);
+
+      // FAQ search functionality
+      const searchInput = document.getElementById('faq-search');
+      const faqItems = document.querySelectorAll('.faq-item');
+      const sections = document.querySelectorAll('section[id]');
+      
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const query = e.target.value.toLowerCase().trim();
+          let hasResults = false;
+          
+          faqItems.forEach((item) => {
+            const question = item.querySelector('h3')?.textContent.toLowerCase() || '';
+            const answer = item.querySelector('.px-5, .px-6')?.textContent.toLowerCase() || '';
+            const matches = question.includes(query) || answer.includes(query);
+            
+            if (matches || query === '') {
+              item.style.display = '';
+              hasResults = true;
+            } else {
+              item.style.display = 'none';
+            }
+          });
+          
+          // Hide/show section headers if no items visible
+          sections.forEach((section) => {
+            const visibleItems = section.querySelectorAll('.faq-item:not([style*="display: none"])');
+            const header = section.querySelector('.flex.items-center.gap-3');
+            if (visibleItems.length === 0 && query !== '') {
+              section.style.display = 'none';
+            } else {
+              section.style.display = '';
+            }
+          });
+        });
+      }
+
+      // Smooth scroll for category nav
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener('click', (e) => {
+          const targetId = anchor.getAttribute('href');
+          if (targetId === '#') return;
+          const target = document.querySelector(targetId);
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+
+      // Accordion: close others when one opens (optional - uncomment for single-open behavior)
+      // document.querySelectorAll('.faq-item').forEach((item) => {
+      //   item.addEventListener('toggle', () => {
+      //     if (item.open) {
+      //       document.querySelectorAll('.faq-item').forEach((other) => {
+      //         if (other !== item) other.open = false;
+      //       });
+      //     }
+      //   });
+      // });
+    });
+  </script>
+
+</body></html>

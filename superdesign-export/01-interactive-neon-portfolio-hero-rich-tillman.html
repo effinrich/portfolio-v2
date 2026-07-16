@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="view-transition" content="same-origin">
+  <title>Rich Tillman - Principal Frontend Engineer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <script src="https://unpkg.com/petite-vue" defer="" init=""></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <script type="module">
+    import TubesCursor from 'https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // Slight delay to allow petite-vue to render the component
+      setTimeout(() => {
+        const canvas = document.getElementById('bg-canvas');
+        if (!canvas) return;
+        
+        try {
+          const app = TubesCursor(canvas, {
+            tubes: {
+              colors: ['#00f0ff', '#ff007f', '#ffd700'],
+              lights: {
+                intensity: 150,
+                colors: ['#83f36e', '#00f0ff', '#ff008a', '#ffd700']
+              }
+            }
+          });
+          
+          const randomColors = (count) => {
+            return new Array(count)
+              .fill(0)
+              .map(() => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'));
+          };
+
+          const container = document.getElementById('bg-container');
+          if (container) {
+            container.addEventListener('click', (e) => {
+              if (e.target.closest('a') || e.target.closest('button')) return;
+              const colors = randomColors(3);
+              const lightsColors = randomColors(4);
+              app.tubes.setColors(colors);
+              app.tubes.setLightsColors(lightsColors);
+            });
+          }
+        } catch (err) {
+          console.error('Failed to init tubes:', err);
+        }
+      }, 100);
+    });
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-panel {
+      background: rgba(20, 20, 20, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    }
+    .vertical-text {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+    }
+    .neon-text {
+      background: linear-gradient(90deg, #00f0ff, #ffd700, #ff007f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shine 5s linear infinite;
+    }
+    @keyframes shine {
+      to {
+        background-position: 200% center;
+      }
+    }
+    @keyframes fade-in-up {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .metric-card {
+      animation: fade-in-up 0.6s ease-out backwards;
+    }
+    .metric-card:nth-child(1) { animation-delay: 0.1s; }
+    .metric-card:nth-child(2) { animation-delay: 0.25s; }
+    .metric-card:nth-child(3) { animation-delay: 0.4s; }
+    @view-transition { navigation: auto; }
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation-duration: 0.4s;
+      animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  </style>
+</head>
+<body>
+  <div class="fixed inset-0 z-0">
+    <!-- component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+<div v-scope="{ ...{&quot;canvasOpacity&quot;:0.9,&quot;showGrid&quot;:true,&quot;showGradient&quot;:true}, $emit() {} }">
+<div id="bg-container" class="relative min-h-screen w-full overflow-hidden bg-black flex flex-col cursor-crosshair" @click="$emit('backgroundClick', $event)"><canvas id="bg-canvas" class="absolute inset-0 w-full h-full block z-0" :style="{ opacity: canvasOpacity, touchAction: 'none' }"></canvas><div v-if="showGrid" class="absolute inset-0 pointer-events-none z-0" style="background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div><div v-if="showGradient" class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-0 pointer-events-none"></div></div>
+</div>
+<!-- /component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+  </div>
+
+  <div class="relative min-h-screen w-full flex flex-col cursor-crosshair z-10 pointer-events-none">
+    <!-- Navigation -->
+    <div class="pointer-events-auto">
+      <!-- component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+<div v-scope="{ ...{&quot;activeItem&quot;:&quot;home&quot;,&quot;isAvailable&quot;:true,&quot;workHref&quot;:&quot;https://p.superdesign.dev/draft/842ac3f0-3493-41fc-b33e-0b65dc7b1fac&quot;,&quot;projectsHref&quot;:&quot;https://p.superdesign.dev/draft/36b48549-7be9-418d-b0c1-af81de96c79f&quot;,&quot;stackHref&quot;:&quot;https://p.superdesign.dev/draft/09fc29b5-265e-46c3-bc95-0233b3ee5c93&quot;,&quot;contactHref&quot;:&quot;https://p.superdesign.dev/draft/c906d6dd-0318-4f57-9ecd-0bd1b1280b06&quot;,&quot;homeHref&quot;:&quot;https://p.superdesign.dev/draft/4ee229bd-e341-4e90-b88c-54789c125b7a&quot;,&quot;servicesHref&quot;:&quot;https://p.superdesign.dev/draft/ec14a340-aae5-411e-becb-8135c3ac07ca&quot;,&quot;resumeHref&quot;:&quot;https://p.superdesign.dev/draft/2b4c8063-bad8-46a1-82bf-342313d619e8&quot;,&quot;aboutHref&quot;:&quot;https://p.superdesign.dev/draft/93b7235e-9fa5-4c0d-be56-ebaf1451e6a1&quot;,&quot;testimonialHref&quot;:&quot;https://p.superdesign.dev/draft/854c6625-18b8-4301-a487-7467880bab7d&quot;,&quot;faqHref&quot;:&quot;https://p.superdesign.dev/draft/698370a6-dbfe-4eb2-ad2a-3f417f5f0204&quot;,&quot;blogHref&quot;:&quot;https://p.superdesign.dev/draft/6f3a87fb-5d47-42e5-b6a6-abcf1b96c10b&quot;}, $emit() {} }">
+<nav class="fixed top-0 left-0 w-full z-40 border-x-0 border-t-0 border-b border-white/10 px-6 py-4" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-8 h-8 rounded bg-zinc-900 border border-white/20 flex items-center justify-center font-mono text-sm font-bold text-[#ffd700]">
+        R
+      </div>
+      <span class="font-medium tracking-tight text-white/90 hidden sm:inline-block">
+        Rich Tillman <span class="text-white/40 font-normal">/ Principal Frontend Engineer</span>
+      </span>
+    </div>
+    
+    <div class="hidden md:flex items-center gap-12 text-sm font-medium">
+      <a :href="workHref" :class="activeItem === 'work' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Work</a>
+      <a :href="projectsHref" :class="activeItem === 'projects' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Projects</a>
+      <a :href="stackHref" :class="activeItem === 'stack' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Stack</a>
+      <a :href="contactHref" :class="activeItem === 'contact' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Contact</a>
+    </div>
+
+    <div v-if="isAvailable" class="flex items-center gap-3 rounded-full px-3 py-1.5 border border-[#ffd700]/30 bg-[#ffd700]/5" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px);">
+      <div class="w-2 h-2 rounded-full bg-[#ffd700] animate-pulse"></div>
+      <span class="text-xs font-medium text-[#ffd700]">Available</span>
+    </div>
+  </div>
+</nav>
+</div>
+<!-- /component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+    </div>
+
+    <!-- Main Content Wrapper -->
+    <main class="relative z-10 flex-1 flex flex-col justify-center max-w-7xl mx-auto w-full px-6 pt-32 pb-24">
+      
+      <!-- Hero Section -->
+      <div class="max-w-4xl space-y-8 pointer-events-auto">
+        
+        <!-- Badges Row -->
+        <div class="flex flex-wrap items-center gap-3 font-mono text-xs">
+          <span class="glass-panel px-3 py-1.5 rounded-full flex items-center gap-2 text-white/70 hover:bg-white/5 transition-colors">
+            <div class="w-1.5 h-1.5 rounded-full bg-[#ffd700]"></div> Remote
+          </span>
+          <span class="glass-panel px-3 py-1.5 rounded-full text-white/70 hover:bg-white/5 transition-colors">
+            React + TypeScript
+          </span>
+          <span class="glass-panel px-3 py-1.5 rounded-full text-white/70 hover:bg-white/5 transition-colors">
+            Storybook • Chromatic
+          </span>
+          <span class="glass-panel px-3 py-1.5 rounded-full text-white/70 hover:bg-white/5 transition-colors">
+            Nx monorepos at scale
+          </span>
+        </div>
+
+        <!-- Big Headline -->
+        <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-[1.05] text-white drop-shadow-2xl">
+          Building the bridge between design <span class="neon-text">systems</span> and AI-native developer tooling.
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="text-lg md:text-xl text-white/60 max-w-2xl leading-relaxed font-normal">
+          I'm <span class="text-white font-medium">Rich Tillman</span> — Principal Frontend Engineer. I architect <span class="text-white font-medium">enterprise-scale</span> React platforms, Nx monorepos, and 0→1 SaaS products — and the design systems (Storybook + React + Figma) that keep design, product, and engineering shipping in lockstep.
+        </p>
+
+        <!-- CTAs -->
+        <div class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 pt-4">
+          <a href="https://p.superdesign.dev/draft/842ac3f0-3493-41fc-b33e-0b65dc7b1fac" id="cta-see-work" aria-label="See selected work" class="w-full sm:w-auto px-6 py-3 bg-[#ffd700] hover:bg-[#ffe54c] text-black font-semibold rounded-full flex items-center justify-center gap-2 transition-all duration-500 hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffd700]">
+            See selected work 
+            <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon>
+          </a>
+          <a href="https://p.superdesign.dev/draft/c906d6dd-0318-4f57-9ecd-0bd1b1280b06" id="cta-get-in-touch" aria-label="Get in touch" class="w-full sm:w-auto px-6 py-3 glass-panel hover:bg-white/10 text-white font-medium rounded-full transition-all duration-500 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50">
+            Get in touch
+          </a>
+          <a href="https://forgekit.cloud" id="cta-forgekit" target="_blank" rel="noopener noreferrer" aria-label="Visit forgekit.cloud" class="px-4 py-3 text-white/50 hover:text-white text-sm font-medium transition-colors flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/30 rounded-lg">
+            forgekit.cloud 
+            <iconify-icon icon="lucide:arrow-up-right" class="text-xs" aria-hidden="true"></iconify-icon>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Interactive Hint -->
+      <div class="absolute right-8 top-1/2 -translate-y-1/2 hidden lg:flex flex-col items-center gap-3 text-white/30 animate-pulse">
+        <iconify-icon icon="lucide:mouse-pointer-click" class="text-2xl" aria-hidden="true"></iconify-icon>
+        <span class="vertical-text font-mono text-[10px] uppercase tracking-widest">Click bg to randomize</span>
+      </div>
+
+    </main>
+
+    <!-- Metrics Section (Bottom) -->
+    <div class="relative z-10 w-full max-w-7xl mx-auto px-6 pb-12 pointer-events-auto">
+      <div class="glass-panel rounded-2xl p-8 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+        
+        <div class="metric-card flex flex-col gap-2">
+          <h3 class="text-4xl md:text-5xl font-bold tracking-tight text-white">5,703+</h3>
+          <p class="text-sm text-white/50 font-mono">npm installs · ForgeKit MCP</p>
+        </div>
+        
+        <div class="metric-card flex flex-col gap-2 md:border-l border-white/10 md:pl-12">
+          <h3 class="text-4xl md:text-5xl font-bold tracking-tight text-white">200+</h3>
+          <p class="text-sm text-white/50 font-mono">component design system</p>
+        </div>
+        
+        <div class="metric-card flex flex-col gap-2 md:border-l border-white/10 md:pl-12">
+          <h3 class="text-4xl md:text-5xl font-bold tracking-tight text-white">500K+</h3>
+          <p class="text-sm text-white/50 font-mono">users on shipped RN apps</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Tech Stack Ticker -->
+    <div class="pointer-events-auto">
+      <!-- component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+<div v-scope="{ ...{&quot;showTicker&quot;:true}, $emit() {} }">
+<div v-if="showTicker" class="relative z-10 w-full overflow-hidden border-t border-white/5 bg-black/50 backdrop-blur-sm py-4 pointer-events-none"><style>@keyframes sd-ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } .sd-animate-ticker { animation: sd-ticker-scroll 30s linear infinite; }</style><div class="flex whitespace-nowrap sd-animate-ticker font-mono text-xs text-white/30 tracking-widest uppercase"><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div></div></div>
+</div>
+<!-- /component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+    </div>
+  </div>
+</body>
+</html>

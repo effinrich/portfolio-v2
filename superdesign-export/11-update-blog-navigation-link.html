@@ -1,0 +1,1280 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="view-transition" content="same-origin">
+  <title>Case Study: React Native Scale — Rich Tillman</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <script src="https://unpkg.com/petite-vue" defer="" init=""></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <script type="module">
+    import TubesCursor from 'https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js';
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const canvas = document.getElementById('bg-canvas');
+        if (!canvas) return;
+        try {
+          const app = TubesCursor(canvas, {
+            tubes: {
+              colors: ['#00f0ff', '#ff007f', '#ffd700'],
+              lights: { intensity: 150, colors: ['#83f36e', '#00f0ff', '#ff008a', '#ffd700'] }
+            }
+          });
+          const randomColors = (count) => new Array(count).fill(0).map(() => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'));
+          const container = document.getElementById('bg-container');
+          if (container) {
+            container.addEventListener('click', (e) => {
+              if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input') || e.target.closest('textarea') || e.target.closest('select')) return;
+              app.tubes.setColors(randomColors(3));
+              app.tubes.setLightsColors(randomColors(4));
+            });
+          }
+        } catch (err) { console.error('Failed to init tubes:', err); }
+      }, 100);
+    });
+  </script>
+  <style>
+    html { background-color: #000000; }
+    @view-transition { navigation: auto; }
+    ::view-transition { background-color: #000000; }
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+    ::view-transition-old(main-content) { animation: 0.25s ease-out both fade-out; }
+    ::view-transition-new(main-content) { animation: 0.25s ease-in 0.1s both fade-in; }
+    @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+    body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; margin: 0; padding: 0; overflow-x: hidden; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    .glass-panel {
+      background: rgba(20, 20, 20, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    }
+    .neon-text {
+      background: linear-gradient(90deg, #00f0ff, #ffd700, #ff007f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shine 5s linear infinite;
+    }
+    @keyframes shine { to { background-position: 200% center; } }
+
+    @keyframes fade-in-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .scroll-reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+    .scroll-reveal.visible { opacity: 1; transform: translateY(0); }
+
+    .timeline-dot { box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
+    .timeline-line { background: linear-gradient(to bottom, rgba(255,215,0,0.4), rgba(0,240,255,0.2), rgba(255,0,127,0.15), transparent); }
+
+    .bar-fill { transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+
+    .tech-card { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .tech-card:hover { transform: translateY(-4px); border-color: rgba(255, 215, 0, 0.2); }
+
+    .lesson-card { transition: all 0.4s ease; }
+    .lesson-card:hover { border-color: rgba(0, 240, 255, 0.2); transform: translateX(4px); }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #000000; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 215, 0, 0.3); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .neon-text { animation: none; }
+      .scroll-reveal { opacity: 1; transform: none; transition: none; }
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            // Animate bars when visible
+            const bars = entry.target.querySelectorAll('[data-bar-width]');
+            bars.forEach(bar => { bar.style.width = bar.dataset.barWidth; });
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      setTimeout(() => {
+        document.querySelectorAll('.scroll-reveal').forEach((el) => observer.observe(el));
+      }, 200);
+    });
+  </script>
+</head>
+<body>
+  <!-- Fixed Canvas Background -->
+  <div class="fixed inset-0 z-0" data-sd-id="1">
+    <!-- component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+<div v-scope="{ ...{&quot;canvasOpacity&quot;:0.9,&quot;showGrid&quot;:true,&quot;showGradient&quot;:true}, $emit() {} }">
+<div id="bg-container" class="relative min-h-screen w-full overflow-hidden bg-black flex flex-col cursor-crosshair" @click="$emit('backgroundClick', $event)"><canvas id="bg-canvas" class="absolute inset-0 w-full h-full block z-0" :style="{ opacity: canvasOpacity, touchAction: 'none' }"></canvas><div v-if="showGrid" class="absolute inset-0 pointer-events-none z-0" style="background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div><div v-if="showGradient" class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-0 pointer-events-none"></div></div>
+</div>
+<!-- /component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+  </div>
+
+  <!-- Main Wrapper -->
+  <div id="bg-container" class="relative min-h-screen w-full flex flex-col cursor-crosshair z-10 pointer-events-none" data-sd-id="2">
+
+    <!-- Navigation (Persistent) -->
+    <div class="pointer-events-auto" style="view-transition-name: main-nav;" data-sd-id="3">
+      <!-- component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+<div v-scope="{ ...{&quot;activeItem&quot;:&quot;work&quot;,&quot;isAvailable&quot;:true,&quot;workHref&quot;:&quot;#work&quot;,&quot;projectsHref&quot;:&quot;#projects&quot;,&quot;stackHref&quot;:&quot;#stack&quot;,&quot;contactHref&quot;:&quot;#contact&quot;}, $emit() {} }">
+<nav class="fixed top-0 left-0 w-full z-40 border-x-0 border-t-0 border-b border-white/10 px-6 py-4" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-8 h-8 rounded bg-zinc-900 border border-white/20 flex items-center justify-center font-mono text-sm font-bold text-[#ffd700]">
+        R
+      </div>
+      <span class="font-medium tracking-tight text-white/90 hidden sm:inline-block">
+        Rich Tillman <span class="text-white/40 font-normal">/ Principal Frontend Engineer</span>
+      </span>
+    </div>
+    
+    <div class="hidden md:flex items-center gap-12 text-sm font-medium">
+      <a :href="workHref" :class="activeItem === 'work' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Work</a>
+      <a :href="projectsHref" :class="activeItem === 'projects' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Projects</a>
+      <a :href="stackHref" :class="activeItem === 'stack' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Stack</a>
+      <a :href="contactHref" :class="activeItem === 'contact' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Contact</a>
+    </div>
+
+    <div v-if="isAvailable" class="flex items-center gap-3 rounded-full px-3 py-1.5 border border-[#ffd700]/30 bg-[#ffd700]/5" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px);">
+      <div class="w-2 h-2 rounded-full bg-[#ffd700] animate-pulse"></div>
+      <span class="text-xs font-medium text-[#ffd700]">Available</span>
+    </div>
+  </div>
+</nav>
+</div>
+<!-- /component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+    </div>
+
+    <!-- Main Content -->
+    <main style="view-transition-name: main-content;" class="relative z-10 flex-1 max-w-7xl mx-auto w-full px-6 pt-28 pb-16 pointer-events-auto" data-sd-id="4">
+
+      <!-- Breadcrumb -->
+      <div class="flex items-center gap-2 text-sm font-mono text-white/40 mb-8" data-sd-id="5">
+        <a href="https://p.superdesign.dev/draft/4ee229bd-e341-4e90-b88c-54789c125b7a" id="breadcrumb-home" class="hover:text-white/80 transition-colors" data-sd-id="6">Home</a>
+        <iconify-icon icon="lucide:chevron-right" class="text-xs"></iconify-icon>
+        <a href="https://p.superdesign.dev/draft/36b48549-7be9-418d-b0c1-af81de96c79f" id="breadcrumb-cases" class="hover:text-white/80 transition-colors" data-sd-id="7">Case Studies</a>
+        <iconify-icon icon="lucide:chevron-right" class="text-xs"></iconify-icon>
+        <span class="text-white/70" data-sd-id="8">Product Scale</span>
+      </div>
+
+      <!-- ═══ HERO SECTION ═══ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="9">
+        <div class="mb-6">
+          <a href="https://p.superdesign.dev/draft/36b48549-7be9-418d-b0c1-af81de96c79f" id="back-to-cases-btn" class="inline-flex items-center gap-2 px-4 py-2 glass-panel rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors text-sm font-medium">
+            <iconify-icon icon="lucide:arrow-left"></iconify-icon>
+            Back to Case Studies
+          </a>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 font-mono text-xs mb-6" data-sd-id="10">
+          <span class="glass-panel px-3 py-1.5 rounded-full flex items-center gap-2 text-white/70" data-sd-id="11">
+            <iconify-icon icon="lucide:smartphone" class="text-[#ffd700]"></iconify-icon>
+            Mobile-First Consumer App
+          </span>
+          <span class="glass-panel px-3 py-1.5 rounded-full text-white/70" data-sd-id="12">14 months (ongoing)</span>
+          <span class="glass-panel px-3 py-1.5 rounded-full text-white/70" data-sd-id="13">1 Principal + 4 Engineers + 2 Designers</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.05] text-white mb-6" data-sd-id="14">
+          Scaling React Native to <span class="neon-text" data-sd-id="15">500K+</span> Monthly Users
+        </h1>
+
+        <p class="text-lg md:text-xl text-white/60 max-w-3xl leading-relaxed" data-sd-id="16">
+          Building a robust, performant cross-platform application serving millions — while shipping weekly features. A deep dive into the architecture, performance, and scaling decisions that took an MVP from 100K to 500K+ users.
+        </p>
+      </section>
+
+      <!-- ═══ CHALLENGE SECTION ═══ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="17">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="18">
+          <div class="w-8 h-px bg-[#ff007f]/50" data-sd-id="19"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ff007f]/70" data-sd-id="20">The Challenge</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8" data-sd-id="21">
+          <!-- Problem Statement -->
+          <div class="lg:col-span-2 glass-panel rounded-2xl p-8" data-sd-id="22">
+            <div class="flex items-start gap-3 mb-4" data-sd-id="23">
+              <iconify-icon icon="lucide:alert-triangle" class="text-2xl text-[#ff007f] mt-1 flex-shrink-0"></iconify-icon>
+              <h2 class="text-2xl font-bold text-white" data-sd-id="24">The Problem</h2>
+            </div>
+            <p class="text-white/60 leading-relaxed mb-4" data-sd-id="25">
+              MVP React Native app hitting scaling limits at <span class="text-white font-medium" data-sd-id="26">100K users</span>. Performance degradation across the board. Navigation complexity spiraling. State management chaos with Redux prop-drilling. Android-specific bugs consuming engineering time.
+            </p>
+            <blockquote class="border-l-2 border-[#ff007f]/40 pl-4 italic text-white/50 text-sm" data-sd-id="27">
+              "Users were experiencing crashes daily. We had 1-star reviews piling up. Something had to change fundamentally."
+            </blockquote>
+          </div>
+
+          <!-- Impact Metrics -->
+          <div class="space-y-4" data-sd-id="28">
+            <div class="glass-panel rounded-2xl p-5 flex items-center gap-4" data-sd-id="29">
+              <div class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center flex-shrink-0" data-sd-id="30">
+                <iconify-icon icon="lucide:star" class="text-xl text-red-400"></iconify-icon>
+              </div>
+              <div data-sd-id="31">
+                <div class="text-2xl font-bold text-white" data-sd-id="32">1★</div>
+                <div class="text-xs text-white/40 font-mono" data-sd-id="33">app store rating</div>
+              </div>
+            </div>
+            <div class="glass-panel rounded-2xl p-5 flex items-center gap-4" data-sd-id="34">
+              <div class="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center flex-shrink-0" data-sd-id="35">
+                <iconify-icon icon="lucide:user-minus" class="text-xl text-orange-400"></iconify-icon>
+              </div>
+              <div data-sd-id="36">
+                <div class="text-2xl font-bold text-white" data-sd-id="37">30%</div>
+                <div class="text-xs text-white/40 font-mono" data-sd-id="38">uninstall rate</div>
+              </div>
+            </div>
+            <div class="glass-panel rounded-2xl p-5 flex items-center gap-4" data-sd-id="39">
+              <div class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center flex-shrink-0" data-sd-id="40">
+                <iconify-icon icon="lucide:zap-off" class="text-xl text-red-400"></iconify-icon>
+              </div>
+              <div data-sd-id="41">
+                <div class="text-2xl font-bold text-white" data-sd-id="42">12%</div>
+                <div class="text-xs text-white/40 font-mono" data-sd-id="43">crash rate</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pain Points Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" data-sd-id="44">
+          <div class="glass-panel rounded-xl p-4 text-center" data-sd-id="45">
+            <iconify-icon icon="lucide:link-broken" class="text-2xl text-[#ff007f] mb-2"></iconify-icon>
+            <p class="text-xs text-white/60" data-sd-id="46">Deep linking broken</p>
+          </div>
+          <div class="glass-panel rounded-xl p-4 text-center" data-sd-id="47">
+            <iconify-icon icon="lucide:smartphone-charging" class="text-2xl text-[#ff007f] mb-2"></iconify-icon>
+            <p class="text-xs text-white/60" data-sd-id="48">Android perf tail</p>
+          </div>
+          <div class="glass-panel rounded-xl p-4 text-center" data-sd-id="49">
+            <iconify-icon icon="lucide:wifi-off" class="text-2xl text-[#ff007f] mb-2"></iconify-icon>
+            <p class="text-xs text-white/60" data-sd-id="50">No offline support</p>
+          </div>
+          <div class="glass-panel rounded-xl p-4 text-center" data-sd-id="51">
+            <iconify-icon icon="lucide:timer" class="text-2xl text-[#ff007f] mb-2"></iconify-icon>
+            <p class="text-xs text-white/60" data-sd-id="52">3-day release cycles</p>
+          </div>
+          <div class="glass-panel rounded-xl p-4 text-center" data-sd-id="53">
+            <iconify-icon icon="lucide:bug" class="text-2xl text-[#ff007f] mb-2"></iconify-icon>
+            <p class="text-xs text-white/60" data-sd-id="54">State mutation bugs</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ SOLUTION APPROACH ═══ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="55">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="56">
+          <div class="w-8 h-px bg-[#00f0ff]/50" data-sd-id="57"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#00f0ff]/70" data-sd-id="58">The Solution</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10 max-w-2xl" data-sd-id="59">
+          A systematic <span class="neon-text" data-sd-id="60">re-architecture</span> across five dimensions
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5" data-sd-id="61">
+          <div class="glass-panel rounded-2xl p-6 tech-card" data-sd-id="62">
+            <div class="w-11 h-11 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center mb-4" data-sd-id="63">
+              <iconify-icon icon="lucide:route" class="text-xl text-[#ffd700]"></iconify-icon>
+            </div>
+            <h3 class="font-semibold text-white mb-2" data-sd-id="64">Navigation</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="65">React Navigation best practices with proper stack/tab/drawer separation and deep linking config from day one.</p>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 tech-card" data-sd-id="66">
+            <div class="w-11 h-11 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center mb-4" data-sd-id="67">
+              <iconify-icon icon="lucide:database" class="text-xl text-[#00f0ff]"></iconify-icon>
+            </div>
+            <h3 class="font-semibold text-white mb-2" data-sd-id="68">State Migration</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="69">Redux → TanStack Query (server) + Zustand (client). Clear separation of concerns, 40% fewer state bugs.</p>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 tech-card" data-sd-id="70">
+            <div class="w-11 h-11 rounded-xl bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center mb-4" data-sd-id="71">
+              <iconify-icon icon="lucide:package" class="text-xl text-[#ff007f]"></iconify-icon>
+            </div>
+            <h3 class="font-semibold text-white mb-2" data-sd-id="72">Bundle Opt</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="73">Removed 12+ unused dependencies. Tree-shaking, lazy loading, RAM bundles for Android. 50% size reduction.</p>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 tech-card" data-sd-id="74">
+            <div class="w-11 h-11 rounded-xl bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center mb-4" data-sd-id="75">
+              <iconify-icon icon="lucide:activity" class="text-xl text-[#83f36e]"></iconify-icon>
+            </div>
+            <h3 class="font-semibold text-white mb-2" data-sd-id="76">Monitoring</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="77">Sentry for crashes, Datadog for performance, Flipper for debugging. Real-user metrics from day one.</p>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 tech-card" data-sd-id="78">
+            <div class="w-11 h-11 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center mb-4" data-sd-id="79">
+              <iconify-icon icon="lucide:rocket" class="text-xl text-[#ffd700]"></iconify-icon>
+            </div>
+            <h3 class="font-semibold text-white mb-2" data-sd-id="80">EAS Pipeline</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="81">Cloud builds + OTA updates. Release cycle from 3 days to 2 hours. Ship hotfixes without app store review.</p>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 tech-card" data-sd-id="82">
+            <div class="w-11 h-11 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center mb-4" data-sd-id="83">
+              <iconify-icon icon="lucide:cpu" class="text-xl text-[#00f0ff]"></iconify-icon>
+            </div>
+            <h3 class="font-semibold text-white mb-2" data-sd-id="84">Android Opt</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="85">ProGuard config, RAM bundles, Hermes engine. Platform-specific perf tail eliminated entirely.</p>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 tech-card" data-sd-id="86">
+            <div class="w-11 h-11 rounded-xl bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center mb-4" data-sd-id="87">
+              <iconify-icon icon="lucide:shield-check" class="text-xl text-[#ff007f]"></iconify-icon>
+            </div>
+            <h3 class="font-semibold text-white mb-2" data-sd-id="88">Testing</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="89">Jest unit tests (90%+ coverage) + Detox E2E. Automated cross-platform testing on real device lab.</p>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 tech-card" data-sd-id="90">
+            <div class="w-11 h-11 rounded-xl bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center mb-4" data-sd-id="91">
+              <iconify-icon icon="lucide:wifi" class="text-xl text-[#83f36e]"></iconify-icon>
+            </div>
+            <h3 class="font-semibold text-white mb-2" data-sd-id="92">Offline-First</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="93">AsyncStorage + TanStack Query sync. 92% offline session success rate. No connectivity checks needed.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ ARCHITECTURE: BEFORE & AFTER ═══ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="94">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="95">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="96"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="97">Architecture</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10 max-w-2xl" data-sd-id="98">
+          Before &amp; After: <span class="neon-text" data-sd-id="99">State Architecture</span>
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-sd-id="100">
+          <!-- Before -->
+          <div class="glass-panel rounded-2xl p-8 border-red-500/10" data-sd-id="101">
+            <div class="flex items-center gap-3 mb-6" data-sd-id="102">
+              <span class="px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-xs font-mono uppercase tracking-wider text-red-400" data-sd-id="103">Before</span>
+              <h3 class="text-lg font-semibold text-white/80" data-sd-id="104">Fragmented Redux</h3>
+            </div>
+            <div class="space-y-3 font-mono text-sm" data-sd-id="105">
+              <div class="flex items-center gap-2 text-white/40" data-sd-id="106">
+                <iconify-icon icon="lucide:x" class="text-red-400"></iconify-icon>
+                <span data-sd-id="107">Single monolithic Redux store</span>
+              </div>
+              <div class="flex items-center gap-2 text-white/40" data-sd-id="108">
+                <iconify-icon icon="lucide:x" class="text-red-400"></iconify-icon>
+                <span data-sd-id="109">Thunk middleware for async (prop-drilling hell)</span>
+              </div>
+              <div class="flex items-center gap-2 text-white/40" data-sd-id="110">
+                <iconify-icon icon="lucide:x" class="text-red-400"></iconify-icon>
+                <span data-sd-id="111">Server &amp; client state mixed together</span>
+              </div>
+              <div class="flex items-center gap-2 text-white/40" data-sd-id="112">
+                <iconify-icon icon="lucide:x" class="text-red-400"></iconify-icon>
+                <span data-sd-id="113">Manual cache invalidation</span>
+              </div>
+              <div class="flex items-center gap-2 text-white/40" data-sd-id="114">
+                <iconify-icon icon="lucide:x" class="text-red-400"></iconify-icon>
+                <span data-sd-id="115">No offline strategy</span>
+              </div>
+            </div>
+            <div class="mt-6 pt-6 border-t border-white/5" data-sd-id="116">
+              <div class="text-3xl font-bold text-red-400" data-sd-id="117">40%</div>
+              <p class="text-xs text-white/40 font-mono" data-sd-id="118">of bugs were state-related</p>
+            </div>
+          </div>
+
+          <!-- After -->
+          <div class="glass-panel rounded-2xl p-8 border-[#00f0ff]/20" data-sd-id="119">
+            <div class="flex items-center gap-3 mb-6" data-sd-id="120">
+              <span class="px-3 py-1 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/20 text-xs font-mono uppercase tracking-wider text-[#00f0ff]" data-sd-id="121">After</span>
+              <h3 class="text-lg font-semibold text-white/80" data-sd-id="122">Separated Concerns</h3>
+            </div>
+            <div class="space-y-3 font-mono text-sm" data-sd-id="123">
+              <div class="flex items-center gap-2 text-white/60" data-sd-id="124">
+                <iconify-icon icon="lucide:check" class="text-[#00f0ff]"></iconify-icon>
+                <span data-sd-id="125">TanStack Query for all server state</span>
+              </div>
+              <div class="flex items-center gap-2 text-white/60" data-sd-id="126">
+                <iconify-icon icon="lucide:check" class="text-[#00f0ff]"></iconify-icon>
+                <span data-sd-id="127">Zustand for lightweight UI state</span>
+              </div>
+              <div class="flex items-center gap-2 text-white/60" data-sd-id="128">
+                <iconify-icon icon="lucide:check" class="text-[#00f0ff]"></iconify-icon>
+                <span data-sd-id="129">Automatic cache invalidation &amp; refetching</span>
+              </div>
+              <div class="flex items-center gap-2 text-white/60" data-sd-id="130">
+                <iconify-icon icon="lucide:check" class="text-[#00f0ff]"></iconify-icon>
+                <span data-sd-id="131">Optimistic updates out of the box</span>
+              </div>
+              <div class="flex items-center gap-2 text-white/60" data-sd-id="132">
+                <iconify-icon icon="lucide:check" class="text-[#00f0ff]"></iconify-icon>
+                <span data-sd-id="133">AsyncStorage persistence + offline sync</span>
+              </div>
+            </div>
+            <div class="mt-6 pt-6 border-t border-white/5" data-sd-id="134">
+              <div class="text-3xl font-bold text-[#00f0ff]" data-sd-id="135">95%↓</div>
+              <p class="text-xs text-white/40 font-mono" data-sd-id="136">reduction in state-related bugs</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ IMPLEMENTATION TIMELINE ═══ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="137">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="138">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="139"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="140">Timeline</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-12 max-w-2xl" data-sd-id="141">
+          14-month <span class="neon-text" data-sd-id="142">implementation journey</span>
+        </h2>
+
+        <div class="relative pl-8 md:pl-12" data-sd-id="143">
+          <div class="absolute left-2 md:left-3 top-2 bottom-2 w-px timeline-line" data-sd-id="144"></div>
+
+          <div class="space-y-8" data-sd-id="145">
+            <!-- Phase 1 -->
+            <div class="relative scroll-reveal" data-sd-id="146">
+              <div class="absolute -left-[1.85rem] md:-left-[2.35rem] top-1.5 w-4 h-4 rounded-full bg-[#ffd700] border-2 border-black timeline-dot" data-sd-id="147"></div>
+              <div class="glass-panel rounded-xl p-6 md:p-8" data-sd-id="148">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3" data-sd-id="149">
+                  <div class="flex items-center gap-3" data-sd-id="150">
+                    <span class="font-mono text-xs text-[#ffd700] bg-[#ffd700]/10 px-3 py-1 rounded-full border border-[#ffd700]/20" data-sd-id="151">Phase 1</span>
+                    <span class="text-xs text-white/40 font-mono" data-sd-id="152">Month 1–3</span>
+                  </div>
+                  <h3 class="text-lg font-semibold text-white" data-sd-id="153">Navigation &amp; Architecture Refactor</h3>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed mb-4" data-sd-id="154">
+                  Root navigation refactored from deeply nested navigators to a flat, predictable structure. Implemented proper deep linking with linking config. Replaced Redux local state with Zustand for UI concerns.
+                </p>
+                <div class="flex flex-wrap gap-2" data-sd-id="155">
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="156">React Navigation v6</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="157">Zustand</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="158">Deep Linking</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phase 2 -->
+            <div class="relative scroll-reveal" data-sd-id="159">
+              <div class="absolute -left-[1.85rem] md:-left-[2.35rem] top-1.5 w-4 h-4 rounded-full bg-[#00f0ff] border-2 border-black timeline-dot" data-sd-id="160"></div>
+              <div class="glass-panel rounded-xl p-6 md:p-8" data-sd-id="161">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3" data-sd-id="162">
+                  <div class="flex items-center gap-3" data-sd-id="163">
+                    <span class="font-mono text-xs text-[#00f0ff] bg-[#00f0ff]/10 px-3 py-1 rounded-full border border-[#00f0ff]/20" data-sd-id="164">Phase 2</span>
+                    <span class="text-xs text-white/40 font-mono" data-sd-id="165">Month 4–6</span>
+                  </div>
+                  <h3 class="text-lg font-semibold text-white" data-sd-id="166">State Management &amp; Data Fetching</h3>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed mb-4" data-sd-id="167">
+                  Migrated all async operations to TanStack Query. Implemented offline sync strategy with AsyncStorage. Added optimistic updates and cache invalidation. Set up background refresh mechanisms for stale data.
+                </p>
+                <div class="flex flex-wrap gap-2" data-sd-id="168">
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="169">TanStack Query v5</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="170">AsyncStorage</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="171">Optimistic Updates</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phase 3 -->
+            <div class="relative scroll-reveal" data-sd-id="172">
+              <div class="absolute -left-[1.85rem] md:-left-[2.35rem] top-1.5 w-4 h-4 rounded-full bg-[#ff007f] border-2 border-black timeline-dot" data-sd-id="173"></div>
+              <div class="glass-panel rounded-xl p-6 md:p-8" data-sd-id="174">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3" data-sd-id="175">
+                  <div class="flex items-center gap-3" data-sd-id="176">
+                    <span class="font-mono text-xs text-[#ff007f] bg-[#ff007f]/10 px-3 py-1 rounded-full border border-[#ff007f]/20" data-sd-id="177">Phase 3</span>
+                    <span class="text-xs text-white/40 font-mono" data-sd-id="178">Month 7–9</span>
+                  </div>
+                  <h3 class="text-lg font-semibold text-white" data-sd-id="179">Performance Optimization &amp; Testing</h3>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed mb-4" data-sd-id="180">
+                  Bundle analysis identified and removed unused code. Image optimization with cached thumbnails. FlatList virtualization tuning. Comprehensive testing suite: Jest for units, Detox for E2E on real devices.
+                </p>
+                <div class="flex flex-wrap gap-2" data-sd-id="181">
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="182">Bundle Analysis</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="183">Detox E2E</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="184">Jest 90%+</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phase 4 -->
+            <div class="relative scroll-reveal" data-sd-id="185">
+              <div class="absolute -left-[1.85rem] md:-left-[2.35rem] top-1.5 w-4 h-4 rounded-full bg-[#83f36e] border-2 border-black timeline-dot" data-sd-id="186"></div>
+              <div class="glass-panel rounded-xl p-6 md:p-8" data-sd-id="187">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3" data-sd-id="188">
+                  <div class="flex items-center gap-3" data-sd-id="189">
+                    <span class="font-mono text-xs text-[#83f36e] bg-[#83f36e]/10 px-3 py-1 rounded-full border border-[#83f36e]/20" data-sd-id="190">Phase 4</span>
+                    <span class="text-xs text-white/40 font-mono" data-sd-id="191">Month 10–12</span>
+                  </div>
+                  <h3 class="text-lg font-semibold text-white" data-sd-id="192">Cross-Platform Parity &amp; Accessibility</h3>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed mb-4" data-sd-id="193">
+                  Android-specific bug fixes and optimizations. Full accessibility audit with screen reader support. Platform-specific UX refinements. Release automation fully configured with EAS Build and Update.
+                </p>
+                <div class="flex flex-wrap gap-2" data-sd-id="194">
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="195">EAS Build</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="196">A11y Audit</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="197">Hermes Engine</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phase 5 -->
+            <div class="relative scroll-reveal" data-sd-id="198">
+              <div class="absolute -left-[1.85rem] md:-left-[2.35rem] top-1.5 w-4 h-4 rounded-full bg-[#ffd700] border-2 border-black timeline-dot" data-sd-id="199"></div>
+              <div class="glass-panel rounded-xl p-6 md:p-8" data-sd-id="200">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3" data-sd-id="201">
+                  <div class="flex items-center gap-3" data-sd-id="202">
+                    <span class="font-mono text-xs text-[#ffd700] bg-[#ffd700]/10 px-3 py-1 rounded-full border border-[#ffd700]/20" data-sd-id="203">Phase 5</span>
+                    <span class="text-xs text-white/40 font-mono" data-sd-id="204">Month 13–14</span>
+                  </div>
+                  <h3 class="text-lg font-semibold text-white" data-sd-id="205">Monitoring, Handoff &amp; Team Training</h3>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed mb-4" data-sd-id="206">
+                  Sentry monitoring alerts and incident response process established. Performance baselines documented. Team onboarding documentation completed. Gradual rollout to production with feature flags.
+                </p>
+                <div class="flex flex-wrap gap-2" data-sd-id="207">
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="208">Sentry</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="209">Datadog</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="210">Feature Flags</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ SCALING METRICS ═══ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="211">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="212">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="213"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="214">Impact</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10 max-w-2xl" data-sd-id="215">
+          The numbers that <span class="neon-text" data-sd-id="216">define the work</span>
+        </h2>
+
+        <!-- Main Metrics Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10" data-sd-id="217">
+          <div class="glass-panel rounded-2xl p-6 md:p-8 flex flex-col gap-2" data-sd-id="218">
+            <div class="w-10 h-10 rounded-lg bg-[#ffd700]/10 flex items-center justify-center mb-2" data-sd-id="219">
+              <iconify-icon icon="lucide:users" class="text-lg text-[#ffd700]"></iconify-icon>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="220">500K+</h3>
+            <p class="text-xs text-white/50 font-mono" data-sd-id="221">monthly active users</p>
+            <p class="text-[10px] text-[#ffd700] font-mono mt-1" data-sd-id="222">↑ 5x from 100K</p>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 md:p-8 flex flex-col gap-2" data-sd-id="223">
+            <div class="w-10 h-10 rounded-lg bg-[#00f0ff]/10 flex items-center justify-center mb-2" data-sd-id="224">
+              <iconify-icon icon="lucide:star" class="text-lg text-[#00f0ff]"></iconify-icon>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="225">4.7★</h3>
+            <p class="text-xs text-white/50 font-mono" data-sd-id="226">app store rating</p>
+            <p class="text-[10px] text-[#00f0ff] font-mono mt-1" data-sd-id="227">↑ from 2.1★</p>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 md:p-8 flex flex-col gap-2" data-sd-id="228">
+            <div class="w-10 h-10 rounded-lg bg-[#ff007f]/10 flex items-center justify-center mb-2" data-sd-id="229">
+              <iconify-icon icon="lucide:shield-check" class="text-lg text-[#ff007f]"></iconify-icon>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="230">0.5%</h3>
+            <p class="text-xs text-white/50 font-mono" data-sd-id="231">crash rate</p>
+            <p class="text-[10px] text-[#ff007f] font-mono mt-1" data-sd-id="232">↓ 95% from 12%</p>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 md:p-8 flex flex-col gap-2" data-sd-id="233">
+            <div class="w-10 h-10 rounded-lg bg-[#83f36e]/10 flex items-center justify-center mb-2" data-sd-id="234">
+              <iconify-icon icon="lucide:rocket" class="text-lg text-[#83f36e]"></iconify-icon>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="235">2hrs</h3>
+            <p class="text-xs text-white/50 font-mono" data-sd-id="236">release cycle</p>
+            <p class="text-[10px] text-[#83f36e] font-mono mt-1" data-sd-id="237">↓ from 3 days</p>
+          </div>
+        </div>
+
+        <!-- Growth Chart -->
+        <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="238">
+          <h3 class="text-sm font-mono uppercase tracking-widest text-white/40 mb-6" data-sd-id="239">User Growth Trajectory</h3>
+          <div class="space-y-4" data-sd-id="240">
+            <!-- Chart bars -->
+            <div class="space-y-3" data-sd-id="241">
+              <div data-sd-id="242">
+                <div class="flex justify-between text-xs text-white/40 font-mono mb-1.5" data-sd-id="243">
+                  <span data-sd-id="244">Month 0 — 100K users</span>
+                  <span data-sd-id="245">Starting point</span>
+                </div>
+                <div class="h-3 rounded-full bg-white/5 overflow-hidden" data-sd-id="246">
+                  <div class="h-full rounded-full bg-gradient-to-r from-[#ff007f] to-[#ff007f]/60 bar-fill" style="width: 0;" data-bar-width="20%" data-sd-id="247"></div>
+                </div>
+              </div>
+              <div data-sd-id="248">
+                <div class="flex justify-between text-xs text-white/40 font-mono mb-1.5" data-sd-id="249">
+                  <span data-sd-id="250">Month 4 — 180K users</span>
+                  <span data-sd-id="251">+80%</span>
+                </div>
+                <div class="h-3 rounded-full bg-white/5 overflow-hidden" data-sd-id="252">
+                  <div class="h-full rounded-full bg-gradient-to-r from-[#ff007f] to-[#ffd700]/60 bar-fill" style="width: 0;" data-bar-width="36%" data-sd-id="253"></div>
+                </div>
+              </div>
+              <div data-sd-id="254">
+                <div class="flex justify-between text-xs text-white/40 font-mono mb-1.5" data-sd-id="255">
+                  <span data-sd-id="256">Month 8 — 320K users</span>
+                  <span data-sd-id="257">+220%</span>
+                </div>
+                <div class="h-3 rounded-full bg-white/5 overflow-hidden" data-sd-id="258">
+                  <div class="h-full rounded-full bg-gradient-to-r from-[#ffd700]/60 to-[#00f0ff]/60 bar-fill" style="width: 0;" data-bar-width="64%" data-sd-id="259"></div>
+                </div>
+              </div>
+              <div data-sd-id="260">
+                <div class="flex justify-between text-xs text-white/40 font-mono mb-1.5" data-sd-id="261">
+                  <span data-sd-id="262">Month 14 — 500K+ users</span>
+                  <span data-sd-id="263">+400%</span>
+                </div>
+                <div class="h-3 rounded-full bg-white/5 overflow-hidden" data-sd-id="264">
+                  <div class="h-full rounded-full bg-gradient-to-r from-[#00f0ff] to-[#83f36e] bar-fill" style="width: 0;" data-bar-width="100%" data-sd-id="265"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 pt-6 border-t border-white/5" data-sd-id="266">
+              <div data-sd-id="267">
+                <div class="text-xl font-bold text-white" data-sd-id="268">2M+</div>
+                <p class="text-[10px] text-white/40 font-mono" data-sd-id="269">cumulative installs</p>
+              </div>
+              <div data-sd-id="270">
+                <div class="text-xl font-bold text-white" data-sd-id="271">5M+</div>
+                <p class="text-[10px] text-white/40 font-mono" data-sd-id="272">peak downloads</p>
+              </div>
+              <div data-sd-id="273">
+                <div class="text-xl font-bold text-white" data-sd-id="274">350K+</div>
+                <p class="text-[10px] text-white/40 font-mono" data-sd-id="275">daily active users</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ PERFORMANCE METRICS ═══ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="276">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="277">
+          <div class="w-8 h-px bg-[#00f0ff]/50" data-sd-id="278"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#00f0ff]/70" data-sd-id="279">Performance</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10 max-w-2xl" data-sd-id="280">
+          Technical <span class="neon-text" data-sd-id="281">performance wins</span>
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" data-sd-id="282">
+          <!-- Bundle Size -->
+          <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="283">
+            <div class="flex items-center gap-2 mb-6" data-sd-id="284">
+              <iconify-icon icon="lucide:package" class="text-[#ffd700]"></iconify-icon>
+              <h3 class="text-sm font-mono uppercase tracking-wider text-white/80" data-sd-id="285">Bundle Size</h3>
+            </div>
+            <div class="space-y-5" data-sd-id="286">
+              <div data-sd-id="287">
+                <div class="flex justify-between text-sm mb-2" data-sd-id="288">
+                  <span class="text-white/40 font-mono" data-sd-id="289">Before</span>
+                  <span class="text-white font-bold" data-sd-id="290">85MB</span>
+                </div>
+                <div class="h-2.5 rounded-full bg-white/5 overflow-hidden" data-sd-id="291">
+                  <div class="h-full rounded-full bg-red-400/60 bar-fill" style="width: 0;" data-bar-width="100%" data-sd-id="292"></div>
+                </div>
+              </div>
+              <div data-sd-id="293">
+                <div class="flex justify-between text-sm mb-2" data-sd-id="294">
+                  <span class="text-white/40 font-mono" data-sd-id="295">After</span>
+                  <span class="text-[#ffd700] font-bold" data-sd-id="296">42MB</span>
+                </div>
+                <div class="h-2.5 rounded-full bg-white/5 overflow-hidden" data-sd-id="297">
+                  <div class="h-full rounded-full bg-[#ffd700] bar-fill" style="width: 0;" data-bar-width="49%" data-sd-id="298"></div>
+                </div>
+              </div>
+              <div class="pt-3 border-t border-white/5" data-sd-id="299">
+                <div class="text-2xl font-bold text-[#ffd700]" data-sd-id="300">50%↓</div>
+                <p class="text-xs text-white/40 font-mono" data-sd-id="301">smaller download</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Startup Time -->
+          <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="302">
+            <div class="flex items-center gap-2 mb-6" data-sd-id="303">
+              <iconify-icon icon="lucide:timer" class="text-[#00f0ff]"></iconify-icon>
+              <h3 class="text-sm font-mono uppercase tracking-wider text-white/80" data-sd-id="304">App Startup</h3>
+            </div>
+            <div class="space-y-5" data-sd-id="305">
+              <div data-sd-id="306">
+                <div class="flex justify-between text-sm mb-2" data-sd-id="307">
+                  <span class="text-white/40 font-mono" data-sd-id="308">Before</span>
+                  <span class="text-white font-bold" data-sd-id="309">4.0s</span>
+                </div>
+                <div class="h-2.5 rounded-full bg-white/5 overflow-hidden" data-sd-id="310">
+                  <div class="h-full rounded-full bg-red-400/60 bar-fill" style="width: 0;" data-bar-width="100%" data-sd-id="311"></div>
+                </div>
+              </div>
+              <div data-sd-id="312">
+                <div class="flex justify-between text-sm mb-2" data-sd-id="313">
+                  <span class="text-white/40 font-mono" data-sd-id="314">After</span>
+                  <span class="text-[#00f0ff] font-bold" data-sd-id="315">2.5s</span>
+                </div>
+                <div class="h-2.5 rounded-full bg-white/5 overflow-hidden" data-sd-id="316">
+                  <div class="h-full rounded-full bg-[#00f0ff] bar-fill" style="width: 0;" data-bar-width="62%" data-sd-id="317"></div>
+                </div>
+              </div>
+              <div class="pt-3 border-t border-white/5" data-sd-id="318">
+                <div class="text-2xl font-bold text-[#00f0ff]" data-sd-id="319">37%↓</div>
+                <p class="text-xs text-white/40 font-mono" data-sd-id="320">faster cold start</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Network -->
+          <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="321">
+            <div class="flex items-center gap-2 mb-6" data-sd-id="322">
+              <iconify-icon icon="lucide:wifi" class="text-[#ff007f]"></iconify-icon>
+              <h3 class="text-sm font-mono uppercase tracking-wider text-white/80" data-sd-id="323">Data Per Session</h3>
+            </div>
+            <div class="space-y-5" data-sd-id="324">
+              <div data-sd-id="325">
+                <div class="flex justify-between text-sm mb-2" data-sd-id="326">
+                  <span class="text-white/40 font-mono" data-sd-id="327">Before</span>
+                  <span class="text-white font-bold" data-sd-id="328">8.5MB</span>
+                </div>
+                <div class="h-2.5 rounded-full bg-white/5 overflow-hidden" data-sd-id="329">
+                  <div class="h-full rounded-full bg-red-400/60 bar-fill" style="width: 0;" data-bar-width="100%" data-sd-id="330"></div>
+                </div>
+              </div>
+              <div data-sd-id="331">
+                <div class="flex justify-between text-sm mb-2" data-sd-id="332">
+                  <span class="text-white/40 font-mono" data-sd-id="333">After</span>
+                  <span class="text-[#ff007f] font-bold" data-sd-id="334">1.2MB</span>
+                </div>
+                <div class="h-2.5 rounded-full bg-white/5 overflow-hidden" data-sd-id="335">
+                  <div class="h-full rounded-full bg-[#ff007f] bar-fill" style="width: 0;" data-bar-width="14%" data-sd-id="336"></div>
+                </div>
+              </div>
+              <div class="pt-3 border-t border-white/5" data-sd-id="337">
+                <div class="text-2xl font-bold text-[#ff007f]" data-sd-id="338">86%↓</div>
+                <p class="text-xs text-white/40 font-mono" data-sd-id="339">less data transferred</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Runtime Metrics -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6" data-sd-id="340">
+          <div class="glass-panel rounded-xl p-5 text-center" data-sd-id="341">
+            <div class="text-2xl font-bold text-white" data-sd-id="342">58 FPS</div>
+            <p class="text-[10px] text-white/40 font-mono mt-1" data-sd-id="343">animation framerate</p>
+            <p class="text-[10px] text-[#83f36e] font-mono" data-sd-id="344">↑ from 45 FPS</p>
+          </div>
+          <div class="glass-panel rounded-xl p-5 text-center" data-sd-id="345">
+            <div class="text-2xl font-bold text-white" data-sd-id="346">95MB</div>
+            <p class="text-[10px] text-white/40 font-mono mt-1" data-sd-id="347">memory usage</p>
+            <p class="text-[10px] text-[#83f36e] font-mono" data-sd-id="348">↓ from 180MB</p>
+          </div>
+          <div class="glass-panel rounded-xl p-5 text-center" data-sd-id="349">
+            <div class="text-2xl font-bold text-white" data-sd-id="350">9</div>
+            <p class="text-[10px] text-white/40 font-mono mt-1" data-sd-id="351">API calls/session</p>
+            <p class="text-[10px] text-[#83f36e] font-mono" data-sd-id="352">↓ from 45</p>
+          </div>
+          <div class="glass-panel rounded-xl p-5 text-center" data-sd-id="353">
+            <div class="text-2xl font-bold text-white" data-sd-id="354">92%</div>
+            <p class="text-[10px] text-white/40 font-mono mt-1" data-sd-id="355">offline success</p>
+            <p class="text-[10px] text-[#83f36e] font-mono" data-sd-id="356">↑ from 0%</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ TECH STACK ═══ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="357">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="358">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="359"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="360">Tech Stack</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10 max-w-2xl" data-sd-id="361">
+          Tools <span class="neon-text" data-sd-id="362">powering the platform</span>
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-sd-id="363">
+          <!-- Core -->
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="364">
+            <div class="flex items-center gap-2 mb-4" data-sd-id="365">
+              <iconify-icon icon="lucide:cpu" class="text-[#ffd700]"></iconify-icon>
+              <h3 class="text-sm font-semibold text-white/80 uppercase tracking-wider font-mono" data-sd-id="366">Core</h3>
+            </div>
+            <div class="flex flex-wrap gap-2" data-sd-id="367">
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ffd700]/20 transition-all cursor-default" data-sd-id="368">React Native 0.72+</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ffd700]/20 transition-all cursor-default" data-sd-id="369">Expo SDK 50+</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ffd700]/20 transition-all cursor-default" data-sd-id="370">TypeScript</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ffd700]/20 transition-all cursor-default" data-sd-id="371">Node.js 18+</span>
+            </div>
+          </div>
+
+          <!-- State -->
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="372">
+            <div class="flex items-center gap-2 mb-4" data-sd-id="373">
+              <iconify-icon icon="lucide:database" class="text-[#00f0ff]"></iconify-icon>
+              <h3 class="text-sm font-semibold text-white/80 uppercase tracking-wider font-mono" data-sd-id="374">State</h3>
+            </div>
+            <div class="flex flex-wrap gap-2" data-sd-id="375">
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#00f0ff]/20 transition-all cursor-default" data-sd-id="376">TanStack Query v5</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#00f0ff]/20 transition-all cursor-default" data-sd-id="377">Zustand</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#00f0ff]/20 transition-all cursor-default" data-sd-id="378">AsyncStorage</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#00f0ff]/20 transition-all cursor-default" data-sd-id="379">React Context</span>
+            </div>
+          </div>
+
+          <!-- Navigation -->
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="380">
+            <div class="flex items-center gap-2 mb-4" data-sd-id="381">
+              <iconify-icon icon="lucide:route" class="text-[#ff007f]"></iconify-icon>
+              <h3 class="text-sm font-semibold text-white/80 uppercase tracking-wider font-mono" data-sd-id="382">Navigation</h3>
+            </div>
+            <div class="flex flex-wrap gap-2" data-sd-id="383">
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ff007f]/20 transition-all cursor-default" data-sd-id="384">React Navigation v6</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ff007f]/20 transition-all cursor-default" data-sd-id="385">Deep Linking</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ff007f]/20 transition-all cursor-default" data-sd-id="386">URL Schema</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ff007f]/20 transition-all cursor-default" data-sd-id="387">Nested Stacks</span>
+            </div>
+          </div>
+
+          <!-- DevOps -->
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="388">
+            <div class="flex items-center gap-2 mb-4" data-sd-id="389">
+              <iconify-icon icon="lucide:rocket" class="text-[#ffd700]"></iconify-icon>
+              <h3 class="text-sm font-semibold text-white/80 uppercase tracking-wider font-mono" data-sd-id="390">DevOps</h3>
+            </div>
+            <div class="flex flex-wrap gap-2" data-sd-id="391">
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ffd700]/20 transition-all cursor-default" data-sd-id="392">EAS Build</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ffd700]/20 transition-all cursor-default" data-sd-id="393">EAS Update (OTA)</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ffd700]/20 transition-all cursor-default" data-sd-id="394">GitHub Actions</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ffd700]/20 transition-all cursor-default" data-sd-id="395">Semantic Release</span>
+            </div>
+          </div>
+
+          <!-- Monitoring -->
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="396">
+            <div class="flex items-center gap-2 mb-4" data-sd-id="397">
+              <iconify-icon icon="lucide:activity" class="text-[#83f36e]"></iconify-icon>
+              <h3 class="text-sm font-semibold text-white/80 uppercase tracking-wider font-mono" data-sd-id="398">Monitoring</h3>
+            </div>
+            <div class="flex flex-wrap gap-2" data-sd-id="399">
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#83f36e]/20 transition-all cursor-default" data-sd-id="400">Sentry</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#83f36e]/20 transition-all cursor-default" data-sd-id="401">Datadog</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#83f36e]/20 transition-all cursor-default" data-sd-id="402">Segment</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#83f36e]/20 transition-all cursor-default" data-sd-id="403">Custom Telemetry</span>
+            </div>
+          </div>
+
+          <!-- Testing -->
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="404">
+            <div class="flex items-center gap-2 mb-4" data-sd-id="405">
+              <iconify-icon icon="lucide:shield-check" class="text-[#ff007f]"></iconify-icon>
+              <h3 class="text-sm font-semibold text-white/80 uppercase tracking-wider font-mono" data-sd-id="406">Testing</h3>
+            </div>
+            <div class="flex flex-wrap gap-2" data-sd-id="407">
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ff007f]/20 transition-all cursor-default" data-sd-id="408">Jest (90%+ cov)</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ff007f]/20 transition-all cursor-default" data-sd-id="409">RNTL</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ff007f]/20 transition-all cursor-default" data-sd-id="410">Detox E2E</span>
+              <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-[#ff007f]/20 transition-all cursor-default" data-sd-id="411">Device Lab</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ BEFORE & AFTER TABLE ═══ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="412">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="413">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="414"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="415">Comparison</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10 max-w-2xl" data-sd-id="416">
+          Before &amp; After <span class="neon-text" data-sd-id="417">at a glance</span>
+        </h2>
+
+        <div class="glass-panel rounded-2xl overflow-hidden" data-sd-id="418">
+          <div class="overflow-x-auto" data-sd-id="419">
+            <table class="w-full" data-sd-id="420">
+              <thead data-sd-id="421">
+                <tr class="border-b border-white/10" data-sd-id="422">
+                  <th class="text-left p-4 md:p-6 text-xs font-mono uppercase tracking-widest text-white/40" data-sd-id="423">Metric</th>
+                  <th class="text-left p-4 md:p-6 text-xs font-mono uppercase tracking-widest text-red-400/70" data-sd-id="424">Before</th>
+                  <th class="text-left p-4 md:p-6 text-xs font-mono uppercase tracking-widest text-[#ffd700]/70" data-sd-id="425">After</th>
+                  <th class="text-right p-4 md:p-6 text-xs font-mono uppercase tracking-widest text-white/40" data-sd-id="426">Change</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/5" data-sd-id="427">
+                <tr class="hover:bg-white/5 transition-colors" data-sd-id="428">
+                  <td class="p-4 md:p-6 text-sm text-white/70" data-sd-id="429">Monthly Active Users</td>
+                  <td class="p-4 md:p-6 text-sm text-white/50 font-mono" data-sd-id="430">100K</td>
+                  <td class="p-4 md:p-6 text-sm text-white font-bold font-mono" data-sd-id="431">500K+</td>
+                  <td class="p-4 md:p-6 text-sm text-right text-[#83f36e] font-mono" data-sd-id="432">5x growth</td>
+                </tr>
+                <tr class="hover:bg-white/5 transition-colors" data-sd-id="433">
+                  <td class="p-4 md:p-6 text-sm text-white/70" data-sd-id="434">Crash Rate</td>
+                  <td class="p-4 md:p-6 text-sm text-white/50 font-mono" data-sd-id="435">12%</td>
+                  <td class="p-4 md:p-6 text-sm text-white font-bold font-mono" data-sd-id="436">0.5%</td>
+                  <td class="p-4 md:p-6 text-sm text-right text-[#83f36e] font-mono" data-sd-id="437">95%↓</td>
+                </tr>
+                <tr class="hover:bg-white/5 transition-colors" data-sd-id="438">
+                  <td class="p-4 md:p-6 text-sm text-white/70" data-sd-id="439">App Store Rating</td>
+                  <td class="p-4 md:p-6 text-sm text-white/50 font-mono" data-sd-id="440">2.1★</td>
+                  <td class="p-4 md:p-6 text-sm text-white font-bold font-mono" data-sd-id="441">4.7★</td>
+                  <td class="p-4 md:p-6 text-sm text-right text-[#83f36e] font-mono" data-sd-id="442">126%↑</td>
+                </tr>
+                <tr class="hover:bg-white/5 transition-colors" data-sd-id="443">
+                  <td class="p-4 md:p-6 text-sm text-white/70" data-sd-id="444">Release Cycle</td>
+                  <td class="p-4 md:p-6 text-sm text-white/50 font-mono" data-sd-id="445">3 days</td>
+                  <td class="p-4 md:p-6 text-sm text-white font-bold font-mono" data-sd-id="446">2 hours</td>
+                  <td class="p-4 md:p-6 text-sm text-right text-[#83f36e] font-mono" data-sd-id="447">97%↓</td>
+                </tr>
+                <tr class="hover:bg-white/5 transition-colors" data-sd-id="448">
+                  <td class="p-4 md:p-6 text-sm text-white/70" data-sd-id="449">Bundle Size</td>
+                  <td class="p-4 md:p-6 text-sm text-white/50 font-mono" data-sd-id="450">85MB</td>
+                  <td class="p-4 md:p-6 text-sm text-white font-bold font-mono" data-sd-id="451">42MB</td>
+                  <td class="p-4 md:p-6 text-sm text-right text-[#83f36e] font-mono" data-sd-id="452">50%↓</td>
+                </tr>
+                <tr class="hover:bg-white/5 transition-colors" data-sd-id="453">
+                  <td class="p-4 md:p-6 text-sm text-white/70" data-sd-id="454">App Startup</td>
+                  <td class="p-4 md:p-6 text-sm text-white/50 font-mono" data-sd-id="455">4.0s</td>
+                  <td class="p-4 md:p-6 text-sm text-white font-bold font-mono" data-sd-id="456">2.5s</td>
+                  <td class="p-4 md:p-6 text-sm text-right text-[#83f36e] font-mono" data-sd-id="457">37%↓</td>
+                </tr>
+                <tr class="hover:bg-white/5 transition-colors" data-sd-id="458">
+                  <td class="p-4 md:p-6 text-sm text-white/70" data-sd-id="459">Data Per Session</td>
+                  <td class="p-4 md:p-6 text-sm text-white/50 font-mono" data-sd-id="460">8.5MB</td>
+                  <td class="p-4 md:p-6 text-sm text-white font-bold font-mono" data-sd-id="461">1.2MB</td>
+                  <td class="p-4 md:p-6 text-sm text-right text-[#83f36e] font-mono" data-sd-id="462">86%↓</td>
+                </tr>
+                <tr class="hover:bg-white/5 transition-colors" data-sd-id="463">
+                  <td class="p-4 md:p-6 text-sm text-white/70" data-sd-id="464">Day 1 Retention</td>
+                  <td class="p-4 md:p-6 text-sm text-white/50 font-mono" data-sd-id="465">35%</td>
+                  <td class="p-4 md:p-6 text-sm text-white font-bold font-mono" data-sd-id="466">68%</td>
+                  <td class="p-4 md:p-6 text-sm text-right text-[#83f36e] font-mono" data-sd-id="467">94%↑</td>
+                </tr>
+                <tr class="hover:bg-white/5 transition-colors" data-sd-id="468">
+                  <td class="p-4 md:p-6 text-sm text-white/70" data-sd-id="469">Uninstall Rate</td>
+                  <td class="p-4 md:p-6 text-sm text-white/50 font-mono" data-sd-id="470">30%</td>
+                  <td class="p-4 md:p-6 text-sm text-white font-bold font-mono" data-sd-id="471">3%</td>
+                  <td class="p-4 md:p-6 text-sm text-right text-[#83f36e] font-mono" data-sd-id="472">90%↓</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ MONETIZATION ═══ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="473">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="474">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="475"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="476">Growth</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10 max-w-2xl" data-sd-id="477">
+          From free app to <span class="neon-text" data-sd-id="478">$2.5M ARR</span>
+        </h2>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6" data-sd-id="479">
+          <div class="glass-panel rounded-2xl p-6 flex flex-col gap-2" data-sd-id="480">
+            <iconify-icon icon="lucide:dollar-sign" class="text-2xl text-[#ffd700] mb-1"></iconify-icon>
+            <h3 class="text-3xl font-bold text-white" data-sd-id="481">$2.5M</h3>
+            <p class="text-xs text-white/50 font-mono" data-sd-id="482">ARR post-optimization</p>
+          </div>
+          <div class="glass-panel rounded-2xl p-6 flex flex-col gap-2" data-sd-id="483">
+            <iconify-icon icon="lucide:trending-up" class="text-2xl text-[#00f0ff] mb-1"></iconify-icon>
+            <h3 class="text-3xl font-bold text-white" data-sd-id="484">12%</h3>
+            <p class="text-xs text-white/50 font-mono" data-sd-id="485">free → paid conversion</p>
+            <p class="text-[10px] text-[#00f0ff] font-mono" data-sd-id="486">↑ from 2%</p>
+          </div>
+          <div class="glass-panel rounded-2xl p-6 flex flex-col gap-2" data-sd-id="487">
+            <iconify-icon icon="lucide:user-check" class="text-2xl text-[#ff007f] mb-1"></iconify-icon>
+            <h3 class="text-3xl font-bold text-white" data-sd-id="488">$3.20</h3>
+            <p class="text-xs text-white/50 font-mono" data-sd-id="489">ARPU (avg revenue/user)</p>
+            <p class="text-[10px] text-[#ff007f] font-mono" data-sd-id="490">↑ from $0.80</p>
+          </div>
+          <div class="glass-panel rounded-2xl p-6 flex flex-col gap-2" data-sd-id="491">
+            <iconify-icon icon="lucide:credit-card" class="text-2xl text-[#83f36e] mb-1"></iconify-icon>
+            <h3 class="text-3xl font-bold text-white" data-sd-id="492">RevenueCat</h3>
+            <p class="text-xs text-white/50 font-mono" data-sd-id="493">in-app purchase integration</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ KEY DECISIONS ═══ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="494">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="495">
+          <div class="w-8 h-px bg-[#00f0ff]/50" data-sd-id="496"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#00f0ff]/70" data-sd-id="497">Decisions</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10 max-w-2xl" data-sd-id="498">
+          Key technical <span class="neon-text" data-sd-id="499">trade-offs</span>
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-sd-id="500">
+          <!-- Decision 1 -->
+          <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="501">
+            <div class="flex items-start justify-between mb-4" data-sd-id="502">
+              <div class="w-11 h-11 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="503">
+                <iconify-icon icon="lucide:git-branch" class="text-xl text-[#ffd700]"></iconify-icon>
+              </div>
+              <span class="text-[10px] font-mono uppercase tracking-wider text-white/30" data-sd-id="504">Decision 1</span>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-3" data-sd-id="505">Expo vs Bare React Native</h3>
+            <div class="space-y-2 text-sm" data-sd-id="506">
+              <p class="text-white/60" data-sd-id="507"><span class="text-[#ffd700] font-medium" data-sd-id="508">Chose:</span> Expo managed workflow</p>
+              <p class="text-white/50" data-sd-id="509"><span class="text-white/40" data-sd-id="510">Why:</span> Faster iteration, OTA updates, cloud builds</p>
+              <p class="text-white/50" data-sd-id="511"><span class="text-white/40" data-sd-id="512">Trade-off:</span> Less native code control (minimal need)</p>
+              <p class="text-[#83f36e]" data-sd-id="513"><span class="text-white/40" data-sd-id="514">Result:</span> 6 weeks faster to market</p>
+            </div>
+          </div>
+
+          <!-- Decision 2 -->
+          <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="515">
+            <div class="flex items-start justify-between mb-4" data-sd-id="516">
+              <div class="w-11 h-11 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="517">
+                <iconify-icon icon="lucide:shuffle" class="text-xl text-[#00f0ff]"></iconify-icon>
+              </div>
+              <span class="text-[10px] font-mono uppercase tracking-wider text-white/30" data-sd-id="518">Decision 2</span>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-3" data-sd-id="519">Redux → Zustand + TanStack Query</h3>
+            <div class="space-y-2 text-sm" data-sd-id="520">
+              <p class="text-white/60" data-sd-id="521"><span class="text-[#00f0ff] font-medium" data-sd-id="522">Chose:</span> Separated state architecture</p>
+              <p class="text-white/50" data-sd-id="523"><span class="text-white/40" data-sd-id="524">Why:</span> Separation of concerns, less boilerplate</p>
+              <p class="text-white/50" data-sd-id="525"><span class="text-white/40" data-sd-id="526">Trade-off:</span> Smaller ecosystem vs Redux</p>
+              <p class="text-[#83f36e]" data-sd-id="527"><span class="text-white/40" data-sd-id="528">Result:</span> 40% fewer state bugs</p>
+            </div>
+          </div>
+
+          <!-- Decision 3 -->
+          <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="529">
+            <div class="flex items-start justify-between mb-4" data-sd-id="530">
+              <div class="w-11 h-11 rounded-xl bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="531">
+                <iconify-icon icon="lucide:flask-conical" class="text-xl text-[#ff007f]"></iconify-icon>
+              </div>
+              <span class="text-[10px] font-mono uppercase tracking-wider text-white/30" data-sd-id="532">Decision 3</span>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-3" data-sd-id="533">E2E Testing Strategy</h3>
+            <div class="space-y-2 text-sm" data-sd-id="534">
+              <p class="text-white/60" data-sd-id="535"><span class="text-[#ff007f] font-medium" data-sd-id="536">Chose:</span> Detox E2E + Jest units</p>
+              <p class="text-white/50" data-sd-id="537"><span class="text-white/40" data-sd-id="538">Why:</span> E2E catches real user journeys</p>
+              <p class="text-white/50" data-sd-id="539"><span class="text-white/40" data-sd-id="540">Trade-off:</span> Slower to run than unit tests</p>
+              <p class="text-[#83f36e]" data-sd-id="541"><span class="text-white/40" data-sd-id="542">Result:</span> 95% bugs caught pre-release</p>
+            </div>
+          </div>
+
+          <!-- Decision 4 -->
+          <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="543">
+            <div class="flex items-start justify-between mb-4" data-sd-id="544">
+              <div class="w-11 h-11 rounded-xl bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center" data-sd-id="545">
+                <iconify-icon icon="lucide:cloud-off" class="text-xl text-[#83f36e]"></iconify-icon>
+              </div>
+              <span class="text-[10px] font-mono uppercase tracking-wider text-white/30" data-sd-id="546">Decision 4</span>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-3" data-sd-id="547">Offline-First Architecture</h3>
+            <div class="space-y-2 text-sm" data-sd-id="548">
+              <p class="text-white/60" data-sd-id="549"><span class="text-[#83f36e] font-medium" data-sd-id="550">Chose:</span> AsyncStorage + TanStack Query</p>
+              <p class="text-white/50" data-sd-id="551"><span class="text-white/40" data-sd-id="552">Why:</span> Seamless UX, no connectivity checks</p>
+              <p class="text-white/50" data-sd-id="553"><span class="text-white/40" data-sd-id="554">Trade-off:</span> Complex sync conflict resolution</p>
+              <p class="text-[#83f36e]" data-sd-id="555"><span class="text-white/40" data-sd-id="556">Result:</span> 92% offline success rate</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ LESSONS LEARNED ═══ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="557">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="558">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="559"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="560">Lessons</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10 max-w-2xl" data-sd-id="561">
+          What I <span class="neon-text" data-sd-id="562">learned</span> scaling to 500K+
+        </h2>
+
+        <div class="space-y-4" data-sd-id="563">
+          <div class="glass-panel rounded-2xl p-6 lesson-card flex items-start gap-5" data-sd-id="564">
+            <div class="w-10 h-10 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center flex-shrink-0" data-sd-id="565">
+              <span class="font-mono font-bold text-[#ffd700]" data-sd-id="566">01</span>
+            </div>
+            <div data-sd-id="567">
+              <h3 class="font-semibold text-white mb-1" data-sd-id="568">Navigation architecture is 50% of RN app quality</h3>
+              <p class="text-sm text-white/50 leading-relaxed" data-sd-id="569">Proper structure enables everything downstream. Deep linking from day one, not retrofitted. Nested navigators are a code smell — flatten early.</p>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 lesson-card flex items-start gap-5" data-sd-id="570">
+            <div class="w-10 h-10 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center flex-shrink-0" data-sd-id="571">
+              <span class="font-mono font-bold text-[#00f0ff]" data-sd-id="572">02</span>
+            </div>
+            <div data-sd-id="573">
+              <h3 class="font-semibold text-white mb-1" data-sd-id="574">Offline-first architecture is non-negotiable</h3>
+              <p class="text-sm text-white/50 leading-relaxed" data-sd-id="575">Users expect apps to work without connectivity. Sync strategy &gt; connectivity status checking. AsyncStorage + TanStack Query is a winning combination for 90%+ offline success.</p>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 lesson-card flex items-start gap-5" data-sd-id="576">
+            <div class="w-10 h-10 rounded-xl bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center flex-shrink-0" data-sd-id="577">
+              <span class="font-mono font-bold text-[#ff007f]" data-sd-id="578">03</span>
+            </div>
+            <div data-sd-id="579">
+              <h3 class="font-semibold text-white mb-1" data-sd-id="580">Performance monitoring from day 1 saves months later</h3>
+              <p class="text-sm text-white/50 leading-relaxed" data-sd-id="581">Sentry integration prevented crisis escalation. Real user metrics &gt; synthetic testing. Established baselines made regressions immediately visible.</p>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 lesson-card flex items-start gap-5" data-sd-id="582">
+            <div class="w-10 h-10 rounded-xl bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center flex-shrink-0" data-sd-id="583">
+              <span class="font-mono font-bold text-[#83f36e]" data-sd-id="584">04</span>
+            </div>
+            <div data-sd-id="585">
+              <h3 class="font-semibold text-white mb-1" data-sd-id="586">Cross-platform testing must be automated</h3>
+              <p class="text-sm text-white/50 leading-relaxed" data-sd-id="587">Manual testing doesn't scale to 500K users. Detox E2E tests catch platform-specific issues before they hit production. Regular device lab testing on real hardware is essential.</p>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 lesson-card flex items-start gap-5" data-sd-id="588">
+            <div class="w-10 h-10 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center flex-shrink-0" data-sd-id="589">
+              <span class="font-mono font-bold text-[#ffd700]" data-sd-id="590">05</span>
+            </div>
+            <div data-sd-id="591">
+              <h3 class="font-semibold text-white mb-1" data-sd-id="592">State complexity increases faster than you expect</h3>
+              <p class="text-sm text-white/50 leading-relaxed" data-sd-id="593">Redux was causing prop-drilling hell. Zustand + TanStack Query &gt; single monolithic state. Clear separation of server vs client state is the most impactful architectural decision.</p>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 lesson-card flex items-start gap-5" data-sd-id="594">
+            <div class="w-10 h-10 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center flex-shrink-0" data-sd-id="595">
+              <span class="font-mono font-bold text-[#00f0ff]" data-sd-id="596">06</span>
+            </div>
+            <div data-sd-id="597">
+              <h3 class="font-semibold text-white mb-1" data-sd-id="598">OTA updates change the shipping game entirely</h3>
+              <p class="text-sm text-white/50 leading-relaxed" data-sd-id="599">EAS Updates enabled fixing bugs in hours, not days. Bypassed app store review cycles for JS-only changes. Users always on latest features without manual updates.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ RELATED PROJECTS ═══ -->
+      <section class="mb-20 scroll-reveal" data-sd-id="600">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="601">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="602"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="603">Related Work</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" data-sd-id="604">
+          <a href="https://p.superdesign.dev/draft/74e6a149-e825-4c2d-b523-bfec727859bf" id="related-ds" class="glass-panel rounded-2xl p-6 space-y-4 block hover:border-[#ffd700]/20 transition-all duration-400 hover:-translate-y-1" data-sd-id="605">
+            <div class="flex items-center justify-between" data-sd-id="606">
+              <div class="w-10 h-10 rounded-lg bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="607">
+                <iconify-icon icon="lucide:layers" class="text-xl text-[#ffd700]"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="text-white/30"></iconify-icon>
+            </div>
+            <div data-sd-id="608">
+              <h3 class="text-lg font-bold text-white" data-sd-id="609">Design System</h3>
+              <p class="text-sm text-white/50 mt-1" data-sd-id="610">Component library ported to React Native with shared TypeScript types.</p>
+            </div>
+            <div class="flex gap-2 font-mono text-[10px] text-white/40" data-sd-id="611">
+              <span data-sd-id="612">Storybook</span> · <span data-sd-id="613">RN</span> · <span data-sd-id="614">Tokens</span>
+            </div>
+          </a>
+
+          <a href="https://p.superdesign.dev/draft/4e864225-9dd3-4004-9997-9b8e595f9a90" id="related-nx" class="glass-panel rounded-2xl p-6 space-y-4 block hover:border-[#00f0ff]/20 transition-all duration-400 hover:-translate-y-1" data-sd-id="615">
+            <div class="flex items-center justify-between" data-sd-id="616">
+              <div class="w-10 h-10 rounded-lg bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="617">
+                <iconify-icon icon="lucide:box" class="text-xl text-[#00f0ff]"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="text-white/30"></iconify-icon>
+            </div>
+            <div data-sd-id="618">
+              <h3 class="text-lg font-bold text-white" data-sd-id="619">Nx Monorepo</h3>
+              <p class="text-sm text-white/50 mt-1" data-sd-id="620">Shared TypeScript types and utilities across web and mobile packages.</p>
+            </div>
+            <div class="flex gap-2 font-mono text-[10px] text-white/40" data-sd-id="621">
+              <span data-sd-id="622">Nx</span> · <span data-sd-id="623">TypeScript</span> · <span data-sd-id="624">Monorepo</span>
+            </div>
+          </a>
+
+          <a href="#" id="related-forgekit" class="glass-panel rounded-2xl p-6 space-y-4 block hover:border-[#ff007f]/20 transition-all duration-400 hover:-translate-y-1" data-sd-id="625">
+            <div class="flex items-center justify-between" data-sd-id="626">
+              <div class="w-10 h-10 rounded-lg bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="627">
+                <iconify-icon icon="lucide:figma" class="text-xl text-[#ff007f]"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="text-white/30"></iconify-icon>
+            </div>
+            <div data-sd-id="628">
+              <h3 class="text-lg font-bold text-white" data-sd-id="629">ForgeKit MCP</h3>
+              <p class="text-sm text-white/50 mt-1" data-sd-id="630">Figma design tokens extracted and used for React Native styling pipeline.</p>
+            </div>
+            <div class="flex gap-2 font-mono text-[10px] text-white/40" data-sd-id="631">
+              <span data-sd-id="632">Figma</span> · <span data-sd-id="633">Tokens</span> · <span data-sd-id="634">MCP</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- ═══ FINAL CTA ═══ -->
+      <section class="mb-8 scroll-reveal" data-sd-id="635">
+        <div class="glass-panel rounded-3xl p-8 md:p-12 lg:p-16 relative overflow-hidden" data-sd-id="636">
+          <div class="absolute -top-40 -right-20 w-80 h-80 rounded-full bg-[#ffd700]/5 blur-3xl pointer-events-none" data-sd-id="637"></div>
+          <div class="absolute -bottom-40 -left-20 w-80 h-80 rounded-full bg-[#00f0ff]/5 blur-3xl pointer-events-none" data-sd-id="638"></div>
+
+          <div class="relative max-w-3xl mx-auto text-center space-y-6" data-sd-id="639">
+            <div class="flex justify-center" data-sd-id="640">
+              <div class="glass-panel rounded-full px-4 py-1.5 border border-[#ffd700]/20 bg-[#ffd700]/5 flex items-center gap-2" data-sd-id="641">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#ffd700] animate-pulse" data-sd-id="642"></div>
+                <span class="font-mono text-[10px] uppercase tracking-widest text-[#ffd700]" data-sd-id="643">Available for mobile projects</span>
+              </div>
+            </div>
+
+            <h2 class="text-3xl md:text-5xl font-bold tracking-tighter text-white" data-sd-id="644">
+              Ready to scale your <span class="neon-text" data-sd-id="645">mobile product?</span>
+            </h2>
+
+            <p class="text-lg text-white/60 max-w-xl mx-auto leading-relaxed" data-sd-id="646">
+              Whether you're hitting performance walls at 100K users or planning architecture for your next 500K — I can help.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4" data-sd-id="647">
+              <a href="https://p.superdesign.dev/draft/c906d6dd-0318-4f57-9ecd-0bd1b1280b06" id="cta-book-call" class="w-full sm:w-auto px-6 py-3 bg-[#ffd700] hover:bg-[#ffe54c] text-black font-semibold rounded-full flex items-center justify-center gap-2 transition-all duration-500 hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)]" data-sd-id="648">
+                Book a discovery call
+                <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+              </a>
+              <a href="https://p.superdesign.dev/draft/36b48549-7be9-418d-b0c1-af81de96c79f" id="cta-view-cases" class="w-full sm:w-auto px-6 py-3 glass-panel hover:bg-white/10 text-white font-medium rounded-full transition-all duration-500 hover:scale-105" data-sd-id="649">
+                View other case studies
+              </a>
+              <a href="https://p.superdesign.dev/draft/ec14a340-aae5-411e-becb-8135c3ac07ca" id="cta-services" class="w-full sm:w-auto px-6 py-3 text-white/50 hover:text-white text-sm font-medium transition-colors" data-sd-id="650">
+                Explore mobile consulting →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer Ticker -->
+    <div class="pointer-events-auto" style="view-transition-name: footer-ticker;" data-sd-id="651">
+      <!-- component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+<div v-scope="{ ...{&quot;showTicker&quot;:true}, $emit() {} }">
+<div v-if="showTicker" class="relative z-10 w-full overflow-hidden border-t border-white/5 bg-black/50 backdrop-blur-sm py-4 pointer-events-none"><style>@keyframes sd-ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } .sd-animate-ticker { animation: sd-ticker-scroll 30s linear infinite; }</style><div class="flex whitespace-nowrap sd-animate-ticker font-mono text-xs text-white/30 tracking-widest uppercase"><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div></div></div>
+</div>
+<!-- /component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+    </div>
+
+  </div>
+
+</body></html>

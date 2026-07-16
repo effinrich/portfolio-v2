@@ -1,0 +1,665 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="view-transition" content="same-origin">
+  <title>ForgeKit MCP — Rich Tillman</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <script src="https://unpkg.com/petite-vue" defer="" init=""></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <script type="module">
+    import TubesCursor from 'https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const canvas = document.getElementById('bg-canvas');
+        if (!canvas) return;
+        
+        try {
+          const app = TubesCursor(canvas, {
+            tubes: {
+              colors: ['#00f0ff', '#ff007f', '#ffd700'],
+              lights: {
+                intensity: 150,
+                colors: ['#83f36e', '#00f0ff', '#ff008a', '#ffd700']
+              }
+            }
+          });
+          
+          const randomColors = (count) => {
+            return new Array(count)
+              .fill(0)
+              .map(() => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'));
+          };
+
+          const container = document.getElementById('bg-container');
+          if (container) {
+            container.addEventListener('click', (e) => {
+              if (e.target.closest('a') || e.target.closest('button')) return;
+              const colors = randomColors(3);
+              const lightsColors = randomColors(4);
+              app.tubes.setColors(colors);
+              app.tubes.setLightsColors(lightsColors);
+            });
+          }
+        } catch (err) {
+          console.error('Failed to init tubes:', err);
+        }
+      }, 100);
+    });
+  </script>
+  <style>
+    html {
+      background-color: #0a0a0a;
+    }
+    @view-transition {
+      navigation: auto;
+    }
+    ::view-transition {
+      background-color: #0a0a0a;
+    }
+    ::view-transition-old(main-content) {
+      animation: 0.25s ease-out both fade-out;
+    }
+    ::view-transition-new(main-content) {
+      animation: 0.25s ease-in 0.1s both fade-in;
+    }
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+      mix-blend-mode: normal;
+    }
+    @keyframes fade-out {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-panel {
+      background: rgba(20, 20, 20, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    }
+    .neon-text {
+      background: linear-gradient(90deg, #00f0ff, #ffd700, #ff007f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shine 5s linear infinite;
+    }
+    @keyframes shine {
+      to {
+        background-position: 200% center;
+      }
+    }
+    @keyframes fade-in-up {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .reveal {
+      animation: fade-in-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    }
+    .reveal:nth-child(1) { animation-delay: 0.05s; }
+    .reveal:nth-child(2) { animation-delay: 0.15s; }
+    .reveal:nth-child(3) { animation-delay: 0.25s; }
+    .reveal:nth-child(4) { animation-delay: 0.35s; }
+    
+    .grid-bg {
+      background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), 
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    
+    .mockup-screen {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(20, 20, 20, 0.6) 50%, rgba(255, 0, 127, 0.08) 100%);
+    }
+    
+    .code-line {
+      background: rgba(255, 255, 255, 0.04);
+    }
+    
+    .tech-badge {
+      transition: all 0.3s ease;
+    }
+    .tech-badge:hover {
+      background: rgba(255, 215, 0, 0.1);
+      border-color: rgba(255, 215, 0, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .feature-card {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .feature-card:hover {
+      border-color: rgba(255, 215, 0, 0.2);
+      transform: translateY(-4px);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 30px 60px -20px rgba(0, 0, 0, 0.7), 0 0 30px -10px rgba(255, 215, 0, 0.15);
+    }
+    
+    .related-card {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .related-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .related-card:hover .related-arrow {
+      transform: translate(2px, -2px);
+      color: #ffd700;
+    }
+    
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #000000;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 215, 0, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <!-- Fixed Canvas Background -->
+  <div class="fixed inset-0 z-0" style="view-transition-name: canvas-bg;" data-sd-id="1">
+    <!-- component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+<div v-scope="{ ...{&quot;canvasOpacity&quot;:0.9,&quot;showGrid&quot;:true,&quot;showGradient&quot;:true}, $emit() {} }">
+<div id="bg-container" class="relative min-h-screen w-full overflow-hidden bg-black flex flex-col cursor-crosshair" @click="$emit('backgroundClick', $event)"><canvas id="bg-canvas" class="absolute inset-0 w-full h-full block z-0" :style="{ opacity: canvasOpacity, touchAction: 'none' }"></canvas><div v-if="showGrid" class="absolute inset-0 pointer-events-none z-0" style="background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div><div v-if="showGradient" class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-0 pointer-events-none"></div></div>
+</div>
+<!-- /component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+  </div>
+
+  <!-- Content Wrapper -->
+  <div class="relative min-h-screen w-full flex flex-col cursor-crosshair z-10 pointer-events-none" data-sd-id="2">
+    
+    <!-- Navigation (Persistent) -->
+    <div class="pointer-events-auto" style="view-transition-name: main-nav;" data-sd-id="3">
+      <!-- component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+<div v-scope="{ ...{&quot;activeItem&quot;:&quot;work&quot;,&quot;isAvailable&quot;:true,&quot;workHref&quot;:&quot;#work&quot;,&quot;projectsHref&quot;:&quot;#projects&quot;,&quot;stackHref&quot;:&quot;#stack&quot;,&quot;contactHref&quot;:&quot;#contact&quot;}, $emit() {} }">
+<nav class="fixed top-0 left-0 w-full z-40 border-x-0 border-t-0 border-b border-white/10 px-6 py-4" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-8 h-8 rounded bg-zinc-900 border border-white/20 flex items-center justify-center font-mono text-sm font-bold text-[#ffd700]">
+        R
+      </div>
+      <span class="font-medium tracking-tight text-white/90 hidden sm:inline-block">
+        Rich Tillman <span class="text-white/40 font-normal">/ Principal Frontend Engineer</span>
+      </span>
+    </div>
+    
+    <div class="hidden md:flex items-center gap-12 text-sm font-medium">
+      <a :href="workHref" :class="activeItem === 'work' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Work</a>
+      <a :href="projectsHref" :class="activeItem === 'projects' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Projects</a>
+      <a :href="stackHref" :class="activeItem === 'stack' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Stack</a>
+      <a :href="contactHref" :class="activeItem === 'contact' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Contact</a>
+    </div>
+
+    <div v-if="isAvailable" class="flex items-center gap-3 rounded-full px-3 py-1.5 border border-[#ffd700]/30 bg-[#ffd700]/5" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px);">
+      <div class="w-2 h-2 rounded-full bg-[#ffd700] animate-pulse"></div>
+      <span class="text-xs font-medium text-[#ffd700]">Available</span>
+    </div>
+  </div>
+</nav>
+</div>
+<!-- /component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+    </div>
+
+    <!-- Main Content -->
+    <main style="view-transition-name: main-content;" class="relative z-10 flex-1 max-w-7xl mx-auto w-full px-6 pt-28 pb-16 pointer-events-auto" data-sd-id="4">
+      
+      <!-- Breadcrumb -->
+      <div class="flex items-center gap-2 text-sm font-mono text-white/40 mb-8" data-sd-id="5">
+        <a href="https://draft-842ac3f0-3493-41fc-b33e-0b65dc7b1fac.preview.superdesign.dev" id="breadcrumb-work" class="hover:text-white/80 transition-colors" data-sd-id="6">Work</a>
+        <iconify-icon icon="lucide:chevron-right" class="text-xs"></iconify-icon>
+        <span class="text-white/70" data-sd-id="7">ForgeKit MCP</span>
+      </div>
+
+      <!-- Project Header Section -->
+      <section class="mb-16" data-sd-id="8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start" data-sd-id="9">
+          
+          <!-- Left: Title & Meta -->
+          <div class="lg:col-span-7 space-y-6" data-sd-id="10">
+            <div class="flex flex-wrap items-center gap-3 font-mono text-xs" data-sd-id="11">
+              <span class="glass-panel px-3 py-1.5 rounded-full flex items-center gap-2 text-white/70" data-sd-id="12">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#00f0ff]" data-sd-id="13"></div> Open Source
+              </span>
+              <span class="glass-panel px-3 py-1.5 rounded-full text-white/70" data-sd-id="14">MCP Protocol</span>
+              <span class="glass-panel px-3 py-1.5 rounded-full text-white/70" data-sd-id="15">2024 — Present</span>
+            </div>
+
+            <h1 class="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tighter leading-[1.02] text-white" data-sd-id="16">
+              ForgeKit <span class="neon-text" data-sd-id="17">MCP</span>
+            </h1>
+
+            <p class="text-lg md:text-xl text-white/60 leading-relaxed max-w-2xl" data-sd-id="18">
+              An AI-native Model Context Protocol server that bridges Figma designs to production React components — eliminating the design-to-code handoff bottleneck for engineering teams.
+            </p>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 pt-2" data-sd-id="19">
+              <a href="https://forgekit.cloud" id="cta-live-demo" target="_blank" rel="noopener noreferrer" aria-label="View live demo" class="w-full sm:w-auto px-6 py-3 bg-[#ffd700] hover:bg-[#ffe54c] text-black font-semibold rounded-full flex items-center justify-center gap-2 transition-all duration-500 hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffd700]" data-sd-id="20">
+                <iconify-icon icon="lucide:external-link" aria-hidden="true"></iconify-icon>
+                Live Demo
+              </a>
+              <a href="https://github.com/richtillman/forgekit" id="cta-source-code" target="_blank" rel="noopener noreferrer" aria-label="View source code on GitHub" class="w-full sm:w-auto px-6 py-3 glass-panel hover:bg-white/10 text-white font-medium rounded-full flex items-center justify-center gap-2 transition-all duration-500 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50" data-sd-id="21">
+                <iconify-icon icon="lucide:github" aria-hidden="true"></iconify-icon>
+                Source Code
+              </a>
+              <a href="https://www.npmjs.com/package/forgekit-mcp" id="cta-npm" target="_blank" rel="noopener noreferrer" aria-label="View on npm" class="px-4 py-3 text-white/50 hover:text-white text-sm font-mono transition-colors flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/30 rounded-lg" data-sd-id="22">
+                npm i forgekit-mcp
+                <iconify-icon icon="lucide:copy" class="text-xs" aria-hidden="true"></iconify-icon>
+              </a>
+            </div>
+          </div>
+
+          <!-- Right: Featured Mockup -->
+          <div class="lg:col-span-5" data-sd-id="23">
+            <div class="glass-panel rounded-2xl overflow-hidden mockup-screen" data-sd-id="24">
+              <!-- Window Chrome -->
+              <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-black/40" data-sd-id="25">
+                <div class="w-3 h-3 rounded-full bg-[#ff5f56]" data-sd-id="26"></div>
+                <div class="w-3 h-3 rounded-full bg-[#ffbd2e]" data-sd-id="27"></div>
+                <div class="w-3 h-3 rounded-full bg-[#27c93f]" data-sd-id="28"></div>
+                <span class="font-mono text-xs text-white/40 ml-2" data-sd-id="29">forgekit-mcp — terminal</span>
+              </div>
+              <!-- Mock Content -->
+              <div class="p-6 space-y-3 font-mono text-xs" data-sd-id="30">
+                <div class="flex items-center gap-2 text-[#27c93f]" data-sd-id="31">
+                  <iconify-icon icon="lucide:check-circle" class="text-sm"></iconify-icon>
+                  <span class="text-white/70" data-sd-id="32">MCP server connected</span>
+                </div>
+                <div class="code-line rounded px-3 py-2 text-white/50" data-sd-id="33">
+                  <span class="text-[#ff007f]" data-sd-id="34">$</span> npx forgekit-mcp
+                </div>
+                <div class="space-y-1.5 pl-3" data-sd-id="35">
+                  <div class="text-white/40" data-sd-id="36">→ Loading Figma parser...</div>
+                  <div class="text-white/40" data-sd-id="37">→ Initializing React codegen...</div>
+                  <div class="text-white/40" data-sd-id="38">→ Registering 12 MCP tools...</div>
+                </div>
+                <div class="code-line rounded px-3 py-2 text-[#00f0ff]" data-sd-id="39">
+                  ✓ Ready · 5,703+ installs
+                </div>
+                <div class="grid grid-cols-3 gap-2 pt-2" data-sd-id="40">
+                  <div class="code-line rounded p-2 text-center" data-sd-id="41">
+                    <div class="text-white/80 font-bold" data-sd-id="42">12</div>
+                    <div class="text-white/30 text-[10px]" data-sd-id="43">Tools</div>
+                  </div>
+                  <div class="code-line rounded p-2 text-center" data-sd-id="44">
+                    <div class="text-[#ffd700] font-bold" data-sd-id="45">3.2k</div>
+                    <div class="text-white/30 text-[10px]" data-sd-id="46">Stars</div>
+                  </div>
+                  <div class="code-line rounded p-2 text-center" data-sd-id="47">
+                    <div class="text-[#00f0ff] font-bold" data-sd-id="48">47</div>
+                    <div class="text-white/30 text-[10px]" data-sd-id="49">Contributors</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Impact Metrics -->
+      <section class="mb-16" data-sd-id="50">
+        <h2 class="text-sm font-mono uppercase tracking-widest text-white/40 mb-6" data-sd-id="51">— Impact</h2>
+        <div class="glass-panel rounded-2xl p-6 md:p-8 grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8" data-sd-id="52">
+          
+          <div class="reveal flex flex-col gap-1.5" data-sd-id="53">
+            <div class="flex items-center gap-2 text-[#ffd700]" data-sd-id="54">
+              <iconify-icon icon="lucide:download" class="text-lg"></iconify-icon>
+              <span class="text-xs font-mono uppercase tracking-wider text-white/40" data-sd-id="55">Installs</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="56">5,703+</h3>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="57">npm weekly downloads</p>
+          </div>
+          
+          <div class="reveal flex flex-col gap-1.5 lg:border-l border-white/10 lg:pl-8" data-sd-id="58">
+            <div class="flex items-center gap-2 text-[#00f0ff]" data-sd-id="59">
+              <iconify-icon icon="lucide:star" class="text-lg"></iconify-icon>
+              <span class="text-xs font-mono uppercase tracking-wider text-white/40" data-sd-id="60">GitHub</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="61">3.2k</h3>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="62">stars · 47 contributors</p>
+          </div>
+          
+          <div class="reveal flex flex-col gap-1.5 lg:border-l border-white/10 lg:pl-8" data-sd-id="63">
+            <div class="flex items-center gap-2 text-[#ff007f]" data-sd-id="64">
+              <iconify-icon icon="lucide:zap" class="text-lg"></iconify-icon>
+              <span class="text-xs font-mono uppercase tracking-wider text-white/40" data-sd-id="65">Time Saved</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="66">80%</h3>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="67">faster design-to-code</p>
+          </div>
+          
+          <div class="reveal flex flex-col gap-1.5 lg:border-l border-white/10 lg:pl-8" data-sd-id="68">
+            <div class="flex items-center gap-2 text-[#83f36e]" data-sd-id="69">
+              <iconify-icon icon="lucide:users" class="text-lg"></iconify-icon>
+              <span class="text-xs font-mono uppercase tracking-wider text-white/40" data-sd-id="70">Teams</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="71">120+</h3>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="72">engineering teams onboard</p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Project Overview -->
+      <section class="mb-16 grid grid-cols-1 lg:grid-cols-3 gap-8" data-sd-id="73">
+        
+        <div class="lg:col-span-2 space-y-6" data-sd-id="74">
+          <h2 class="text-sm font-mono uppercase tracking-widest text-white/40" data-sd-id="75">— Overview</h2>
+          <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white leading-tight" data-sd-id="76">
+            Bridging the gap between <span class="neon-text" data-sd-id="77">design intent</span> and shipped code.
+          </h3>
+          <div class="space-y-4 text-white/60 text-base md:text-lg leading-relaxed" data-sd-id="78">
+            <p data-sd-id="79">
+              ForgeKit MCP is a Model Context Protocol server that integrates directly with AI coding assistants like Cursor, Windsurf, and Claude Desktop. It exposes Figma designs as structured context — allowing AI agents to generate pixel-accurate React components from design files without manual screenshot interpretation.
+            </p>
+            <p data-sd-id="80">
+              The server parses Figma's REST API, normalizes auto-layout constraints into flexbox equivalents, extracts design tokens (colors, typography, spacing), and feeds them to the AI as typed JSON schemas. The result: components that match designs on the first pass, not the tenth.
+            </p>
+          </div>
+        </div>
+
+        <!-- Role & Contributions Sidebar -->
+        <aside class="space-y-6" data-sd-id="81">
+          <div class="glass-panel rounded-2xl p-6 space-y-5" data-sd-id="82">
+            <h4 class="text-xs font-mono uppercase tracking-widest text-[#ffd700]" data-sd-id="83">Role &amp; Scope</h4>
+            
+            <div class="space-y-3" data-sd-id="84">
+              <div class="flex items-start gap-3" data-sd-id="85">
+                <iconify-icon icon="lucide:user" class="text-white/40 mt-0.5"></iconify-icon>
+                <div data-sd-id="86">
+                  <div class="text-sm font-medium text-white" data-sd-id="87">Creator &amp; Maintainer</div>
+                  <div class="text-xs text-white/40 font-mono" data-sd-id="88">Solo founder → 47 contributors</div>
+                </div>
+              </div>
+              
+              <div class="flex items-start gap-3" data-sd-id="89">
+                <iconify-icon icon="lucide:calendar" class="text-white/40 mt-0.5"></iconify-icon>
+                <div data-sd-id="90">
+                  <div class="text-sm font-medium text-white" data-sd-id="91">Jan 2024 — Present</div>
+                  <div class="text-xs text-white/40 font-mono" data-sd-id="92">14 months active development</div>
+                </div>
+              </div>
+              
+              <div class="flex items-start gap-3" data-sd-id="93">
+                <iconify-icon icon="lucide:git-branch" class="text-white/40 mt-0.5"></iconify-icon>
+                <div data-sd-id="94">
+                  <div class="text-sm font-medium text-white" data-sd-id="95">Open Source · MIT</div>
+                  <div class="text-xs text-white/40 font-mono" data-sd-id="96">1,847 commits · 312 PRs merged</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-white/10" data-sd-id="97">
+              <h5 class="text-xs font-mono uppercase tracking-widest text-white/40 mb-3" data-sd-id="98">Key Contributions</h5>
+              <ul class="space-y-2 text-sm text-white/60" data-sd-id="99">
+                <li class="flex items-start gap-2" data-sd-id="100">
+                  <span class="text-[#ffd700] mt-0.5" data-sd-id="101">→</span>
+                  Designed MCP tool schema for Figma node traversal
+                </li>
+                <li class="flex items-start gap-2" data-sd-id="102">
+                  <span class="text-[#ffd700] mt-0.5" data-sd-id="103">→</span>
+                  Built TypeScript codegen engine with token mapping
+                </li>
+                <li class="flex items-start gap-2" data-sd-id="104">
+                  <span class="text-[#ffd700] mt-0.5" data-sd-id="105">→</span>
+                  Authored comprehensive docs &amp; onboarding guides
+                </li>
+                <li class="flex items-start gap-2" data-sd-id="106">
+                  <span class="text-[#ffd700] mt-0.5" data-sd-id="107">→</span>
+                  Grew community to 3.2k stars in 8 months
+                </li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+
+      </section>
+
+      <!-- Feature Highlights -->
+      <section class="mb-16" data-sd-id="108">
+        <h2 class="text-sm font-mono uppercase tracking-widest text-white/40 mb-6" data-sd-id="109">— Feature Highlights</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-sd-id="110">
+          
+          <div class="feature-card glass-panel rounded-2xl p-6 space-y-4 cursor-pointer" data-sd-id="111">
+            <div class="w-12 h-12 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="112">
+              <iconify-icon icon="lucide:figma" class="text-2xl text-[#ffd700]"></iconify-icon>
+            </div>
+            <h3 class="text-xl font-bold text-white" data-sd-id="113">Figma Node Parser</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="114">
+              Deep-traverses Figma's node tree and normalizes auto-layout constraints into CSS flexbox equivalents — preserving responsive behavior.
+            </p>
+          </div>
+
+          <div class="feature-card glass-panel rounded-2xl p-6 space-y-4 cursor-pointer" data-sd-id="115">
+            <div class="w-12 h-12 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="116">
+              <iconify-icon icon="lucide:code-2" class="text-2xl text-[#00f0ff]"></iconify-icon>
+            </div>
+            <h3 class="text-xl font-bold text-white" data-sd-id="117">React Codegen</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="118">
+              Generates typed React + TypeScript components with Tailwind classes or CSS Modules. Outputs Storybook stories automatically.
+            </p>
+          </div>
+
+          <div class="feature-card glass-panel rounded-2xl p-6 space-y-4 cursor-pointer" data-sd-id="119">
+            <div class="w-12 h-12 rounded-xl bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="120">
+              <iconify-icon icon="lucide:palette" class="text-2xl text-[#ff007f]"></iconify-icon>
+            </div>
+            <h3 class="text-xl font-bold text-white" data-sd-id="121">Design Token Sync</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="122">
+              Extracts colors, typography scales, spacing units, and shadows from Figma variables — outputs to style-dictionary format.
+            </p>
+          </div>
+
+          <div class="feature-card glass-panel rounded-2xl p-6 space-y-4 cursor-pointer" data-sd-id="123">
+            <div class="w-12 h-12 rounded-xl bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center" data-sd-id="124">
+              <iconify-icon icon="lucide:terminal" class="text-2xl text-[#83f36e]"></iconify-icon>
+            </div>
+            <h3 class="text-xl font-bold text-white" data-sd-id="125">12 MCP Tools</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="126">
+              Exposes tools like get_figma_file, extract_components, map_design_tokens, and generate_component — all typed with JSON schemas.
+            </p>
+          </div>
+
+          <div class="feature-card glass-panel rounded-2xl p-6 space-y-4 cursor-pointer" data-sd-id="127">
+            <div class="w-12 h-12 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="128">
+              <iconify-icon icon="lucide:plug" class="text-2xl text-[#ffd700]"></iconify-icon>
+            </div>
+            <h3 class="text-xl font-bold text-white" data-sd-id="129">IDE Integrations</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="130">
+              Native support for Cursor, Windsurf, Claude Desktop, and Continue.dev. Zero-config setup via npx forgekit-mcp.
+            </p>
+          </div>
+
+          <div class="feature-card glass-panel rounded-2xl p-6 space-y-4 cursor-pointer" data-sd-id="131">
+            <div class="w-12 h-12 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="132">
+              <iconify-icon icon="lucide:git-merge" class="text-2xl text-[#00f0ff]"></iconify-icon>
+            </div>
+            <h3 class="text-xl font-bold text-white" data-sd-id="133">Component Diffing</h3>
+            <p class="text-sm text-white/50 leading-relaxed" data-sd-id="134">
+              Compares generated components against existing design system entries — flags duplicates and suggests refactors before PR creation.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Tech Stack -->
+      <section class="mb-16" data-sd-id="135">
+        <h2 class="text-sm font-mono uppercase tracking-widest text-white/40 mb-6" data-sd-id="136">— Tech Stack</h2>
+        <div class="glass-panel rounded-2xl p-6 md:p-8" data-sd-id="137">
+          <div class="flex flex-wrap gap-3" data-sd-id="138">
+            <span class="tech-badge glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="139">
+              <iconify-icon icon="lucide:file-code" class="text-[#3178c6]"></iconify-icon>
+              TypeScript
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="140">
+              <iconify-icon icon="lucide:atom" class="text-[#61dafb]"></iconify-icon>
+              React 18
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="141">
+              <iconify-icon icon="simple-icons:nodedotjs" class="text-[#339933]"></iconify-icon>
+              Node.js
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="142">
+              <iconify-icon icon="lucide:figma" class="text-[#ffd700]"></iconify-icon>
+              Figma REST API
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="143">
+              <iconify-icon icon="lucide:terminal" class="text-[#83f36e]"></iconify-icon>
+              MCP SDK
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="144">
+              <iconify-icon icon="lucide:wind" class="text-[#06b6d4]"></iconify-icon>
+              Tailwind CSS
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="145">
+              <iconify-icon icon="lucide:book-open" class="text-[#ff4785]"></iconify-icon>
+              Storybook 8
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="146">
+              <iconify-icon icon="lucide:check-circle" class="text-[#ba4d00]"></iconify-icon>
+              Vitest
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="147">
+              <iconify-icon icon="lucide:package" class="text-[#cb3837]"></iconify-icon>
+              npm
+            </span>
+            <span class="tech-badge glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm text-white/80 cursor-default" data-sd-id="148">
+              <iconify-icon icon="lucide:github" class="text-white"></iconify-icon>
+              GitHub Actions
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Related Projects -->
+      <section class="mb-16" data-sd-id="149">
+        <div class="flex items-center justify-between mb-6" data-sd-id="150">
+          <h2 class="text-sm font-mono uppercase tracking-widest text-white/40" data-sd-id="151">— Related Work</h2>
+          <a href="https://draft-842ac3f0-3493-41fc-b33e-0b65dc7b1fac.preview.superdesign.dev" id="cta-view-all" class="text-sm text-white/50 hover:text-white transition-colors flex items-center gap-1" data-sd-id="152">
+            View all
+            <iconify-icon icon="lucide:arrow-right" class="text-xs"></iconify-icon>
+          </a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" data-sd-id="153">
+          
+          <a href="#" id="related-1" class="related-card glass-panel rounded-2xl p-6 space-y-4 block" data-sd-id="154">
+            <div class="flex items-center justify-between" data-sd-id="155">
+              <div class="w-10 h-10 rounded-lg bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="156">
+                <iconify-icon icon="lucide:layers" class="text-xl text-[#00f0ff]"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="related-arrow text-white/30 transition-all duration-300"></iconify-icon>
+            </div>
+            <div data-sd-id="157">
+              <h3 class="text-lg font-bold text-white" data-sd-id="158">Enterprise DS</h3>
+              <p class="text-sm text-white/50 mt-1" data-sd-id="159">200+ component React design system with Storybook, Chromatic, and automated visual regression.</p>
+            </div>
+            <div class="flex gap-2 font-mono text-[10px] text-white/40" data-sd-id="160">
+              <span data-sd-id="161">React</span> · <span data-sd-id="162">Storybook</span> · <span data-sd-id="163">Tailwind</span>
+            </div>
+          </a>
+
+          <a href="#" id="related-2" class="related-card glass-panel rounded-2xl p-6 space-y-4 block" data-sd-id="164">
+            <div class="flex items-center justify-between" data-sd-id="165">
+              <div class="w-10 h-10 rounded-lg bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="166">
+                <iconify-icon icon="lucide:smartphone" class="text-xl text-[#ff007f]"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="related-arrow text-white/30 transition-all duration-300"></iconify-icon>
+            </div>
+            <div data-sd-id="167">
+              <h3 class="text-lg font-bold text-white" data-sd-id="168">RN App Platform</h3>
+              <p class="text-sm text-white/50 mt-1" data-sd-id="169">React Native monorepo shipping apps to 500K+ users with Expo, Nx, and shared design tokens.</p>
+            </div>
+            <div class="flex gap-2 font-mono text-[10px] text-white/40" data-sd-id="170">
+              <span data-sd-id="171">RN</span> · <span data-sd-id="172">Expo</span> · <span data-sd-id="173">Nx</span>
+            </div>
+          </a>
+
+          <a href="#" id="related-3" class="related-card glass-panel rounded-2xl p-6 space-y-4 block" data-sd-id="174">
+            <div class="flex items-center justify-between" data-sd-id="175">
+              <div class="w-10 h-10 rounded-lg bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="176">
+                <iconify-icon icon="lucide:box" class="text-xl text-[#ffd700]"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:arrow-up-right" class="related-arrow text-white/30 transition-all duration-300"></iconify-icon>
+            </div>
+            <div data-sd-id="177">
+              <h3 class="text-lg font-bold text-white" data-sd-id="178">Tamagui UI Kit</h3>
+              <p class="text-sm text-white/50 mt-1" data-sd-id="179">Cross-platform UI kit built on Tamagui — one codebase, web + native, with themeable design tokens.</p>
+            </div>
+            <div class="flex gap-2 font-mono text-[10px] text-white/40" data-sd-id="180">
+              <span data-sd-id="181">Tamagui</span> · <span data-sd-id="182">Universal</span> · <span data-sd-id="183">Tokens</span>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- Final CTA -->
+      <section class="mb-8" data-sd-id="184">
+        <div class="glass-panel rounded-2xl p-8 md:p-12 text-center space-y-6" data-sd-id="185">
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="186">
+            Want to build something <span class="neon-text" data-sd-id="187">like this?</span>
+          </h2>
+          <p class="text-white/60 max-w-xl mx-auto" data-sd-id="188">
+            I'm available for select engagements — design systems, MCP integrations, and React platform architecture.
+          </p>
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2" data-sd-id="189">
+            <a href="https://draft-c906d6dd-0318-4f57-9ecd-0bd1b1280b06.preview.superdesign.dev" id="cta-contact-bottom" class="w-full sm:w-auto px-6 py-3 bg-[#ffd700] hover:bg-[#ffe54c] text-black font-semibold rounded-full flex items-center justify-center gap-2 transition-all duration-500 hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)]" data-sd-id="190">
+              Get in touch
+              <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon>
+            </a>
+            <a href="https://draft-93b7235e-9fa5-4c0d-be56-ebaf1451e6a1.preview.superdesign.dev" id="cta-about-bottom" class="w-full sm:w-auto px-6 py-3 glass-panel hover:bg-white/10 text-white font-medium rounded-full transition-all duration-500 hover:scale-105" data-sd-id="191">
+              About me
+            </a>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer Ticker -->
+    <div class="pointer-events-auto" style="view-transition-name: footer-ticker;" data-sd-id="192">
+      <!-- component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+<div v-scope="{ ...{&quot;showTicker&quot;:true}, $emit() {} }">
+<div v-if="showTicker" class="relative z-10 w-full overflow-hidden border-t border-white/5 bg-black/50 backdrop-blur-sm py-4 pointer-events-none"><style>@keyframes sd-ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } .sd-animate-ticker { animation: sd-ticker-scroll 30s linear infinite; }</style><div class="flex whitespace-nowrap sd-animate-ticker font-mono text-xs text-white/30 tracking-widest uppercase"><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div></div></div>
+</div>
+<!-- /component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+    </div>
+
+  </div>
+
+</body></html>

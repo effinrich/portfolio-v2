@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="view-transition" content="same-origin">
+  <title>Resources &amp; Tools — Rich Tillman</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <script src="https://unpkg.com/petite-vue" defer="" init=""></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <script type="module">
+    import TubesCursor from 'https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const canvas = document.getElementById('bg-canvas');
+        if (!canvas) return;
+        
+        try {
+          const app = TubesCursor(canvas, {
+            tubes: {
+              colors: ['#00f0ff', '#ff007f', '#ffd700'],
+              lights: {
+                intensity: 150,
+                colors: ['#83f36e', '#00f0ff', '#ff008a', '#ffd700']
+              }
+            }
+          });
+          
+          const randomColors = (count) => {
+            return new Array(count)
+              .fill(0)
+              .map(() => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'));
+          };
+
+          const container = document.getElementById('bg-container');
+          if (container) {
+            container.addEventListener('click', (e) => {
+              if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input')) return;
+              const colors = randomColors(3);
+              const lightsColors = randomColors(4);
+              app.tubes.setColors(colors);
+              app.tubes.setLightsColors(lightsColors);
+            });
+          }
+        } catch (err) {
+          console.error('Failed to init tubes:', err);
+        }
+      }, 100);
+    });
+  </script>
+  <style>
+    html { background-color: #000000; }
+    @view-transition { navigation: auto; }
+    ::view-transition { background-color: #000000; }
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+    ::view-transition-old(main-content) { animation: 0.25s ease-out both fade-out; }
+    ::view-transition-new(main-content) { animation: 0.25s ease-in 0.1s both fade-in; }
+    @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    .glass-panel {
+      background: rgba(20, 20, 20, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    }
+    .neon-text {
+      background: linear-gradient(90deg, #00f0ff, #ffd700, #ff007f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shine 5s linear infinite;
+    }
+    @keyframes shine { to { background-position: 200% center; } }
+    
+    .grid-bg {
+      background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), 
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .reveal { animation: fade-in-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+    .reveal-1 { animation-delay: 0.05s; }
+    .reveal-2 { animation-delay: 0.15s; }
+    .reveal-3 { animation-delay: 0.25s; }
+    .reveal-4 { animation-delay: 0.35s; }
+    .reveal-5 { animation-delay: 0.45s; }
+    .reveal-6 { animation-delay: 0.55s; }
+    
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+    }
+    .scroll-reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .resource-card {
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .resource-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255, 215, 0, 0.25);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 30px 60px -15px rgba(0, 0, 0, 0.7), 0 0 30px -10px rgba(255, 215, 0, 0.15);
+    }
+    .resource-card:hover .resource-icon {
+      transform: scale(1.1) rotate(-3deg);
+    }
+    .resource-icon {
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .filter-btn {
+      transition: all 0.3s ease;
+    }
+    .filter-btn.active {
+      background: rgba(255, 215, 0, 0.1);
+      border-color: rgba(255, 215, 0, 0.4);
+      color: #ffd700;
+    }
+    
+    .search-input {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+    .search-input:hover { border-color: rgba(255, 255, 255, 0.15); }
+    .search-input:focus {
+      outline: none;
+      border-color: rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1), 0 0 20px rgba(255, 215, 0, 0.08);
+      background: rgba(0, 0, 0, 0.5);
+    }
+    .search-input::placeholder { color: rgba(255, 255, 255, 0.3); }
+    
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #000000; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 215, 0, 0.3); }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+      
+      setTimeout(() => {
+        document.querySelectorAll('.scroll-reveal').forEach((el) => observer.observe(el));
+      }, 200);
+
+      // Filter logic
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      const cards = document.querySelectorAll('.resource-card-wrap');
+      
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const filter = btn.dataset.filter;
+          
+          cards.forEach(card => {
+            if (filter === 'all' || card.dataset.category === filter) {
+              card.style.display = '';
+              setTimeout(() => card.classList.remove('opacity-0', 'scale-95'), 10);
+            } else {
+              card.classList.add('opacity-0', 'scale-95');
+              setTimeout(() => card.style.display = 'none', 300);
+            }
+          });
+        });
+      });
+
+      // Search logic
+      const searchInput = document.getElementById('resource-search');
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        cards.forEach(card => {
+          const title = card.querySelector('h3').textContent.toLowerCase();
+          const desc = card.querySelector('p').textContent.toLowerCase();
+          if (title.includes(query) || desc.includes(query)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+  <!-- Background -->
+  <div class="fixed inset-0 z-0" data-sd-id="1">
+    <!-- component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+<div v-scope="{ ...{&quot;canvasOpacity&quot;:0.9,&quot;showGrid&quot;:true,&quot;showGradient&quot;:true}, $emit() {} }">
+<div id="bg-container" class="relative min-h-screen w-full overflow-hidden bg-black flex flex-col cursor-crosshair" @click="$emit('backgroundClick', $event)"><canvas id="bg-canvas" class="absolute inset-0 w-full h-full block z-0" :style="{ opacity: canvasOpacity, touchAction: 'none' }"></canvas><div v-if="showGrid" class="absolute inset-0 pointer-events-none z-0" style="background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div><div v-if="showGradient" class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-0 pointer-events-none"></div></div>
+</div>
+<!-- /component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+  </div>
+
+  <!-- Main Wrapper -->
+  <div class="relative min-h-screen w-full flex flex-col cursor-crosshair z-10 pointer-events-none" style="view-transition-name: main-content;" data-sd-id="2">
+    
+    <!-- Navigation -->
+    <div class="pointer-events-auto" style="view-transition-name: main-nav;" data-sd-id="3">
+      <!-- component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+<div v-scope="{ ...{&quot;activeItem&quot;:&quot;work&quot;,&quot;isAvailable&quot;:true,&quot;workHref&quot;:&quot;#work&quot;,&quot;projectsHref&quot;:&quot;#projects&quot;,&quot;stackHref&quot;:&quot;#stack&quot;,&quot;contactHref&quot;:&quot;#contact&quot;}, $emit() {} }">
+<nav class="fixed top-0 left-0 w-full z-40 border-x-0 border-t-0 border-b border-white/10 px-6 py-4" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-8 h-8 rounded bg-zinc-900 border border-white/20 flex items-center justify-center font-mono text-sm font-bold text-[#ffd700]">
+        R
+      </div>
+      <span class="font-medium tracking-tight text-white/90 hidden sm:inline-block">
+        Rich Tillman <span class="text-white/40 font-normal">/ Principal Frontend Engineer</span>
+      </span>
+    </div>
+    
+    <div class="hidden md:flex items-center gap-12 text-sm font-medium">
+      <a :href="workHref" :class="activeItem === 'work' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Work</a>
+      <a :href="projectsHref" :class="activeItem === 'projects' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Projects</a>
+      <a :href="stackHref" :class="activeItem === 'stack' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Stack</a>
+      <a :href="contactHref" :class="activeItem === 'contact' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Contact</a>
+    </div>
+
+    <div v-if="isAvailable" class="flex items-center gap-3 rounded-full px-3 py-1.5 border border-[#ffd700]/30 bg-[#ffd700]/5" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px);">
+      <div class="w-2 h-2 rounded-full bg-[#ffd700] animate-pulse"></div>
+      <span class="text-xs font-medium text-[#ffd700]">Available</span>
+    </div>
+  </div>
+</nav>
+</div>
+<!-- /component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+    </div>
+
+    <!-- Main Content -->
+    <main class="relative z-10 flex-1 max-w-7xl mx-auto w-full px-6 pt-32 pb-16 pointer-events-auto" data-sd-id="4">
+      
+      <!-- ═══════════════════════════════════════ -->
+      <!-- HERO SECTION -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-16 reveal reveal-1" data-sd-id="5">
+        <div class="flex items-center gap-3 mb-6" data-sd-id="6">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="7"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="8">Open Source</span>
+        </div>
+        
+        <h1 class="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tighter leading-[1.05] text-white mb-6" data-sd-id="9">
+          Resources &amp; <span class="neon-text" data-sd-id="10">Tools</span>
+        </h1>
+        
+        <p class="text-lg md:text-xl text-white/60 max-w-2xl leading-relaxed mb-8" data-sd-id="11">
+          Free templates, guides, and tools for engineers building at scale. A curated collection of resources I've built and open-sourced based on lessons learned from shipping 50+ projects.
+        </p>
+
+        <!-- Stats Dashboard -->
+        <div class="glass-panel rounded-2xl p-6 md:p-8 grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8" data-sd-id="12">
+          <div class="flex flex-col gap-1.5" data-sd-id="13">
+            <div class="flex items-center gap-2 text-[#ffd700]" data-sd-id="14">
+              <iconify-icon icon="lucide:download" class="text-lg"></iconify-icon>
+              <span class="text-xs font-mono uppercase tracking-wider text-white/40" data-sd-id="15">Downloads</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="16">150K+</h3>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="17">across all resources</p>
+          </div>
+          
+          <div class="flex flex-col gap-1.5 lg:border-l border-white/10 lg:pl-8" data-sd-id="18">
+            <div class="flex items-center gap-2 text-[#00f0ff]" data-sd-id="19">
+              <iconify-icon icon="lucide:users" class="text-lg"></iconify-icon>
+              <span class="text-xs font-mono uppercase tracking-wider text-white/40" data-sd-id="20">Devs</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="21">500+</h3>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="22">using these tools</p>
+          </div>
+          
+          <div class="flex flex-col gap-1.5 lg:border-l border-white/10 lg:pl-8" data-sd-id="23">
+            <div class="flex items-center gap-2 text-[#ff007f]" data-sd-id="24">
+              <iconify-icon icon="lucide:star" class="text-lg"></iconify-icon>
+              <span class="text-xs font-mono uppercase tracking-wider text-white/40" data-sd-id="25">GitHub</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="26">20K+</h3>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="27">stars across repos</p>
+          </div>
+          
+          <div class="flex flex-col gap-1.5 lg:border-l border-white/10 lg:pl-8" data-sd-id="28">
+            <div class="flex items-center gap-2 text-[#83f36e]" data-sd-id="29">
+              <iconify-icon icon="lucide:package" class="text-lg"></iconify-icon>
+              <span class="text-xs font-mono uppercase tracking-wider text-white/40" data-sd-id="30">Projects</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="31">10+</h3>
+            <p class="text-xs text-white/40 font-mono" data-sd-id="32">active open source</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- SEARCH & FILTER -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-12 scroll-reveal" data-sd-id="33">
+        <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-center" data-sd-id="34">
+          <!-- Search -->
+          <div class="relative flex-1" data-sd-id="35">
+            <iconify-icon icon="lucide:search" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 text-sm" aria-hidden="true"></iconify-icon>
+            <input type="text" id="resource-search" placeholder="Search resources..." class="search-input w-full rounded-full pl-11 pr-4 py-3 text-white text-sm font-normal" aria-label="Search resources" data-sd-id="36">
+          </div>
+          
+          <!-- Filters -->
+          <div class="flex flex-wrap gap-2" data-sd-id="37">
+            <button class="filter-btn active glass-panel px-4 py-2 rounded-full text-xs font-mono uppercase tracking-wider text-white/60" data-filter="all" data-sd-id="38">All</button>
+            <button class="filter-btn glass-panel px-4 py-2 rounded-full text-xs font-mono uppercase tracking-wider text-white/60" data-filter="design" data-sd-id="39">Design Systems</button>
+            <button class="filter-btn glass-panel px-4 py-2 rounded-full text-xs font-mono uppercase tracking-wider text-white/60" data-filter="arch" data-sd-id="40">Architecture</button>
+            <button class="filter-btn glass-panel px-4 py-2 rounded-full text-xs font-mono uppercase tracking-wider text-white/60" data-filter="perf" data-sd-id="41">Performance</button>
+            <button class="filter-btn glass-panel px-4 py-2 rounded-full text-xs font-mono uppercase tracking-wider text-white/60" data-filter="devtools" data-sd-id="42">DevTools</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- RESOURCES GRID -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24" data-sd-id="43">
+        
+        <!-- Resource 1: Design System Starter Kit -->
+        <div class="resource-card-wrap scroll-reveal" data-category="design" data-sd-id="44">
+          <div class="resource-card glass-panel rounded-2xl p-6 flex flex-col gap-4 h-full relative overflow-hidden" data-sd-id="45">
+            <!-- Featured Badge -->
+            <div class="absolute top-4 right-4 glass-panel px-2.5 py-1 rounded-full border border-[#ffd700]/30 bg-[#ffd700]/10 flex items-center gap-1.5" data-sd-id="46">
+              <iconify-icon icon="lucide:flame" class="text-[#ffd700] text-xs"></iconify-icon>
+              <span class="text-[10px] font-mono uppercase tracking-wider text-[#ffd700]" data-sd-id="47">Most Downloaded</span>
+            </div>
+            
+            <div class="w-12 h-12 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center resource-icon" data-sd-id="48">
+              <iconify-icon icon="lucide:component" class="text-2xl text-[#ffd700]"></iconify-icon>
+            </div>
+            
+            <div class="flex-1" data-sd-id="49">
+              <div class="flex items-center gap-2 mb-2" data-sd-id="50">
+                <span class="text-[10px] font-mono uppercase tracking-wider text-white/40 px-2 py-0.5 rounded bg-white/5 border border-white/10" data-sd-id="51">Design Systems</span>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="52">Design System Starter Kit</h3>
+              <p class="text-sm text-white/50 leading-relaxed mb-4" data-sd-id="53">
+                Production-ready Storybook template with 40+ pre-built components, Tailwind config, TypeScript setup, and component documentation guidelines.
+              </p>
+            </div>
+            
+            <div class="flex flex-wrap gap-1.5 mb-4" data-sd-id="54">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="55">Storybook</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="56">React</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="57">TypeScript</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="58">Tailwind</span>
+            </div>
+            
+            <div class="flex items-center justify-between text-xs text-white/40 font-mono pt-4 border-t border-white/5" data-sd-id="59">
+              <span class="flex items-center gap-1.5" data-sd-id="60"><iconify-icon icon="lucide:star" class="text-[#ffd700] text-xs"></iconify-icon> 1.2k stars</span>
+              <span class="flex items-center gap-1.5" data-sd-id="61"><iconify-icon icon="lucide:download" class="text-xs"></iconify-icon> 2.4K/mo</span>
+            </div>
+            
+            <a href="#" id="resource-cta-1" class="w-full px-4 py-2.5 bg-[#ffd700]/10 hover:bg-[#ffd700]/20 border border-[#ffd700]/30 text-[#ffd700] font-medium rounded-full flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02] text-sm" data-sd-id="62">
+              <iconify-icon icon="lucide:github" class="text-base"></iconify-icon>
+              Download from GitHub
+            </a>
+          </div>
+        </div>
+
+        <!-- Resource 2: Nx Monorepo Architecture Guide -->
+        <div class="resource-card-wrap scroll-reveal" data-category="arch" data-sd-id="63">
+          <div class="resource-card glass-panel rounded-2xl p-6 flex flex-col gap-4 h-full" data-sd-id="64">
+            <div class="w-12 h-12 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center resource-icon" data-sd-id="65">
+              <iconify-icon icon="lucide:layers" class="text-2xl text-[#00f0ff]"></iconify-icon>
+            </div>
+            
+            <div class="flex-1" data-sd-id="66">
+              <div class="flex items-center gap-2 mb-2" data-sd-id="67">
+                <span class="text-[10px] font-mono uppercase tracking-wider text-white/40 px-2 py-0.5 rounded bg-white/5 border border-white/10" data-sd-id="68">Architecture</span>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="69">Nx Monorepo Architecture Guide</h3>
+              <p class="text-sm text-white/50 leading-relaxed mb-4" data-sd-id="70">
+                Step-by-step guide to structuring scalable React + Node.js monorepos. Includes workspace configuration, shared libraries strategy, and GitHub Actions CI/CD setup.
+              </p>
+            </div>
+            
+            <div class="flex flex-wrap gap-1.5 mb-4" data-sd-id="71">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="72">Nx</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="73">TypeScript</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="74">GitHub Actions</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="75">Monorepos</span>
+            </div>
+            
+            <div class="flex items-center justify-between text-xs text-white/40 font-mono pt-4 border-t border-white/5" data-sd-id="76">
+              <span class="flex items-center gap-1.5" data-sd-id="77"><iconify-icon icon="lucide:download" class="text-xs"></iconify-icon> 3.2K downloads</span>
+              <span class="flex items-center gap-1.5" data-sd-id="78"><iconify-icon icon="lucide:share-2" class="text-xs"></iconify-icon> 150+ shares</span>
+            </div>
+            
+            <a href="#" id="resource-cta-2" class="w-full px-4 py-2.5 glass-panel hover:bg-white/10 text-white font-medium rounded-full flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02] text-sm" data-sd-id="79">
+              <iconify-icon icon="lucide:book-open" class="text-base"></iconify-icon>
+              Read Guide
+            </a>
+          </div>
+        </div>
+
+        <!-- Resource 3: React Architecture Checklist -->
+        <div class="resource-card-wrap scroll-reveal" data-category="arch" data-sd-id="80">
+          <div class="resource-card glass-panel rounded-2xl p-6 flex flex-col gap-4 h-full" data-sd-id="81">
+            <div class="w-12 h-12 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center resource-icon" data-sd-id="82">
+              <iconify-icon icon="lucide:check-square" class="text-2xl text-[#ffd700]"></iconify-icon>
+            </div>
+            
+            <div class="flex-1" data-sd-id="83">
+              <div class="flex items-center gap-2 mb-2" data-sd-id="84">
+                <span class="text-[10px] font-mono uppercase tracking-wider text-white/40 px-2 py-0.5 rounded bg-white/5 border border-white/10" data-sd-id="85">Architecture</span>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="86">React Architecture Checklist</h3>
+              <p class="text-sm text-white/50 leading-relaxed mb-4" data-sd-id="87">
+                Comprehensive checklist for shipping scalable React applications. Covers component patterns, state management, code splitting, performance optimization, and testing strategies.
+              </p>
+            </div>
+            
+            <div class="flex flex-wrap gap-1.5 mb-4" data-sd-id="88">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="89">React</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="90">TypeScript</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="91">Performance</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="92">Testing</span>
+            </div>
+            
+            <div class="flex items-center justify-between text-xs text-white/40 font-mono pt-4 border-t border-white/5" data-sd-id="93">
+              <span class="flex items-center gap-1.5" data-sd-id="94"><iconify-icon icon="lucide:download" class="text-xs"></iconify-icon> 5.4K downloads</span>
+              <span class="flex items-center gap-1.5" data-sd-id="95"><iconify-icon icon="lucide:star" class="text-[#ffd700] text-xs"></iconify-icon> 8.2k stars</span>
+            </div>
+            
+            <a href="#" id="resource-cta-3" class="w-full px-4 py-2.5 bg-[#ffd700]/10 hover:bg-[#ffd700]/20 border border-[#ffd700]/30 text-[#ffd700] font-medium rounded-full flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02] text-sm" data-sd-id="96">
+              <iconify-icon icon="lucide:download" class="text-base"></iconify-icon>
+              Download Checklist
+            </a>
+          </div>
+        </div>
+
+        <!-- Resource 4: Figma Design Token Extractor -->
+        <div class="resource-card-wrap scroll-reveal" data-category="devtools" data-sd-id="97">
+          <div class="resource-card glass-panel rounded-2xl p-6 flex flex-col gap-4 h-full relative overflow-hidden" data-sd-id="98">
+            <!-- New Badge -->
+            <div class="absolute top-4 right-4 glass-panel px-2.5 py-1 rounded-full border border-[#ff007f]/30 bg-[#ff007f]/10 flex items-center gap-1.5" data-sd-id="99">
+              <div class="w-1.5 h-1.5 rounded-full bg-[#ff007f] animate-pulse" data-sd-id="100"></div>
+              <span class="text-[10px] font-mono uppercase tracking-wider text-[#ff007f]" data-sd-id="101">New</span>
+            </div>
+            
+            <div class="w-12 h-12 rounded-xl bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center resource-icon" data-sd-id="102">
+              <iconify-icon icon="lucide:figma" class="text-2xl text-[#ff007f]"></iconify-icon>
+            </div>
+            
+            <div class="flex-1" data-sd-id="103">
+              <div class="flex items-center gap-2 mb-2" data-sd-id="104">
+                <span class="text-[10px] font-mono uppercase tracking-wider text-white/40 px-2 py-0.5 rounded bg-white/5 border border-white/10" data-sd-id="105">DevTools</span>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="106">Figma Design Token Plugin</h3>
+              <p class="text-sm text-white/50 leading-relaxed mb-4" data-sd-id="107">
+                Figma plugin to automatically extract and export design tokens directly to code. Supports Tailwind CSS, CSS-in-JS, and style-dictionary formats. Zero configuration needed.
+              </p>
+            </div>
+            
+            <div class="flex flex-wrap gap-1.5 mb-4" data-sd-id="108">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="109">Figma API</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="110">Design Tokens</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="111">Plugin</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="112">Automation</span>
+            </div>
+            
+            <div class="flex items-center justify-between text-xs text-white/40 font-mono pt-4 border-t border-white/5" data-sd-id="113">
+              <span class="flex items-center gap-1.5" data-sd-id="114"><iconify-icon icon="lucide:download" class="text-xs"></iconify-icon> 1.8K installs</span>
+              <span class="flex items-center gap-1.5" data-sd-id="115"><iconify-icon icon="lucide:star" class="text-[#ff007f] text-xs"></iconify-icon> 4.9/5 rating</span>
+            </div>
+            
+            <a href="#" id="resource-cta-4" class="w-full px-4 py-2.5 glass-panel hover:bg-white/10 text-white font-medium rounded-full flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02] text-sm" data-sd-id="116">
+              <iconify-icon icon="lucide:plug" class="text-base"></iconify-icon>
+              Install Plugin
+            </a>
+          </div>
+        </div>
+
+        <!-- Resource 5: Frontend Code Review Template -->
+        <div class="resource-card-wrap scroll-reveal" data-category="devtools" data-sd-id="117">
+          <div class="resource-card glass-panel rounded-2xl p-6 flex flex-col gap-4 h-full" data-sd-id="118">
+            <div class="w-12 h-12 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center resource-icon" data-sd-id="119">
+              <iconify-icon icon="lucide:code-2" class="text-2xl text-[#ffd700]"></iconify-icon>
+            </div>
+            
+            <div class="flex-1" data-sd-id="120">
+              <div class="flex items-center gap-2 mb-2" data-sd-id="121">
+                <span class="text-[10px] font-mono uppercase tracking-wider text-white/40 px-2 py-0.5 rounded bg-white/5 border border-white/10" data-sd-id="122">DevTools</span>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="123">Frontend Code Review Template</h3>
+              <p class="text-sm text-white/50 leading-relaxed mb-4" data-sd-id="124">
+                Production-grade code review checklist for React pull requests. Covers performance, accessibility, testing, security, and maintainability standards.
+              </p>
+            </div>
+            
+            <div class="flex flex-wrap gap-1.5 mb-4" data-sd-id="125">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="126">React</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="127">Code Quality</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="128">Guidelines</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="129">PR Templates</span>
+            </div>
+            
+            <div class="flex items-center justify-between text-xs text-white/40 font-mono pt-4 border-t border-white/5" data-sd-id="130">
+              <span class="flex items-center gap-1.5" data-sd-id="131"><iconify-icon icon="lucide:star" class="text-[#ffd700] text-xs"></iconify-icon> 2.1k stars</span>
+              <span class="flex items-center gap-1.5" data-sd-id="132"><iconify-icon icon="lucide:git-fork" class="text-xs"></iconify-icon> 450+ forks</span>
+            </div>
+            
+            <a href="#" id="resource-cta-5" class="w-full px-4 py-2.5 glass-panel hover:bg-white/10 text-white font-medium rounded-full flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02] text-sm" data-sd-id="133">
+              <iconify-icon icon="lucide:github" class="text-base"></iconify-icon>
+              View on GitHub
+            </a>
+          </div>
+        </div>
+
+        <!-- Resource 6: Performance Audit Framework -->
+        <div class="resource-card-wrap scroll-reveal" data-category="perf" data-sd-id="134">
+          <div class="resource-card glass-panel rounded-2xl p-6 flex flex-col gap-4 h-full" data-sd-id="135">
+            <div class="w-12 h-12 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center resource-icon" data-sd-id="136">
+              <iconify-icon icon="lucide:zap" class="text-2xl text-[#00f0ff]"></iconify-icon>
+            </div>
+            
+            <div class="flex-1" data-sd-id="137">
+              <div class="flex items-center gap-2 mb-2" data-sd-id="138">
+                <span class="text-[10px] font-mono uppercase tracking-wider text-white/40 px-2 py-0.5 rounded bg-white/5 border border-white/10" data-sd-id="139">Performance</span>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="140">Performance Audit Framework</h3>
+              <p class="text-sm text-white/50 leading-relaxed mb-4" data-sd-id="141">
+                Comprehensive methodology and spreadsheet template for auditing React app performance. Includes metric definitions, optimization strategies, and before/after tracking.
+              </p>
+            </div>
+            
+            <div class="flex flex-wrap gap-1.5 mb-4" data-sd-id="142">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="143">Performance</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="144">Metrics</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="145">Optimization</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="146">Tools</span>
+            </div>
+            
+            <div class="flex items-center justify-between text-xs text-white/40 font-mono pt-4 border-t border-white/5" data-sd-id="147">
+              <span class="flex items-center gap-1.5" data-sd-id="148"><iconify-icon icon="lucide:download" class="text-xs"></iconify-icon> 3.8K downloads</span>
+              <span class="flex items-center gap-1.5" data-sd-id="149"><iconify-icon icon="lucide:users" class="text-xs"></iconify-icon> 200+ teams</span>
+            </div>
+            
+            <a href="#" id="resource-cta-6" class="w-full px-4 py-2.5 bg-[#00f0ff]/10 hover:bg-[#00f0ff]/20 border border-[#00f0ff]/30 text-[#00f0ff] font-medium rounded-full flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02] text-sm" data-sd-id="150">
+              <iconify-icon icon="lucide:download" class="text-base"></iconify-icon>
+              Download Template
+            </a>
+          </div>
+        </div>
+
+        <!-- Resource 7: TypeScript Style Guide -->
+        <div class="resource-card-wrap scroll-reveal" data-category="arch" data-sd-id="151">
+          <div class="resource-card glass-panel rounded-2xl p-6 flex flex-col gap-4 h-full" data-sd-id="152">
+            <div class="w-12 h-12 rounded-xl bg-[#3178c6]/10 border border-[#3178c6]/20 flex items-center justify-center resource-icon" data-sd-id="153">
+              <iconify-icon icon="lucide:file-code" class="text-2xl text-[#3178c6]"></iconify-icon>
+            </div>
+            
+            <div class="flex-1" data-sd-id="154">
+              <div class="flex items-center gap-2 mb-2" data-sd-id="155">
+                <span class="text-[10px] font-mono uppercase tracking-wider text-white/40 px-2 py-0.5 rounded bg-white/5 border border-white/10" data-sd-id="156">Architecture</span>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="157">TypeScript Strict Mode Guide</h3>
+              <p class="text-sm text-white/50 leading-relaxed mb-4" data-sd-id="158">
+                How to migrate your React codebase to TypeScript strict mode without breaking everything. Step-by-step approach with real-world examples.
+              </p>
+            </div>
+            
+            <div class="flex flex-wrap gap-1.5 mb-4" data-sd-id="159">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="160">TypeScript</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="161">React</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="162">Migration</span>
+            </div>
+            
+            <div class="flex items-center justify-between text-xs text-white/40 font-mono pt-4 border-t border-white/5" data-sd-id="163">
+              <span class="flex items-center gap-1.5" data-sd-id="164"><iconify-icon icon="lucide:book-open" class="text-xs"></iconify-icon> 12-part series</span>
+              <span class="flex items-center gap-1.5" data-sd-id="165"><iconify-icon icon="lucide:clock" class="text-xs"></iconify-icon> 45 min read</span>
+            </div>
+            
+            <a href="#" id="resource-cta-7" class="w-full px-4 py-2.5 glass-panel hover:bg-white/10 text-white font-medium rounded-full flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02] text-sm" data-sd-id="166">
+              <iconify-icon icon="lucide:book-open" class="text-base"></iconify-icon>
+              Read Guide
+            </a>
+          </div>
+        </div>
+
+        <!-- Resource 8: Accessibility Audit Checklist -->
+        <div class="resource-card-wrap scroll-reveal" data-category="devtools" data-sd-id="167">
+          <div class="resource-card glass-panel rounded-2xl p-6 flex flex-col gap-4 h-full" data-sd-id="168">
+            <div class="w-12 h-12 rounded-xl bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center resource-icon" data-sd-id="169">
+              <iconify-icon icon="lucide:accessibility" class="text-2xl text-[#83f36e]"></iconify-icon>
+            </div>
+            
+            <div class="flex-1" data-sd-id="170">
+              <div class="flex items-center gap-2 mb-2" data-sd-id="171">
+                <span class="text-[10px] font-mono uppercase tracking-wider text-white/40 px-2 py-0.5 rounded bg-white/5 border border-white/10" data-sd-id="172">DevTools</span>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2 tracking-tight" data-sd-id="173">Frontend Accessibility Checklist</h3>
+              <p class="text-sm text-white/50 leading-relaxed mb-4" data-sd-id="174">
+                Complete WCAG 2.1 AA checklist specifically for React applications with examples, testing tools, and screen reader compatibility guidelines.
+              </p>
+            </div>
+            
+            <div class="flex flex-wrap gap-1.5 mb-4" data-sd-id="175">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="176">Accessibility</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="177">WCAG</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-white/50 bg-white/5 border border-white/10" data-sd-id="178">React</span>
+            </div>
+            
+            <div class="flex items-center justify-between text-xs text-white/40 font-mono pt-4 border-t border-white/5" data-sd-id="179">
+              <span class="flex items-center gap-1.5" data-sd-id="180"><iconify-icon icon="lucide:download" class="text-xs"></iconify-icon> 2.6K downloads</span>
+              <span class="flex items-center gap-1.5" data-sd-id="181"><iconify-icon icon="lucide:check-circle" class="text-[#83f36e] text-xs"></iconify-icon> WCAG 2.1 AA</span>
+            </div>
+            
+            <a href="#" id="resource-cta-8" class="w-full px-4 py-2.5 bg-[#83f36e]/10 hover:bg-[#83f36e]/20 border border-[#83f36e]/30 text-[#83f36e] font-medium rounded-full flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02] text-sm" data-sd-id="182">
+              <iconify-icon icon="lucide:download" class="text-base"></iconify-icon>
+              Download Checklist
+            </a>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- COLLABORATION CTA -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-16 scroll-reveal" data-sd-id="183">
+        <div class="glass-panel rounded-3xl p-8 md:p-12 relative overflow-hidden" data-sd-id="184">
+          <div class="absolute -top-40 -right-20 w-80 h-80 rounded-full bg-[#ffd700]/5 blur-3xl pointer-events-none" data-sd-id="185"></div>
+          <div class="absolute -bottom-40 -left-20 w-80 h-80 rounded-full bg-[#00f0ff]/5 blur-3xl pointer-events-none" data-sd-id="186"></div>
+          
+          <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-8 items-center" data-sd-id="187">
+            <div class="space-y-4" data-sd-id="188">
+              <div class="flex items-center gap-3" data-sd-id="189">
+                <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="190"></div>
+                <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="191">Collaborate</span>
+              </div>
+              <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white" data-sd-id="192">
+                Want to collaborate on <span class="neon-text" data-sd-id="193">tools?</span>
+              </h2>
+              <p class="text-white/60 leading-relaxed" data-sd-id="194">
+                I'm always open to collaborating on resources that help the developer community. Have an idea for a tool, template, or guide? Let's build it together.
+              </p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row lg:flex-col gap-4 lg:items-end" data-sd-id="195">
+              <a href="https://p.superdesign.dev/draft/c906d6dd-0318-4f57-9ecd-0bd1b1280b06" id="cta-collaborate" class="w-full lg:w-auto px-6 py-3 bg-[#ffd700] hover:bg-[#ffe54c] text-black font-semibold rounded-full flex items-center justify-center gap-2 transition-all duration-500 hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)]" data-sd-id="196">
+                Reach out to discuss ideas
+                <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon>
+              </a>
+              <a href="https://github.com/richtillman" id="cta-github-follow" target="_blank" rel="noopener noreferrer" class="w-full lg:w-auto px-6 py-3 glass-panel hover:bg-white/10 text-white font-medium rounded-full flex items-center justify-center gap-2 transition-all duration-500 hover:scale-105" data-sd-id="197">
+                <iconify-icon icon="lucide:github" aria-hidden="true"></iconify-icon>
+                Follow on GitHub
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- FOOTER CTA -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="scroll-reveal" data-sd-id="198">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6 glass-panel rounded-2xl p-6 md:p-8" data-sd-id="199">
+          <div class="text-center md:text-left" data-sd-id="200">
+            <h3 class="text-xl font-semibold text-white mb-1" data-sd-id="201">Need help implementing any of these?</h3>
+            <p class="text-sm text-white/50" data-sd-id="202">Book a consulting call for personalized guidance on your project.</p>
+          </div>
+          <a href="https://p.superdesign.dev/draft/c906d6dd-0318-4f57-9ecd-0bd1b1280b06" id="cta-consulting-call" class="w-full md:w-auto px-6 py-3 bg-[#ffd700] hover:bg-[#ffe54c] text-black font-semibold rounded-full flex items-center justify-center gap-2 transition-all duration-500 hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] whitespace-nowrap" data-sd-id="203">
+            Book a consulting call
+            <iconify-icon icon="lucide:calendar" aria-hidden="true"></iconify-icon>
+          </a>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer Ticker -->
+    <div class="pointer-events-auto" style="view-transition-name: footer-ticker;" data-sd-id="204">
+      <!-- component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+<div v-scope="{ ...{&quot;showTicker&quot;:true}, $emit() {} }">
+<div v-if="showTicker" class="relative z-10 w-full overflow-hidden border-t border-white/5 bg-black/50 backdrop-blur-sm py-4 pointer-events-none"><style>@keyframes sd-ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } .sd-animate-ticker { animation: sd-ticker-scroll 30s linear infinite; }</style><div class="flex whitespace-nowrap sd-animate-ticker font-mono text-xs text-white/30 tracking-widest uppercase"><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div></div></div>
+</div>
+<!-- /component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+    </div>
+  </div>
+
+</body>
+</html>

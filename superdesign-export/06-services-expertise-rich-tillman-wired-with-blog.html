@@ -1,0 +1,1065 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="view-transition" content="same-origin">
+  <title>Services &amp; Expertise — Rich Tillman</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <script src="https://unpkg.com/petite-vue" defer="" init=""></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <script type="module">
+    import TubesCursor from 'https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const canvas = document.getElementById('bg-canvas');
+        if (!canvas) return;
+        
+        try {
+          const app = TubesCursor(canvas, {
+            tubes: {
+              colors: ['#00f0ff', '#ff007f', '#ffd700'],
+              lights: {
+                intensity: 150,
+                colors: ['#83f36e', '#00f0ff', '#ff008a', '#ffd700']
+              }
+            }
+          });
+          
+          const randomColors = (count) => {
+            return new Array(count)
+              .fill(0)
+              .map(() => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'));
+          };
+
+          const container = document.getElementById('bg-container');
+          if (container) {
+            container.addEventListener('click', (e) => {
+              if (e.target.closest('a') || e.target.closest('button')) return;
+              const colors = randomColors(3);
+              const lightsColors = randomColors(4);
+              app.tubes.setColors(colors);
+              app.tubes.setLightsColors(lightsColors);
+            });
+          }
+        } catch (err) {
+          console.error('Failed to init tubes:', err);
+        }
+      }, 100);
+    });
+  </script>
+  <style>
+    html { background-color: #000000; }
+    @view-transition { navigation: auto; }
+    ::view-transition { background-color: #000000; }
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+    ::view-transition-old(main-content) { animation: 0.25s ease-out both fade-out; }
+    ::view-transition-new(main-content) { animation: 0.25s ease-in 0.1s both fade-in; }
+    @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    .glass-panel {
+      background: rgba(20, 20, 20, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    }
+    
+    .neon-text {
+      background: linear-gradient(90deg, #00f0ff, #ffd700, #ff007f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shine 5s linear infinite;
+    }
+    @keyframes shine { to { background-position: 200% center; } }
+    
+    .grid-bg {
+      background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), 
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    
+    /* Staggered reveal animations */
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0;
+      animation: fade-in-up 0.7s ease-out forwards;
+    }
+    .reveal-1 { animation-delay: 0.1s; }
+    .reveal-2 { animation-delay: 0.25s; }
+    .reveal-3 { animation-delay: 0.4s; }
+    .reveal-4 { animation-delay: 0.55s; }
+    
+    /* Service card hover */
+    .service-card {
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .service-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255, 215, 0, 0.3);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 30px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px -10px rgba(255, 215, 0, 0.15);
+    }
+    .service-card:hover .service-icon-wrap {
+      transform: scale(1.08) rotate(-3deg);
+    }
+    .service-icon-wrap {
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    /* Timeline */
+    .timeline-line {
+      background: linear-gradient(to bottom, rgba(255,215,0,0.5), rgba(0,240,255,0.3), rgba(255,0,127,0.2), transparent);
+    }
+    .timeline-dot {
+      box-shadow: 0 0 20px rgba(255,215,0,0.5);
+    }
+    
+    /* Scroll reveal via Intersection Observer */
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .scroll-reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* Engagement card */
+    .engagement-card {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .engagement-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 240, 255, 0.25);
+    }
+    
+    /* Tech badge */
+    .tech-badge {
+      transition: all 0.3s ease;
+    }
+    .tech-badge:hover {
+      background: rgba(255, 215, 0, 0.1);
+      border-color: rgba(255, 215, 0, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #000000; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 215, 0, 0.3); }
+    
+    @media (prefers-reduced-motion: reduce) {
+      .neon-text, .reveal, .scroll-reveal { animation: none; opacity: 1; transform: none; }
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+      
+      setTimeout(() => {
+        document.querySelectorAll('.scroll-reveal').forEach((el) => observer.observe(el));
+      }, 200);
+    });
+  </script>
+</head>
+<body>
+  <!-- Fixed Canvas Background -->
+  <div class="fixed inset-0 z-0" data-sd-id="1">
+    <!-- component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+<div v-scope="{ ...{&quot;canvasOpacity&quot;:0.9,&quot;showGrid&quot;:true,&quot;showGradient&quot;:true}, $emit() {} }">
+<div id="bg-container" class="relative min-h-screen w-full overflow-hidden bg-black flex flex-col cursor-crosshair" @click="$emit('backgroundClick', $event)"><canvas id="bg-canvas" class="absolute inset-0 w-full h-full block z-0" :style="{ opacity: canvasOpacity, touchAction: 'none' }"></canvas><div v-if="showGrid" class="absolute inset-0 pointer-events-none z-0" style="background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div><div v-if="showGradient" class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-0 pointer-events-none"></div></div>
+</div>
+<!-- /component: CanvasBackground (db5d26ac-3682-42e6-953a-cb2b95c53ec1) -->
+  </div>
+
+  <!-- Content Wrapper -->
+  <div class="relative min-h-screen w-full flex flex-col cursor-crosshair z-10 pointer-events-none" data-sd-id="2">
+    
+    <!-- Navigation (Persistent) -->
+    <div class="pointer-events-auto" data-sd-id="3">
+      <!-- component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+<div v-scope="{ ...{&quot;activeItem&quot;:&quot;work&quot;,&quot;isAvailable&quot;:true,&quot;workHref&quot;:&quot;#work&quot;,&quot;projectsHref&quot;:&quot;#projects&quot;,&quot;stackHref&quot;:&quot;#stack&quot;,&quot;contactHref&quot;:&quot;#contact&quot;}, $emit() {} }">
+<nav class="fixed top-0 left-0 w-full z-40 border-x-0 border-t-0 border-b border-white/10 px-6 py-4" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.5);">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-8 h-8 rounded bg-zinc-900 border border-white/20 flex items-center justify-center font-mono text-sm font-bold text-[#ffd700]">
+        R
+      </div>
+      <span class="font-medium tracking-tight text-white/90 hidden sm:inline-block">
+        Rich Tillman <span class="text-white/40 font-normal">/ Principal Frontend Engineer</span>
+      </span>
+    </div>
+    
+    <div class="hidden md:flex items-center gap-12 text-sm font-medium">
+      <a :href="workHref" :class="activeItem === 'work' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Work</a>
+      <a :href="projectsHref" :class="activeItem === 'projects' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Projects</a>
+      <a :href="stackHref" :class="activeItem === 'stack' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Stack</a>
+      <a :href="contactHref" :class="activeItem === 'contact' ? 'text-white' : 'text-white/60 hover:text-white'" class="transition-colors">Contact</a>
+    </div>
+
+    <div v-if="isAvailable" class="flex items-center gap-3 rounded-full px-3 py-1.5 border border-[#ffd700]/30 bg-[#ffd700]/5" style="background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(16px);">
+      <div class="w-2 h-2 rounded-full bg-[#ffd700] animate-pulse"></div>
+      <span class="text-xs font-medium text-[#ffd700]">Available</span>
+    </div>
+  </div>
+</nav>
+</div>
+<!-- /component: NavigationBar (80d62ee2-98d9-4b52-807c-d40c38de1701) -->
+    </div>
+
+    <!-- Main Content -->
+    <main style="view-transition-name: main-content;" class="relative z-10 flex-1 max-w-7xl mx-auto w-full px-6 pt-32 pb-16 pointer-events-auto" data-sd-id="4">
+      
+      <!-- ═══════════════════════════════════════ -->
+      <!-- HERO SECTION -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-24 lg:mb-32" data-sd-id="5">
+        <div class="reveal reveal-1 flex items-center gap-3 mb-8" data-sd-id="6">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="7"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="8">Services &amp; Expertise</span>
+        </div>
+        
+        <h1 class="reveal reveal-2 text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-[1.05] text-white mb-8" data-sd-id="9">
+          What I <span class="neon-text" data-sd-id="10">Offer</span>
+        </h1>
+        
+        <p class="reveal reveal-3 text-xl md:text-2xl text-white/50 font-mono tracking-tight mb-6" data-sd-id="11">
+          Specialized consulting for teams shipping at scale
+        </p>
+        
+        <p class="reveal reveal-4 text-lg md:text-xl text-white/60 max-w-3xl leading-relaxed" data-sd-id="12">
+          10+ years architecting React platforms, design systems, and cross-platform products. I solve the hard problems: <span class="text-white font-medium" data-sd-id="13">system design, code quality, engineering velocity.</span>
+        </p>
+        
+        <!-- Quick stats row -->
+        <div class="reveal reveal-4 flex flex-wrap items-center gap-3 font-mono text-xs pt-8 mt-4" data-sd-id="14">
+          <span class="glass-panel px-3 py-1.5 rounded-full flex items-center gap-2 text-white/70 hover:bg-white/5 transition-colors" data-sd-id="15">
+            <iconify-icon icon="lucide:clock" class="text-[#ffd700] text-sm"></iconify-icon>
+            10+ years experience
+          </span>
+          <span class="glass-panel px-3 py-1.5 rounded-full flex items-center gap-2 text-white/70 hover:bg-white/5 transition-colors" data-sd-id="16">
+            <iconify-icon icon="lucide:layers" class="text-[#ffd700] text-sm"></iconify-icon>
+            200+ components shipped
+          </span>
+          <span class="glass-panel px-3 py-1.5 rounded-full flex items-center gap-2 text-white/70 hover:bg-white/5 transition-colors" data-sd-id="17">
+            <iconify-icon icon="lucide:users" class="text-[#ffd700] text-sm"></iconify-icon>
+            500K+ users impacted
+          </span>
+          <span class="glass-panel px-3 py-1.5 rounded-full flex items-center gap-2 text-white/70 hover:bg-white/5 transition-colors" data-sd-id="18">
+            <div class="w-1.5 h-1.5 rounded-full bg-[#ffd700] animate-pulse" data-sd-id="19"></div>
+            Available for select engagements
+          </span>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- SERVICES SECTION -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-24 lg:mb-32 scroll-reveal" data-sd-id="20">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="21">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="22"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="23">Core Services</span>
+        </div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4 max-w-3xl" data-sd-id="24">
+          Five ways I can <span class="neon-text" data-sd-id="25">level up</span> your engineering
+        </h2>
+        <p class="text-lg text-white/50 max-w-2xl mb-12" data-sd-id="26">
+          From design systems to monorepo architecture — specialized engagements with measurable outcomes.
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-sd-id="27">
+          
+          <!-- Service 1: Design Systems Consulting -->
+          <div class="service-card glass-panel rounded-2xl p-8 flex flex-col gap-5" data-sd-id="28">
+            <div class="flex items-start justify-between" data-sd-id="29">
+              <div class="service-icon-wrap w-14 h-14 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="30">
+                <iconify-icon icon="lucide:palette" class="text-2xl text-[#ffd700]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/30 px-2.5 py-1 rounded-full border border-white/10" data-sd-id="31">01</span>
+            </div>
+            <div data-sd-id="32">
+              <h3 class="text-xl font-bold text-white mb-2" data-sd-id="33">Design Systems Consulting</h3>
+              <p class="text-sm text-white/60 leading-relaxed" data-sd-id="34">
+                Build component libraries that scale with your team. <span class="text-white/80" data-sd-id="35">200+ Storybook components</span> proves I know the craft.
+              </p>
+            </div>
+            
+            <div class="space-y-3 pt-2" data-sd-id="36">
+              <div data-sd-id="37">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2" data-sd-id="38">Typical projects</p>
+                <ul class="space-y-1.5 text-sm text-white/60" data-sd-id="39">
+                  <li class="flex items-start gap-2" data-sd-id="40"><span class="text-[#ffd700] mt-0.5" data-sd-id="41">→</span> Enterprise component library</li>
+                  <li class="flex items-start gap-2" data-sd-id="42"><span class="text-[#ffd700] mt-0.5" data-sd-id="43">→</span> Design token pipeline (Figma ↔ React)</li>
+                  <li class="flex items-start gap-2" data-sd-id="44"><span class="text-[#ffd700] mt-0.5" data-sd-id="45">→</span> Storybook + Chromatic setup</li>
+                </ul>
+              </div>
+              
+              <div data-sd-id="46">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2" data-sd-id="47">Key skills</p>
+                <div class="flex flex-wrap gap-1.5" data-sd-id="48">
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="49">Storybook</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="50">React</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="51">TypeScript</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="52">Figma</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="53">Tokens</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="54">A11y</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-4 border-t border-white/5 grid grid-cols-2 gap-4" data-sd-id="55">
+              <div data-sd-id="56">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-1" data-sd-id="57">Timeline</p>
+                <p class="text-sm font-medium text-white" data-sd-id="58">8–12 weeks</p>
+              </div>
+              <div data-sd-id="59">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-1" data-sd-id="60">Engagement</p>
+                <p class="text-sm font-medium text-white" data-sd-id="61">Project / Retainer</p>
+              </div>
+            </div>
+            
+            <div class="pt-3" data-sd-id="62">
+              <p class="font-mono text-[10px] uppercase tracking-widest text-[#ffd700]/70 mb-2" data-sd-id="63">Outcomes</p>
+              <p class="text-xs text-white/50 leading-relaxed" data-sd-id="64">200+ components · 40% faster feature shipping · design-engineering alignment</p>
+            </div>
+          </div>
+          
+          <!-- Service 2: React Architecture & Code Review -->
+          <div class="service-card glass-panel rounded-2xl p-8 flex flex-col gap-5" data-sd-id="65">
+            <div class="flex items-start justify-between" data-sd-id="66">
+              <div class="service-icon-wrap w-14 h-14 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="67">
+                <iconify-icon icon="lucide:code-2" class="text-2xl text-[#00f0ff]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/30 px-2.5 py-1 rounded-full border border-white/10" data-sd-id="68">02</span>
+            </div>
+            <div data-sd-id="69">
+              <h3 class="text-xl font-bold text-white mb-2" data-sd-id="70">React Architecture &amp; Code Review</h3>
+              <p class="text-sm text-white/60 leading-relaxed" data-sd-id="71">
+                Audit and improve React codebases. <span class="text-white/80" data-sd-id="72">Performance-first architecture</span> that scales to millions of users.
+              </p>
+            </div>
+            
+            <div class="space-y-3 pt-2" data-sd-id="73">
+              <div data-sd-id="74">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2" data-sd-id="75">Typical projects</p>
+                <ul class="space-y-1.5 text-sm text-white/60" data-sd-id="76">
+                  <li class="flex items-start gap-2" data-sd-id="77"><span class="text-[#00f0ff] mt-0.5" data-sd-id="78">→</span> App modernization &amp; refactors</li>
+                  <li class="flex items-start gap-2" data-sd-id="79"><span class="text-[#00f0ff] mt-0.5" data-sd-id="80">→</span> Performance optimization</li>
+                  <li class="flex items-start gap-2" data-sd-id="81"><span class="text-[#00f0ff] mt-0.5" data-sd-id="82">→</span> Architecture review &amp; audit</li>
+                  <li class="flex items-start gap-2" data-sd-id="83"><span class="text-[#00f0ff] mt-0.5" data-sd-id="84">→</span> Scaling to 500K+ users</li>
+                </ul>
+              </div>
+              
+              <div data-sd-id="85">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2" data-sd-id="86">Key skills</p>
+                <div class="flex flex-wrap gap-1.5" data-sd-id="87">
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="88">React</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="89">TypeScript</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="90">Next.js</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="91">Performance</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="92">Testing</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="93">Patterns</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-4 border-t border-white/5 grid grid-cols-2 gap-4" data-sd-id="94">
+              <div data-sd-id="95">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-1" data-sd-id="96">Timeline</p>
+                <p class="text-sm font-medium text-white" data-sd-id="97">2–12 weeks</p>
+              </div>
+              <div data-sd-id="98">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-1" data-sd-id="99">Engagement</p>
+                <p class="text-sm font-medium text-white" data-sd-id="100">Hourly / Project</p>
+              </div>
+            </div>
+            
+            <div class="pt-3" data-sd-id="101">
+              <p class="font-mono text-[10px] uppercase tracking-widest text-[#00f0ff]/70 mb-2" data-sd-id="102">Outcomes</p>
+              <p class="text-xs text-white/50 leading-relaxed" data-sd-id="103">3–5x performance improvements · reduced bundle size · sustainable patterns</p>
+            </div>
+          </div>
+          
+          <!-- Service 3: 0→1 Product Development -->
+          <div class="service-card glass-panel rounded-2xl p-8 flex flex-col gap-5" data-sd-id="104">
+            <div class="flex items-start justify-between" data-sd-id="105">
+              <div class="service-icon-wrap w-14 h-14 rounded-xl bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="106">
+                <iconify-icon icon="lucide:rocket" class="text-2xl text-[#ff007f]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/30 px-2.5 py-1 rounded-full border border-white/10" data-sd-id="107">03</span>
+            </div>
+            <div data-sd-id="108">
+              <h3 class="text-xl font-bold text-white mb-2" data-sd-id="109">0→1 Product Development</h3>
+              <p class="text-sm text-white/60 leading-relaxed" data-sd-id="110">
+                Build from scratch. MVP to production in weeks, not months. <span class="text-white/80" data-sd-id="111">Solid architecture day one.</span>
+              </p>
+            </div>
+            
+            <div class="space-y-3 pt-2" data-sd-id="112">
+              <div data-sd-id="113">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2" data-sd-id="114">Typical projects</p>
+                <ul class="space-y-1.5 text-sm text-white/60" data-sd-id="115">
+                  <li class="flex items-start gap-2" data-sd-id="116"><span class="text-[#ff007f] mt-0.5" data-sd-id="117">→</span> SaaS MVP build</li>
+                  <li class="flex items-start gap-2" data-sd-id="118"><span class="text-[#ff007f] mt-0.5" data-sd-id="119">→</span> Mobile app (React Native)</li>
+                  <li class="flex items-start gap-2" data-sd-id="120"><span class="text-[#ff007f] mt-0.5" data-sd-id="121">→</span> Feature platform</li>
+                  <li class="flex items-start gap-2" data-sd-id="122"><span class="text-[#ff007f] mt-0.5" data-sd-id="123">→</span> Experimental products</li>
+                </ul>
+              </div>
+              
+              <div data-sd-id="124">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2" data-sd-id="125">Key skills</p>
+                <div class="flex flex-wrap gap-1.5" data-sd-id="126">
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="127">Full-stack React</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="128">TypeScript</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="129">Next.js</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="130">Data modeling</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="131">DevOps</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-4 border-t border-white/5 grid grid-cols-2 gap-4" data-sd-id="132">
+              <div data-sd-id="133">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-1" data-sd-id="134">Timeline</p>
+                <p class="text-sm font-medium text-white" data-sd-id="135">6–12 weeks</p>
+              </div>
+              <div data-sd-id="136">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-1" data-sd-id="137">Engagement</p>
+                <p class="text-sm font-medium text-white" data-sd-id="138">Project / Hourly</p>
+              </div>
+            </div>
+            
+            <div class="pt-3" data-sd-id="139">
+              <p class="font-mono text-[10px] uppercase tracking-widest text-[#ff007f]/70 mb-2" data-sd-id="140">Outcomes</p>
+              <p class="text-xs text-white/50 leading-relaxed" data-sd-id="141">Shippable product · clean codebase · documented decisions · scalable foundation</p>
+            </div>
+          </div>
+          
+          <!-- Service 4: Monorepo Architecture & Infrastructure -->
+          <div class="service-card glass-panel rounded-2xl p-8 flex flex-col gap-5" data-sd-id="142">
+            <div class="flex items-start justify-between" data-sd-id="143">
+              <div class="service-icon-wrap w-14 h-14 rounded-xl bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center" data-sd-id="144">
+                <iconify-icon icon="lucide:git-branch" class="text-2xl text-[#83f36e]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/30 px-2.5 py-1 rounded-full border border-white/10" data-sd-id="145">04</span>
+            </div>
+            <div data-sd-id="146">
+              <h3 class="text-xl font-bold text-white mb-2" data-sd-id="147">Monorepo Architecture &amp; Infrastructure</h3>
+              <p class="text-sm text-white/60 leading-relaxed" data-sd-id="148">
+                Architect systems for 10+ engineering teams. Unify development experience. <span class="text-white/80" data-sd-id="149">Cut build times by 60%.</span>
+              </p>
+            </div>
+            
+            <div class="space-y-3 pt-2" data-sd-id="150">
+              <div data-sd-id="151">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2" data-sd-id="152">Typical projects</p>
+                <ul class="space-y-1.5 text-sm text-white/60" data-sd-id="153">
+                  <li class="flex items-start gap-2" data-sd-id="154"><span class="text-[#83f36e] mt-0.5" data-sd-id="155">→</span> Polyrepo → Monorepo migration</li>
+                  <li class="flex items-start gap-2" data-sd-id="156"><span class="text-[#83f36e] mt-0.5" data-sd-id="157">→</span> Nx/Turborepo setup</li>
+                  <li class="flex items-start gap-2" data-sd-id="158"><span class="text-[#83f36e] mt-0.5" data-sd-id="159">→</span> CI/CD optimization</li>
+                  <li class="flex items-start gap-2" data-sd-id="160"><span class="text-[#83f36e] mt-0.5" data-sd-id="161">→</span> Multi-app coordination</li>
+                </ul>
+              </div>
+              
+              <div data-sd-id="162">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2" data-sd-id="163">Key skills</p>
+                <div class="flex flex-wrap gap-1.5" data-sd-id="164">
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="165">Nx</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="166">Turborepo</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="167">TypeScript</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="168">GitHub Actions</span>
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="169">Docker</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-4 border-t border-white/5 grid grid-cols-2 gap-4" data-sd-id="170">
+              <div data-sd-id="171">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-1" data-sd-id="172">Timeline</p>
+                <p class="text-sm font-medium text-white" data-sd-id="173">6–8 weeks</p>
+              </div>
+              <div data-sd-id="174">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-1" data-sd-id="175">Engagement</p>
+                <p class="text-sm font-medium text-white" data-sd-id="176">Project / Retainer</p>
+              </div>
+            </div>
+            
+            <div class="pt-3" data-sd-id="177">
+              <p class="font-mono text-[10px] uppercase tracking-widest text-[#83f36e]/70 mb-2" data-sd-id="178">Outcomes</p>
+              <p class="text-xs text-white/50 leading-relaxed" data-sd-id="179">60% faster builds · 12+ shared libraries · 50+ engineer velocity · single-command deploys</p>
+            </div>
+          </div>
+          
+          <!-- Service 5: Team Leadership & Technical Mentoring -->
+          <div class="service-card glass-panel rounded-2xl p-8 flex flex-col gap-5 md:col-span-2" data-sd-id="180">
+            <div class="flex items-start justify-between" data-sd-id="181">
+              <div class="service-icon-wrap w-14 h-14 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="182">
+                <iconify-icon icon="lucide:users" class="text-2xl text-[#ffd700]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/30 px-2.5 py-1 rounded-full border border-white/10" data-sd-id="183">05</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-sd-id="184">
+              <div data-sd-id="185">
+                <h3 class="text-xl font-bold text-white mb-2" data-sd-id="186">Team Leadership &amp; Technical Mentoring</h3>
+                <p class="text-sm text-white/60 leading-relaxed" data-sd-id="187">
+                  Level up engineering teams. Code review culture, design system adoption, architecture decisions, hiring technical staff.
+                </p>
+                
+                <div class="space-y-3 pt-4" data-sd-id="188">
+                  <div data-sd-id="189">
+                    <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2" data-sd-id="190">Typical projects</p>
+                    <ul class="space-y-1.5 text-sm text-white/60" data-sd-id="191">
+                      <li class="flex items-start gap-2" data-sd-id="192"><span class="text-[#ffd700] mt-0.5" data-sd-id="193">→</span> Engineering mentorship programs</li>
+                      <li class="flex items-start gap-2" data-sd-id="194"><span class="text-[#ffd700] mt-0.5" data-sd-id="195">→</span> Code review setup &amp; culture</li>
+                      <li class="flex items-start gap-2" data-sd-id="196"><span class="text-[#ffd700] mt-0.5" data-sd-id="197">→</span> Architecture guidance &amp; ADRs</li>
+                      <li class="flex items-start gap-2" data-sd-id="198"><span class="text-[#ffd700] mt-0.5" data-sd-id="199">→</span> Team hiring consultation</li>
+                    </ul>
+                  </div>
+                  
+                  <div data-sd-id="200">
+                    <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2" data-sd-id="201">Key skills</p>
+                    <div class="flex flex-wrap gap-1.5" data-sd-id="202">
+                      <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="203">Leadership</span>
+                      <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="204">Mentoring</span>
+                      <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="205">System design</span>
+                      <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="206">Tech communication</span>
+                      <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/60" data-sd-id="207">Team scaling</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex flex-col justify-between gap-4" data-sd-id="208">
+                <div class="grid grid-cols-2 gap-4 pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-white/5 md:pl-6" data-sd-id="209">
+                  <div data-sd-id="210">
+                    <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-1" data-sd-id="211">Timeline</p>
+                    <p class="text-sm font-medium text-white" data-sd-id="212">1–3 months min.</p>
+                  </div>
+                  <div data-sd-id="213">
+                    <p class="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-1" data-sd-id="214">Engagement</p>
+                    <p class="text-sm font-medium text-white" data-sd-id="215">Retainer / Hourly</p>
+                  </div>
+                </div>
+                
+                <div class="pt-4 border-t border-white/5" data-sd-id="216">
+                  <p class="font-mono text-[10px] uppercase tracking-widest text-[#ffd700]/70 mb-2" data-sd-id="217">Outcomes</p>
+                  <p class="text-xs text-white/50 leading-relaxed" data-sd-id="218">Improved code quality · faster shipping · retained talent · better hiring decisions</p>
+                </div>
+                
+                <div class="glass-panel rounded-xl p-4 mt-2" data-sd-id="219">
+                  <p class="text-xs text-white/40 font-mono mb-1" data-sd-id="220">Leadership philosophy</p>
+                  <p class="text-sm text-white/70 italic" data-sd-id="221">"I ship with you, not just for you. Mentorship is baked into every engagement."</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- ENGAGEMENT MODELS -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-24 lg:mb-32 scroll-reveal" data-sd-id="222">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="223">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="224"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="225">Engagement Models</span>
+        </div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4 max-w-3xl" data-sd-id="226">
+          Four ways to <span class="neon-text" data-sd-id="227">work together</span>
+        </h2>
+        <p class="text-lg text-white/50 max-w-2xl mb-12" data-sd-id="228">
+          Flexible engagement options tailored to your project scope, timeline, and team needs.
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-sd-id="229">
+          
+          <!-- Hourly Consulting -->
+          <div class="engagement-card glass-panel rounded-2xl p-6 flex flex-col gap-4" data-sd-id="230">
+            <div class="flex items-center justify-between" data-sd-id="231">
+              <div class="w-10 h-10 rounded-lg bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="232">
+                <iconify-icon icon="lucide:clock" class="text-lg text-[#ffd700]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/40" data-sd-id="233">Model 01</span>
+            </div>
+            <div data-sd-id="234">
+              <h3 class="text-base font-bold text-white mb-1" data-sd-id="235">Hourly Consulting</h3>
+              <p class="text-xs text-white/50" data-sd-id="236">Quick consultations, code reviews, architecture questions.</p>
+            </div>
+            <div class="space-y-2 text-xs text-white/60 pt-2 border-t border-white/5" data-sd-id="237">
+              <div class="flex items-center gap-2" data-sd-id="238"><iconify-icon icon="lucide:check" class="text-[#ffd700] text-xs"></iconify-icon> Competitive professional rate</div>
+              <div class="flex items-center gap-2" data-sd-id="239"><iconify-icon icon="lucide:check" class="text-[#ffd700] text-xs"></iconify-icon> 1-hour minimum</div>
+              <div class="flex items-center gap-2" data-sd-id="240"><iconify-icon icon="lucide:check" class="text-[#ffd700] text-xs"></iconify-icon> 5–10 hrs/week available</div>
+              <div class="flex items-center gap-2" data-sd-id="241"><iconify-icon icon="lucide:check" class="text-[#ffd700] text-xs"></iconify-icon> 1–2 week turnaround</div>
+            </div>
+          </div>
+          
+          <!-- Project-Based -->
+          <div class="engagement-card glass-panel rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden" data-sd-id="242">
+            <div class="absolute top-0 right-0 px-2 py-1 bg-[#ffd700]/10 border-l border-b border-[#ffd700]/20 rounded-bl-lg" data-sd-id="243">
+              <span class="font-mono text-[9px] uppercase tracking-widest text-[#ffd700]" data-sd-id="244">Preferred</span>
+            </div>
+            <div class="flex items-center justify-between" data-sd-id="245">
+              <div class="w-10 h-10 rounded-lg bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="246">
+                <iconify-icon icon="lucide:package" class="text-lg text-[#00f0ff]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/40 mt-6" data-sd-id="247">Model 02</span>
+            </div>
+            <div data-sd-id="248">
+              <h3 class="text-base font-bold text-white mb-1" data-sd-id="249">Project-Based</h3>
+              <p class="text-xs text-white/50" data-sd-id="250">Fixed scope, deliverables, timeline. Best for builds.</p>
+            </div>
+            <div class="space-y-2 text-xs text-white/60 pt-2 border-t border-white/5" data-sd-id="251">
+              <div class="flex items-center gap-2" data-sd-id="252"><iconify-icon icon="lucide:check" class="text-[#00f0ff] text-xs"></iconify-icon> 4–12 week timeline</div>
+              <div class="flex items-center gap-2" data-sd-id="253"><iconify-icon icon="lucide:check" class="text-[#00f0ff] text-xs"></iconify-icon> 50% upfront, 50% delivery</div>
+              <div class="flex items-center gap-2" data-sd-id="254"><iconify-icon icon="lucide:check" class="text-[#00f0ff] text-xs"></iconify-icon> Clear deliverables</div>
+              <div class="flex items-start gap-2" data-sd-id="255"><iconify-icon icon="lucide:check" class="text-[#00f0ff] text-xs mt-0.5"></iconify-icon> <span data-sd-id="256">DS: $40–60K · Product: $50–100K</span></div>
+            </div>
+          </div>
+          
+          <!-- Retainer -->
+          <div class="engagement-card glass-panel rounded-2xl p-6 flex flex-col gap-4" data-sd-id="257">
+            <div class="flex items-center justify-between" data-sd-id="258">
+              <div class="w-10 h-10 rounded-lg bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="259">
+                <iconify-icon icon="lucide:repeat" class="text-lg text-[#ff007f]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/40" data-sd-id="260">Model 03</span>
+            </div>
+            <div data-sd-id="261">
+              <h3 class="text-base font-bold text-white mb-1" data-sd-id="262">Retainer</h3>
+              <p class="text-xs text-white/50" data-sd-id="263">Ongoing mentorship, code reviews, strategic guidance.</p>
+            </div>
+            <div class="space-y-2 text-xs text-white/60 pt-2 border-t border-white/5" data-sd-id="264">
+              <div class="flex items-center gap-2" data-sd-id="265"><iconify-icon icon="lucide:check" class="text-[#ff007f] text-xs"></iconify-icon> 10–20 hours/month</div>
+              <div class="flex items-center gap-2" data-sd-id="266"><iconify-icon icon="lucide:check" class="text-[#ff007f] text-xs"></iconify-icon> 3-month minimum</div>
+              <div class="flex items-center gap-2" data-sd-id="267"><iconify-icon icon="lucide:check" class="text-[#ff007f] text-xs"></iconify-icon> Flexible month-to-month</div>
+              <div class="flex items-center gap-2" data-sd-id="268"><iconify-icon icon="lucide:check" class="text-[#ff007f] text-xs"></iconify-icon> Priority support access</div>
+            </div>
+          </div>
+          
+          <!-- Code Review Sessions -->
+          <div class="engagement-card glass-panel rounded-2xl p-6 flex flex-col gap-4" data-sd-id="269">
+            <div class="flex items-center justify-between" data-sd-id="270">
+              <div class="w-10 h-10 rounded-lg bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center" data-sd-id="271">
+                <iconify-icon icon="lucide:search-code" class="text-lg text-[#83f36e]"></iconify-icon>
+              </div>
+              <span class="font-mono text-[10px] uppercase tracking-widest text-white/40" data-sd-id="272">Model 04</span>
+            </div>
+            <div data-sd-id="273">
+              <h3 class="text-base font-bold text-white mb-1" data-sd-id="274">Code Review Sessions</h3>
+              <p class="text-xs text-white/50" data-sd-id="275">Deep-dive review of PRs, architecture, patterns.</p>
+            </div>
+            <div class="space-y-2 text-xs text-white/60 pt-2 border-t border-white/5" data-sd-id="276">
+              <div class="flex items-center gap-2" data-sd-id="277"><iconify-icon icon="lucide:check" class="text-[#83f36e] text-xs"></iconify-icon> 1–2 hour deep-dive</div>
+              <div class="flex items-center gap-2" data-sd-id="278"><iconify-icon icon="lucide:check" class="text-[#83f36e] text-xs"></iconify-icon> Hourly rate</div>
+              <div class="flex items-center gap-2" data-sd-id="279"><iconify-icon icon="lucide:check" class="text-[#83f36e] text-xs"></iconify-icon> Written feedback</div>
+              <div class="flex items-center gap-2" data-sd-id="280"><iconify-icon icon="lucide:check" class="text-[#83f36e] text-xs"></iconify-icon> Recorded session</div>
+            </div>
+          </div>
+          
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- PROCESS TIMELINE -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-24 lg:mb-32 scroll-reveal" data-sd-id="281">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="282">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="283"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="284">Process</span>
+        </div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4 max-w-3xl" data-sd-id="285">
+          How we <span class="neon-text" data-sd-id="286">work together</span>
+        </h2>
+        <p class="text-lg text-white/50 max-w-2xl mb-12" data-sd-id="287">
+          Transparent, phased approach. You always know what's happening and why.
+        </p>
+        
+        <div class="relative pl-8 md:pl-12" data-sd-id="288">
+          <!-- Timeline vertical line -->
+          <div class="absolute left-2 md:left-3 top-2 bottom-2 w-px timeline-line" data-sd-id="289"></div>
+          
+          <div class="space-y-8" data-sd-id="290">
+            
+            <!-- Phase 1 -->
+            <div class="relative" data-sd-id="291">
+              <div class="absolute -left-[1.85rem] md:-left-[2.35rem] top-1.5 w-4 h-4 rounded-full bg-[#ffd700] border-2 border-black timeline-dot" data-sd-id="292"></div>
+              <div class="glass-panel rounded-xl p-6 md:p-8 hover:bg-white/5 transition-colors" data-sd-id="293">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3" data-sd-id="294">
+                  <div class="flex items-center gap-3" data-sd-id="295">
+                    <span class="font-mono text-xs text-[#ffd700] bg-[#ffd700]/10 px-2.5 py-1 rounded-full border border-[#ffd700]/20" data-sd-id="296">PHASE 01</span>
+                    <h3 class="text-lg font-semibold text-white" data-sd-id="297">Discovery</h3>
+                  </div>
+                  <span class="font-mono text-xs text-white/50 bg-white/5 px-3 py-1 rounded-full border border-white/10 w-fit" data-sd-id="298">Week 1</span>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed mb-4" data-sd-id="299">
+                  60-minute initial consultation. Understand goals, constraints, current state. Identify blockers and opportunities. Agree on scope and approach.
+                </p>
+                <div class="flex flex-wrap gap-2" data-sd-id="300">
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="301">Goals alignment</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="302">Constraint mapping</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="303">Scope agreement</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Phase 2 -->
+            <div class="relative" data-sd-id="304">
+              <div class="absolute -left-[1.85rem] md:-left-[2.35rem] top-1.5 w-4 h-4 rounded-full bg-[#00f0ff] border-2 border-black" style="box-shadow: 0 0 20px rgba(0,240,255,0.5);" data-sd-id="305"></div>
+              <div class="glass-panel rounded-xl p-6 md:p-8 hover:bg-white/5 transition-colors" data-sd-id="306">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3" data-sd-id="307">
+                  <div class="flex items-center gap-3" data-sd-id="308">
+                    <span class="font-mono text-xs text-[#00f0ff] bg-[#00f0ff]/10 px-2.5 py-1 rounded-full border border-[#00f0ff]/20" data-sd-id="309">PHASE 02</span>
+                    <h3 class="text-lg font-semibold text-white" data-sd-id="310">Scoping</h3>
+                  </div>
+                  <span class="font-mono text-xs text-white/50 bg-white/5 px-3 py-1 rounded-full border border-white/10 w-fit" data-sd-id="311">Week 1–2</span>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed mb-4" data-sd-id="312">
+                  Define deliverables and success metrics. Create detailed project plan. Align on timeline and investment. Kickoff with your team.
+                </p>
+                <div class="flex flex-wrap gap-2" data-sd-id="313">
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="314">Deliverables defined</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="315">Success metrics</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="316">Project plan</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Phase 3 -->
+            <div class="relative" data-sd-id="317">
+              <div class="absolute -left-[1.85rem] md:-left-[2.35rem] top-1.5 w-4 h-4 rounded-full bg-[#ff007f] border-2 border-black" style="box-shadow: 0 0 20px rgba(255,0,127,0.5);" data-sd-id="318"></div>
+              <div class="glass-panel rounded-xl p-6 md:p-8 hover:bg-white/5 transition-colors" data-sd-id="319">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3" data-sd-id="320">
+                  <div class="flex items-center gap-3" data-sd-id="321">
+                    <span class="font-mono text-xs text-[#ff007f] bg-[#ff007f]/10 px-2.5 py-1 rounded-full border border-[#ff007f]/20" data-sd-id="322">PHASE 03</span>
+                    <h3 class="text-lg font-semibold text-white" data-sd-id="323">Delivery</h3>
+                  </div>
+                  <span class="font-mono text-xs text-white/50 bg-white/5 px-3 py-1 rounded-full border border-white/10 w-fit" data-sd-id="324">Weeks 3–X</span>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed mb-4" data-sd-id="325">
+                  Hands-on execution or guidance. Weekly check-ins and demos. Transparent communication. Iterate based on feedback.
+                </p>
+                <div class="flex flex-wrap gap-2" data-sd-id="326">
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="327">Weekly demos</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="328">Async updates</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="329">Iterative feedback</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Phase 4 -->
+            <div class="relative" data-sd-id="330">
+              <div class="absolute -left-[1.85rem] md:-left-[2.35rem] top-1.5 w-4 h-4 rounded-full bg-[#83f36e] border-2 border-black" style="box-shadow: 0 0 20px rgba(131,243,110,0.5);" data-sd-id="331"></div>
+              <div class="glass-panel rounded-xl p-6 md:p-8 hover:bg-white/5 transition-colors" data-sd-id="332">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3" data-sd-id="333">
+                  <div class="flex items-center gap-3" data-sd-id="334">
+                    <span class="font-mono text-xs text-[#83f36e] bg-[#83f36e]/10 px-2.5 py-1 rounded-full border border-[#83f36e]/20" data-sd-id="335">PHASE 04</span>
+                    <h3 class="text-lg font-semibold text-white" data-sd-id="336">Handoff &amp; Beyond</h3>
+                  </div>
+                  <span class="font-mono text-xs text-white/50 bg-white/5 px-3 py-1 rounded-full border border-white/10 w-fit" data-sd-id="337">Final week</span>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed mb-4" data-sd-id="338">
+                  Full documentation and training. Code walkthroughs with team. Maintenance plan. Post-project support available.
+                </p>
+                <div class="flex flex-wrap gap-2" data-sd-id="339">
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="340">Documentation</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="341">Team training</span>
+                  <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/50" data-sd-id="342">Maintenance plan</span>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- TECH STACK -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-24 lg:mb-32 scroll-reveal" data-sd-id="343">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="344">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="345"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="346">Tech Stack</span>
+        </div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4 max-w-3xl" data-sd-id="347">
+          Tools I <span class="neon-text" data-sd-id="348">build with</span> daily
+        </h2>
+        <p class="text-lg text-white/50 max-w-2xl mb-12" data-sd-id="349">
+          Specialized across the full spectrum of modern frontend engineering.
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-sd-id="350">
+          
+          <!-- Frontend -->
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="351">
+            <div class="flex items-center gap-2 mb-4" data-sd-id="352">
+              <iconify-icon icon="lucide:monitor" class="text-[#ffd700]"></iconify-icon>
+              <h3 class="text-sm font-semibold text-white/80 uppercase tracking-wider font-mono" data-sd-id="353">Frontend</h3>
+            </div>
+            <div class="flex flex-wrap gap-2" data-sd-id="354">
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="355">React</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="356">Next.js</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="357">TypeScript</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="358">Tailwind</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="359">TanStack Start</span>
+            </div>
+          </div>
+          
+          <!-- Mobile -->
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="360">
+            <div class="flex items-center gap-2 mb-4" data-sd-id="361">
+              <iconify-icon icon="lucide:smartphone" class="text-[#00f0ff]"></iconify-icon>
+              <h3 class="text-sm font-semibold text-white/80 uppercase tracking-wider font-mono" data-sd-id="362">Mobile</h3>
+            </div>
+            <div class="flex flex-wrap gap-2" data-sd-id="363">
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="364">React Native</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="365">Expo</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="366">EAS Build</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="367">Reanimated</span>
+            </div>
+          </div>
+          
+          <!-- Design Systems -->
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="368">
+            <div class="flex items-center gap-2 mb-4" data-sd-id="369">
+              <iconify-icon icon="lucide:palette" class="text-[#ff007f]"></iconify-icon>
+              <h3 class="text-sm font-semibold text-white/80 uppercase tracking-wider font-mono" data-sd-id="370">Design Systems</h3>
+            </div>
+            <div class="flex flex-wrap gap-2" data-sd-id="371">
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="372">Storybook</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="373">Chromatic</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="374">Figma</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="375">shadcn/ui</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="376">Radix UI</span>
+            </div>
+          </div>
+          
+          <!-- DevTools -->
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="377">
+            <div class="flex items-center gap-2 mb-4" data-sd-id="378">
+              <iconify-icon icon="lucide:wrench" class="text-[#83f36e]"></iconify-icon>
+              <h3 class="text-sm font-semibold text-white/80 uppercase tracking-wider font-mono" data-sd-id="379">DevTools</h3>
+            </div>
+            <div class="flex flex-wrap gap-2" data-sd-id="380">
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="381">Nx</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="382">Turborepo</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="383">GitHub Actions</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="384">Vite</span>
+            </div>
+          </div>
+          
+          <!-- Infrastructure -->
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="385">
+            <div class="flex items-center gap-2 mb-4" data-sd-id="386">
+              <iconify-icon icon="lucide:server" class="text-[#ffd700]"></iconify-icon>
+              <h3 class="text-sm font-semibold text-white/80 uppercase tracking-wider font-mono" data-sd-id="387">Infrastructure</h3>
+            </div>
+            <div class="flex flex-wrap gap-2" data-sd-id="388">
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="389">Node.js</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="390">Docker</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="391">Vercel</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="392">Supabase</span>
+            </div>
+          </div>
+          
+          <!-- Other -->
+          <div class="glass-panel rounded-2xl p-6" data-sd-id="393">
+            <div class="flex items-center gap-2 mb-4" data-sd-id="394">
+              <iconify-icon icon="lucide:sparkles" class="text-[#00f0ff]"></iconify-icon>
+              <h3 class="text-sm font-semibold text-white/80 uppercase tracking-wider font-mono" data-sd-id="395">Other</h3>
+            </div>
+            <div class="flex flex-wrap gap-2" data-sd-id="396">
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="397">Testing</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="398">Performance</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="399">Accessibility</span>
+              <span class="tech-badge px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 cursor-default" data-sd-id="400">DX</span>
+            </div>
+          </div>
+          
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- WHY WORK WITH ME -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="mb-24 lg:mb-32 scroll-reveal" data-sd-id="401">
+        <div class="flex items-center gap-3 mb-8" data-sd-id="402">
+          <div class="w-8 h-px bg-[#ffd700]/50" data-sd-id="403"></div>
+          <span class="font-mono text-xs uppercase tracking-widest text-[#ffd700]/70" data-sd-id="404">Why Me</span>
+        </div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4 max-w-3xl" data-sd-id="405">
+          Proven <span class="neon-text" data-sd-id="406">ROI</span>. Measurable results.
+        </h2>
+        <p class="text-lg text-white/50 max-w-2xl mb-12" data-sd-id="407">
+          I don't just write code. I architect systems, mentor teams, and document everything.
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-sd-id="408">
+          
+          <div class="glass-panel rounded-2xl p-8 flex flex-col gap-4 hover:bg-white/5 transition-colors" data-sd-id="409">
+            <div class="w-12 h-12 rounded-xl bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center" data-sd-id="410">
+              <iconify-icon icon="lucide:award" class="text-2xl text-[#ffd700]"></iconify-icon>
+            </div>
+            <div data-sd-id="411">
+              <h3 class="text-xl font-bold text-white mb-2" data-sd-id="412">10+ years shipping React at scale</h3>
+              <p class="text-sm text-white/60 leading-relaxed" data-sd-id="413">
+                200+ component libraries built. 500K+ users impacted. From 0→1 MVPs to enterprise platforms serving millions.
+              </p>
+            </div>
+          </div>
+          
+          <div class="glass-panel rounded-2xl p-8 flex flex-col gap-4 hover:bg-white/5 transition-colors" data-sd-id="414">
+            <div class="w-12 h-12 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center" data-sd-id="415">
+              <iconify-icon icon="lucide:brain" class="text-2xl text-[#00f0ff]"></iconify-icon>
+            </div>
+            <div data-sd-id="416">
+              <h3 class="text-xl font-bold text-white mb-2" data-sd-id="417">Systems thinker, not just coder</h3>
+              <p class="text-sm text-white/60 leading-relaxed" data-sd-id="418">
+                Architecture, developer experience, team dynamics matter equally. The hard problems live at the intersections.
+              </p>
+            </div>
+          </div>
+          
+          <div class="glass-panel rounded-2xl p-8 flex flex-col gap-4 hover:bg-white/5 transition-colors" data-sd-id="419">
+            <div class="w-12 h-12 rounded-xl bg-[#ff007f]/10 border border-[#ff007f]/20 flex items-center justify-center" data-sd-id="420">
+              <iconify-icon icon="lucide:hand-heart" class="text-2xl text-[#ff007f]"></iconify-icon>
+            </div>
+            <div data-sd-id="421">
+              <h3 class="text-xl font-bold text-white mb-2" data-sd-id="422">Hands-on technical leadership</h3>
+              <p class="text-sm text-white/60 leading-relaxed" data-sd-id="423">
+                I ship with you, mentor your team, document everything. No black-box consulting. Your team levels up alongside the work.
+              </p>
+            </div>
+          </div>
+          
+          <div class="glass-panel rounded-2xl p-8 flex flex-col gap-4 hover:bg-white/5 transition-colors" data-sd-id="424">
+            <div class="w-12 h-12 rounded-xl bg-[#83f36e]/10 border border-[#83f36e]/20 flex items-center justify-center" data-sd-id="425">
+              <iconify-icon icon="lucide:trending-up" class="text-2xl text-[#83f36e]"></iconify-icon>
+            </div>
+            <div data-sd-id="426">
+              <h3 class="text-xl font-bold text-white mb-2" data-sd-id="427">Proven ROI, every engagement</h3>
+              <p class="text-sm text-white/60 leading-relaxed" data-sd-id="428">
+                60% faster builds. 40% faster shipping. 3–5x performance gains. The metrics speak for themselves.
+              </p>
+            </div>
+          </div>
+          
+        </div>
+        
+        <!-- Testimonial Preview -->
+        <div class="glass-panel rounded-2xl p-8 md:p-10 mt-8 relative overflow-hidden" data-sd-id="429">
+          <div class="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-[#ffd700]/5 blur-3xl pointer-events-none" data-sd-id="430"></div>
+          <div class="relative flex flex-col md:flex-row items-start gap-6" data-sd-id="431">
+            <div class="w-14 h-14 rounded-full glass-panel border-2 border-[#ffd700]/30 flex items-center justify-center flex-shrink-0" data-sd-id="432">
+              <span class="text-lg font-bold text-[#ffd700]" data-sd-id="433">JM</span>
+            </div>
+            <div class="flex-1" data-sd-id="434">
+              <div class="flex items-center gap-1 mb-3" data-sd-id="435">
+                <iconify-icon icon="lucide:star" class="text-sm text-[#ffd700] fill-[#ffd700]"></iconify-icon>
+                <iconify-icon icon="lucide:star" class="text-sm text-[#ffd700] fill-[#ffd700]"></iconify-icon>
+                <iconify-icon icon="lucide:star" class="text-sm text-[#ffd700] fill-[#ffd700]"></iconify-icon>
+                <iconify-icon icon="lucide:star" class="text-sm text-[#ffd700] fill-[#ffd700]"></iconify-icon>
+                <iconify-icon icon="lucide:star" class="text-sm text-[#ffd700] fill-[#ffd700]"></iconify-icon>
+              </div>
+              <p class="text-lg md:text-xl text-white/80 leading-relaxed mb-4" data-sd-id="436">
+                "Rich architected our entire monorepo and design system from scratch. Transformed our engineering velocity — 15 teams now ship 3x faster. Highly recommend."
+              </p>
+              <div class="flex items-center gap-3" data-sd-id="437">
+                <div data-sd-id="438">
+                  <p class="text-sm font-medium text-white" data-sd-id="439">Jordan Martinez</p>
+                  <p class="text-xs text-white/40 font-mono" data-sd-id="440">Engineering Lead · Fortune 500 SaaS</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- CTA SECTION -->
+      <!-- ═══════════════════════════════════════ -->
+      <section class="scroll-reveal mb-12" data-sd-id="441">
+        <div class="glass-panel rounded-3xl p-8 md:p-12 lg:p-16 relative overflow-hidden" data-sd-id="442">
+          <!-- Decorative glows -->
+          <div class="absolute -top-40 -right-20 w-80 h-80 rounded-full bg-[#ffd700]/5 blur-3xl pointer-events-none" data-sd-id="443"></div>
+          <div class="absolute -bottom-40 -left-20 w-80 h-80 rounded-full bg-[#00f0ff]/5 blur-3xl pointer-events-none" data-sd-id="444"></div>
+          
+          <div class="relative max-w-3xl mx-auto text-center space-y-6" data-sd-id="445">
+            <div class="flex justify-center" data-sd-id="446">
+              <div class="glass-panel rounded-full px-4 py-1.5 border border-[#ffd700]/20 bg-[#ffd700]/5 flex items-center gap-2" data-sd-id="447">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#ffd700] animate-pulse" data-sd-id="448"></div>
+                <span class="font-mono text-[10px] uppercase tracking-widest text-[#ffd700]" data-sd-id="449">Available for select engagements</span>
+              </div>
+            </div>
+            
+            <h2 class="text-4xl md:text-6xl font-bold tracking-tighter text-white" data-sd-id="450">
+              Let's <span class="neon-text" data-sd-id="451">ship</span> something great
+            </h2>
+            
+            <p class="text-lg text-white/60 max-w-xl mx-auto leading-relaxed" data-sd-id="452">
+              Book a free 30-minute consultation. We'll discuss your goals, constraints, and whether we're a good fit. No pressure, no charge.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4" data-sd-id="453">
+              <a href="https://p.superdesign.dev/draft/c906d6dd-0318-4f57-9ecd-0bd1b1280b06" id="cta-book-consultation" aria-label="Book a 30-minute consultation" class="w-full sm:w-auto px-6 py-3 bg-[#ffd700] hover:bg-[#ffe54c] text-black font-semibold rounded-full flex items-center justify-center gap-2 transition-all duration-500 hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffd700]" data-sd-id="454">
+                <iconify-icon icon="lucide:calendar" aria-hidden="true"></iconify-icon>
+                Book a 30-minute consultation
+              </a>
+              <a href="https://p.superdesign.dev/draft/842ac3f0-3493-41fc-b33e-0b65dc7b1fac" id="cta-view-case-studies" aria-label="View case studies" class="w-full sm:w-auto px-6 py-3 glass-panel hover:bg-white/10 text-white font-medium rounded-full transition-all duration-500 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50" data-sd-id="455">
+                View work
+                <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon>
+              </a>
+              <a href="https://p.superdesign.dev/draft/842ac3f0-3493-41fc-b33e-0b65dc7b1fac" id="cta-view-case-studies" aria-label="View case studies" class="w-full sm:w-auto px-6 py-3 glass-panel hover:bg-white/10 text-white font-medium rounded-full transition-all duration-500 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50" data-sd-id="455">
+                <iconify-icon icon="lucide:calendar" aria-hidden="true"></iconify-icon>
+                Book a 30-minute consultation
+              </a>
+              <a href="https://p.superdesign.dev/draft/36b48549-7be9-418d-b0c1-af81de96c79f" id="cta-view-case-studies" aria-label="View case studies" class="w-full sm:w-auto px-6 py-3 glass-panel hover:bg-white/10 text-white font-medium rounded-full transition-all duration-500 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50" data-sd-id="455">
+                View case studies
+                <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon>
+              </a>
+            </div>
+            
+            <p class="text-xs text-white/30 font-mono pt-4" data-sd-id="456">No charge for initial discovery call · Let's see if we're a good fit</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer Ticker -->
+    <div class="pointer-events-auto" data-sd-id="457">
+      <!-- component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+<div v-scope="{ ...{&quot;showTicker&quot;:true}, $emit() {} }">
+<div v-if="showTicker" class="relative z-10 w-full overflow-hidden border-t border-white/5 bg-black/50 backdrop-blur-sm py-4 pointer-events-none"><style>@keyframes sd-ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } .sd-animate-ticker { animation: sd-ticker-scroll 30s linear infinite; }</style><div class="flex whitespace-nowrap sd-animate-ticker font-mono text-xs text-white/30 tracking-widest uppercase"><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div><div class="flex items-center gap-12 px-6"><span>Next.js</span> <span class="text-white/10">/</span> <span>TanStack Start</span> <span class="text-white/10">/</span> <span>React Native</span> <span class="text-white/10">/</span> <span>Expo</span> <span class="text-white/10">/</span> <span>Storybook 10+</span> <span class="text-white/10">/</span> <span>Chromatic</span> <span class="text-white/10">/</span> <span>Nx</span> <span class="text-white/10">/</span> <span>Turborepo</span> <span class="text-white/10">/</span> <span>Chakra UI</span> <span class="text-white/10">/</span> <span>shadcn/ui</span> <span class="text-white/10">/</span> <span>Tamagui</span> <span class="text-white/10">/</span> <span>Radix UI</span> <span class="text-white/10">/</span> <span>Figma MCP</span></div></div></div>
+</div>
+<!-- /component: HeroFooterTicker (57975466-4f82-4713-976e-ad1a119a4314) -->
+    </div>
+
+  </div>
+
+</body></html>
