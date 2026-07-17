@@ -1,4 +1,6 @@
 {
   "projectId": "rich-tillman-portfolio",
-  "projectToken": "chpt_d6aa683fa389d21"
+  "projectToken": "chpt_d6aa683fa389d21",
+  "onlyChanged": true,
+  "zip": true
 }
