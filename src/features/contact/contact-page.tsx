@@ -16,15 +16,15 @@ const PROJECT_TYPES = [
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-function isValidEmail(email: string): boolean {
+export function isValidEmail(email: string): boolean {
   return emailPattern.test(email.trim())
 }
 
-function isNonEmpty(value: string): boolean {
+export function isNonEmpty(value: string): boolean {
   return value.trim().length > 0
 }
 
-function validateField(fieldName: string, value: string): Record<string, string> {
+export function validateField(fieldName: string, value: string): Record<string, string> {
   const errors: Record<string, string> = {}
 
   if (fieldName === "name" && !isNonEmpty(value)) {
@@ -45,21 +45,11 @@ function validateField(fieldName: string, value: string): Record<string, string>
 }
 
 function getFieldErrors(formData: Record<string, string>): Record<string, string> {
-  const errors: Record<string, string> = {}
-
-  if (!isNonEmpty(formData.name)) {
-    errors.name = "Name is required"
+  return {
+    ...validateField("name", formData.name),
+    ...validateField("email", formData.email),
+    ...validateField("message", formData.message),
   }
-  if (!isNonEmpty(formData.email)) {
-    errors.email = "Email is required"
-  } else if (!isValidEmail(formData.email)) {
-    errors.email = "Enter a valid email"
-  }
-  if (!isNonEmpty(formData.message)) {
-    errors.message = "Message is required"
-  }
-
-  return errors
 }
 
 export function ContactPage() {
@@ -67,17 +57,23 @@ export function ContactPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [touched, setTouched] = useState<Record<string, boolean>>({})
 
   const handleFieldBlur = useCallback((fieldName: string, value: string) => {
-    setTouched((prev) => ({ ...prev, [fieldName]: true }))
     const newErrors = validateField(fieldName, value)
-    setErrors((prev) => ({ ...prev, ...newErrors }))
+    setErrors((prev) => {
+      const updated = { ...prev }
+      if (newErrors[fieldName]) {
+        updated[fieldName] = newErrors[fieldName]
+      } else {
+        delete updated[fieldName]
+      }
+      return updated
+    })
   }, [])
 
   const handleFieldChange = useCallback(
     (fieldName: string, value: string) => {
-      if (touched[fieldName]) {
+      if (errors[fieldName]) {
         const newErrors = validateField(fieldName, value)
         if (newErrors[fieldName]) {
           setErrors((prev) => ({ ...prev, [fieldName]: newErrors[fieldName] }))
@@ -90,7 +86,7 @@ export function ContactPage() {
         }
       }
     },
-    [touched],
+    [errors],
   )
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -125,7 +121,6 @@ export function ContactPage() {
       setSubmitted(true)
       event.currentTarget.reset()
       setErrors({})
-      setTouched({})
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to submit")
     } finally {

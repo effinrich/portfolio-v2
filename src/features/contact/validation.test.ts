@@ -1,34 +1,5 @@
 import { describe, it, expect } from "vitest"
-
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-function isValidEmail(email: string): boolean {
-  return emailPattern.test(email.trim())
-}
-
-function isNonEmpty(value: string): boolean {
-  return value.trim().length > 0
-}
-
-function validateField(fieldName: string, value: string): Record<string, string> {
-  const errors: Record<string, string> = {}
-
-  if (fieldName === "name" && !isNonEmpty(value)) {
-    errors.name = "Name is required"
-  }
-  if (fieldName === "email") {
-    if (!isNonEmpty(value)) {
-      errors.email = "Email is required"
-    } else if (!isValidEmail(value)) {
-      errors.email = "Enter a valid email"
-    }
-  }
-  if (fieldName === "message" && !isNonEmpty(value)) {
-    errors.message = "Message is required"
-  }
-
-  return errors
-}
+import { isValidEmail, isNonEmpty, validateField } from "./contact-page"
 
 describe("contact form validation", () => {
   describe("isValidEmail", () => {
@@ -137,6 +108,77 @@ describe("contact form validation", () => {
         const errors = validateField("message", "This is a message")
         expect(errors.message).toBeUndefined()
       })
+    })
+  })
+})
+
+describe("ContactPage form submission prevention", () => {
+  describe("submission prevention with invalid data", () => {
+    it("prevents submission when name is empty by detecting validation error", () => {
+      const formData = {
+        name: "",
+        email: "test@example.com",
+        message: "This is a message",
+      }
+
+      const nameErrors = validateField("name", formData.name)
+      const emailErrors = validateField("email", formData.email)
+      const messageErrors = validateField("message", formData.message)
+
+      const allErrors = { ...nameErrors, ...emailErrors, ...messageErrors }
+
+      expect(allErrors.name).toBe("Name is required")
+      expect(Object.keys(allErrors).length).toBeGreaterThan(0)
+    })
+
+    it("prevents submission when email is invalid by detecting validation error", () => {
+      const formData = {
+        name: "John Doe",
+        email: "invalid-email",
+        message: "This is a message",
+      }
+
+      const nameErrors = validateField("name", formData.name)
+      const emailErrors = validateField("email", formData.email)
+      const messageErrors = validateField("message", formData.message)
+
+      const allErrors = { ...nameErrors, ...emailErrors, ...messageErrors }
+
+      expect(allErrors.email).toBe("Enter a valid email")
+      expect(Object.keys(allErrors).length).toBeGreaterThan(0)
+    })
+
+    it("prevents submission when message is empty by detecting validation error", () => {
+      const formData = {
+        name: "John Doe",
+        email: "test@example.com",
+        message: "",
+      }
+
+      const nameErrors = validateField("name", formData.name)
+      const emailErrors = validateField("email", formData.email)
+      const messageErrors = validateField("message", formData.message)
+
+      const allErrors = { ...nameErrors, ...emailErrors, ...messageErrors }
+
+      expect(allErrors.message).toBe("Message is required")
+      expect(Object.keys(allErrors).length).toBeGreaterThan(0)
+    })
+
+    it("allows submission when all fields are valid", () => {
+      const formData = {
+        name: "John Doe",
+        email: "test@example.com",
+        message: "This is a test message",
+      }
+
+      const nameErrors = validateField("name", formData.name)
+      const emailErrors = validateField("email", formData.email)
+      const messageErrors = validateField("message", formData.message)
+
+      const allErrors = { ...nameErrors, ...emailErrors, ...messageErrors }
+
+      expect(Object.keys(allErrors).length).toBe(0)
     })
   })
 })
