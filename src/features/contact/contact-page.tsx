@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { CheckCircle, Mail, MapPin } from "lucide-react"
 import { PortfolioLayout } from "#/features/layout/portfolio-layout"
 import { GlassPanel } from "#/features/ui/glass-panel"
@@ -14,10 +14,84 @@ const PROJECT_TYPES = [
   "Other",
 ]
 
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function isValidEmail(email: string): boolean {
+  return emailPattern.test(email.trim())
+}
+
+function isNonEmpty(value: string): boolean {
+  return value.trim().length > 0
+}
+
+function validateField(fieldName: string, value: string): Record<string, string> {
+  const errors: Record<string, string> = {}
+
+  if (fieldName === "name" && !isNonEmpty(value)) {
+    errors.name = "Name is required"
+  }
+  if (fieldName === "email") {
+    if (!isNonEmpty(value)) {
+      errors.email = "Email is required"
+    } else if (!isValidEmail(value)) {
+      errors.email = "Enter a valid email"
+    }
+  }
+  if (fieldName === "message" && !isNonEmpty(value)) {
+    errors.message = "Message is required"
+  }
+
+  return errors
+}
+
+function getFieldErrors(formData: Record<string, string>): Record<string, string> {
+  const errors: Record<string, string> = {}
+
+  if (!isNonEmpty(formData.name)) {
+    errors.name = "Name is required"
+  }
+  if (!isNonEmpty(formData.email)) {
+    errors.email = "Email is required"
+  } else if (!isValidEmail(formData.email)) {
+    errors.email = "Enter a valid email"
+  }
+  if (!isNonEmpty(formData.message)) {
+    errors.message = "Message is required"
+  }
+
+  return errors
+}
+
 export function ContactPage() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
+
+  const handleFieldBlur = useCallback((fieldName: string, value: string) => {
+    setTouched((prev) => ({ ...prev, [fieldName]: true }))
+    const newErrors = validateField(fieldName, value)
+    setErrors((prev) => ({ ...prev, ...newErrors }))
+  }, [])
+
+  const handleFieldChange = useCallback(
+    (fieldName: string, value: string) => {
+      if (touched[fieldName]) {
+        const newErrors = validateField(fieldName, value)
+        if (newErrors[fieldName]) {
+          setErrors((prev) => ({ ...prev, [fieldName]: newErrors[fieldName] }))
+        } else {
+          setErrors((prev) => {
+            const updated = { ...prev }
+            delete updated[fieldName]
+            return updated
+          })
+        }
+      }
+    },
+    [touched],
+  )
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -25,16 +99,33 @@ export function ContactPage() {
     setError(null)
 
     const form = new FormData(event.currentTarget)
+    const formData = {
+      name: String(form.get("name") ?? ""),
+      email: String(form.get("email") ?? ""),
+      company: String(form.get("company") ?? "") || undefined,
+      projectType: String(form.get("projectType") ?? ""),
+      message: String(form.get("message") ?? ""),
+    }
+
+    const validationErrors = getFieldErrors(formData as Record<string, string>)
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      setLoading(false)
+      return
+    }
+
     try {
       await submitContactForm({
-        name: String(form.get("name") ?? ""),
-        email: String(form.get("email") ?? ""),
-        company: String(form.get("company") ?? "") || undefined,
-        projectType: String(form.get("projectType") ?? ""),
-        message: String(form.get("message") ?? ""),
+        name: formData.name,
+        email: formData.email,
+        company: formData.company,
+        projectType: formData.projectType,
+        message: formData.message,
       })
       setSubmitted(true)
       event.currentTarget.reset()
+      setErrors({})
+      setTouched({})
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to submit")
     } finally {
@@ -80,7 +171,10 @@ export function ContactPage() {
                   required
                   className="glass-input w-full rounded-xl px-4 py-3 text-white"
                   placeholder="Your name"
+                  onBlur={(e) => handleFieldBlur("name", e.currentTarget.value)}
+                  onChange={(e) => handleFieldChange("name", e.currentTarget.value)}
                 />
+                {errors.name ? <p className="mt-1 text-sm text-red-400">{errors.name}</p> : null}
               </div>
               <div>
                 <label
@@ -96,7 +190,10 @@ export function ContactPage() {
                   required
                   className="glass-input w-full rounded-xl px-4 py-3 text-white"
                   placeholder="you@company.com"
+                  onBlur={(e) => handleFieldBlur("email", e.currentTarget.value)}
+                  onChange={(e) => handleFieldChange("email", e.currentTarget.value)}
                 />
+                {errors.email ? <p className="mt-1 text-sm text-red-400">{errors.email}</p> : null}
               </div>
             </div>
 
@@ -150,7 +247,12 @@ export function ContactPage() {
                 rows={5}
                 className="glass-input w-full resize-none rounded-xl px-4 py-3 text-white"
                 placeholder="Tell me about your project..."
+                onBlur={(e) => handleFieldBlur("message", e.currentTarget.value)}
+                onChange={(e) => handleFieldChange("message", e.currentTarget.value)}
               />
+              {errors.message ? (
+                <p className="mt-1 text-sm text-red-400">{errors.message}</p>
+              ) : null}
             </div>
 
             {error ? <p className="text-sm text-red-400">{error}</p> : null}
