@@ -1,5 +1,31 @@
-import { describe, it, expect } from "vitest"
-import { isValidEmail, isNonEmpty, validateField } from "./contact-page"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
+import { render, screen, fireEvent, cleanup } from "@testing-library/react"
+import React from "react"
+import { isValidEmail, isNonEmpty, validateField, ContactPage } from "./contact-page"
+
+// Use vi.hoisted to define mocks before they're referenced
+const { mockSubmitContactForm } = vi.hoisted(() => ({
+  mockSubmitContactForm: vi.fn(),
+}))
+
+// Mock dependencies before importing ContactPage
+vi.mock("#/features/layout/portfolio-layout", () => ({
+  PortfolioLayout: ({ children }: { children: React.ReactNode }) =>
+    React.createElement("div", null, children),
+}))
+
+vi.mock("#/features/ui/glass-panel", () => ({
+  GlassPanel: ({ children }: { children: React.ReactNode }) =>
+    React.createElement("div", null, children),
+}))
+
+vi.mock("#/features/ui/section-header", () => ({
+  SectionHeader: () => React.createElement("div"),
+}))
+
+vi.mock("#/features/content/queries", () => ({
+  submitContactForm: mockSubmitContactForm,
+}))
 
 describe("contact form validation", () => {
   describe("isValidEmail", () => {
@@ -112,73 +138,73 @@ describe("contact form validation", () => {
   })
 })
 
-describe("ContactPage form submission prevention", () => {
-  describe("submission prevention with invalid data", () => {
-    it("prevents submission when name is empty by detecting validation error", () => {
-      const formData = {
-        name: "",
-        email: "test@example.com",
-        message: "This is a message",
-      }
+describe("ContactPage form submission", () => {
+  beforeEach(() => {
+    mockSubmitContactForm.mockClear()
+    mockSubmitContactForm.mockResolvedValue(undefined)
+  })
 
-      const nameErrors = validateField("name", formData.name)
-      const emailErrors = validateField("email", formData.email)
-      const messageErrors = validateField("message", formData.message)
+  afterEach(() => {
+    cleanup()
+  })
 
-      const allErrors = { ...nameErrors, ...emailErrors, ...messageErrors }
+  it("prevents form submission when name is empty", () => {
+    render(React.createElement(ContactPage))
 
-      expect(allErrors.name).toBe("Name is required")
-      expect(Object.keys(allErrors).length).toBeGreaterThan(0)
-    })
+    const emailInput = screen.getByPlaceholderText("you@company.com")
+    const messageTextarea = screen.getByPlaceholderText("Tell me about your project...")
+    const submitButton = screen.getByRole("button", { name: /send message/i })
 
-    it("prevents submission when email is invalid by detecting validation error", () => {
-      const formData = {
-        name: "John Doe",
-        email: "invalid-email",
-        message: "This is a message",
-      }
+    fireEvent.change(emailInput, { target: { value: "test@example.com" } })
+    fireEvent.change(messageTextarea, { target: { value: "Test message" } })
+    fireEvent.click(submitButton)
 
-      const nameErrors = validateField("name", formData.name)
-      const emailErrors = validateField("email", formData.email)
-      const messageErrors = validateField("message", formData.message)
+    expect(mockSubmitContactForm).not.toHaveBeenCalled()
+  })
 
-      const allErrors = { ...nameErrors, ...emailErrors, ...messageErrors }
+  it("prevents form submission when email is invalid", () => {
+    render(React.createElement(ContactPage))
 
-      expect(allErrors.email).toBe("Enter a valid email")
-      expect(Object.keys(allErrors).length).toBeGreaterThan(0)
-    })
+    const nameInput = screen.getByPlaceholderText("Your name")
+    const emailInput = screen.getByPlaceholderText("you@company.com")
+    const messageTextarea = screen.getByPlaceholderText("Tell me about your project...")
+    const submitButton = screen.getByRole("button", { name: /send message/i })
 
-    it("prevents submission when message is empty by detecting validation error", () => {
-      const formData = {
-        name: "John Doe",
-        email: "test@example.com",
-        message: "",
-      }
+    fireEvent.change(nameInput, { target: { value: "John Doe" } })
+    fireEvent.change(emailInput, { target: { value: "invalid-email" } })
+    fireEvent.change(messageTextarea, { target: { value: "Test message" } })
+    fireEvent.click(submitButton)
 
-      const nameErrors = validateField("name", formData.name)
-      const emailErrors = validateField("email", formData.email)
-      const messageErrors = validateField("message", formData.message)
+    expect(mockSubmitContactForm).not.toHaveBeenCalled()
+  })
 
-      const allErrors = { ...nameErrors, ...emailErrors, ...messageErrors }
+  it("prevents form submission when message is empty", () => {
+    render(React.createElement(ContactPage))
 
-      expect(allErrors.message).toBe("Message is required")
-      expect(Object.keys(allErrors).length).toBeGreaterThan(0)
-    })
+    const nameInput = screen.getByPlaceholderText("Your name")
+    const emailInput = screen.getByPlaceholderText("you@company.com")
+    const submitButton = screen.getByRole("button", { name: /send message/i })
 
-    it("allows submission when all fields are valid", () => {
-      const formData = {
-        name: "John Doe",
-        email: "test@example.com",
-        message: "This is a test message",
-      }
+    fireEvent.change(nameInput, { target: { value: "John Doe" } })
+    fireEvent.change(emailInput, { target: { value: "test@example.com" } })
+    fireEvent.click(submitButton)
 
-      const nameErrors = validateField("name", formData.name)
-      const emailErrors = validateField("email", formData.email)
-      const messageErrors = validateField("message", formData.message)
+    expect(mockSubmitContactForm).not.toHaveBeenCalled()
+  })
 
-      const allErrors = { ...nameErrors, ...emailErrors, ...messageErrors }
+  it("allows form submission when all fields are valid", () => {
+    render(React.createElement(ContactPage))
 
-      expect(Object.keys(allErrors).length).toBe(0)
-    })
+    const nameInput = screen.getByPlaceholderText("Your name")
+    const emailInput = screen.getByPlaceholderText("you@company.com")
+    const messageTextarea = screen.getByPlaceholderText("Tell me about your project...")
+    const submitButton = screen.getByRole("button", { name: /send message/i })
+
+    fireEvent.change(nameInput, { target: { value: "John Doe" } })
+    fireEvent.change(emailInput, { target: { value: "test@example.com" } })
+    fireEvent.change(messageTextarea, { target: { value: "Test message" } })
+    fireEvent.click(submitButton)
+
+    expect(mockSubmitContactForm).toHaveBeenCalled()
   })
 })
