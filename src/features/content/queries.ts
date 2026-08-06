@@ -23,6 +23,7 @@ export async function getProjects() {
     tags: row.tags,
     metric: row.metric ?? undefined,
     href: row.href,
+    image: row.image ?? undefined,
     featured: row.featured,
   }))
 }
