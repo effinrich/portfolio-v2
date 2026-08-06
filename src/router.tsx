@@ -19,8 +19,10 @@ function installViewTransitionRejectionGuard() {
     const reason = event.reason
     if (
       reason instanceof DOMException &&
-      reason.name === "InvalidStateError" &&
-      reason.message.includes("Transition was aborted")
+      (reason.name === "InvalidStateError" || reason.name === "AbortError") &&
+      /Transition was aborted|Old view transition aborted by new view transition|Transition was skipped/.test(
+        reason.message,
+      )
     ) {
       event.preventDefault()
     }
