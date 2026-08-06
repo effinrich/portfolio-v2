@@ -26,7 +26,7 @@ jobs:
         with:
           # Required by Chromatic so it can compare against the full git history
           # (baseline detection / TurboSnap). Don't lower this.
-          fetch-depth: 0
+          fetch-depth: 0h
       - name: Set up Bun
         uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2
       - name: Install dependencies

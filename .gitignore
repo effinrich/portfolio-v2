@@ -21,3 +21,5 @@ coverage
 .omc/
 .qodo/
 ContextPool/
+.defract-worktrees
+.defract/

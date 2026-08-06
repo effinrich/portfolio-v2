@@ -5,6 +5,7 @@ export type Project = {
   tags: string[]
   metric?: string
   href: string
+  image?: string
   featured: boolean
 }
 
@@ -41,6 +42,8 @@ export type CaseStudy = {
   tags: string[]
   summary: string
   metrics: { label: string; value: string }[]
+  image?: string
+  liveHref?: string
 }
 
 export type FaqItem = {
@@ -68,20 +71,22 @@ export const PROJECTS: Project[] = [
     slug: "tokencast",
     title: "TokenCast",
     description:
-      "Design token pipeline broadcasting Figma variables to code — keeping design systems in sync across web and mobile platforms.",
-    tags: ["Design Tokens", "Figma", "Storybook"],
-    metric: "200+ components",
-    href: "/work",
+      "Paste design tokens — Figma variables, CSS custom properties, or a Tailwind config — get a live preview and exportable theme code (Tailwind, Chakra, shadcn/ui), with server-rendered Save & Share links.",
+    tags: ["React Router", "Supabase", "Design Tokens"],
+    metric: "Lighthouse 100/99",
+    href: "https://tokencast.vercel.app",
+    image: "/images/projects/tokencast.png",
     featured: true,
   },
   {
     slug: "mcp-atlas",
     title: "MCP Atlas",
     description:
-      "A visual directory and discovery layer for Model Context Protocol servers — helping developers find, evaluate, and integrate MCP tools.",
-    tags: ["MCP", "React", "TypeScript"],
-    metric: "Open Source",
-    href: "/work",
+      "A curated, link-verified directory of real Model Context Protocol servers — official and community — searchable and filterable, built with Astro islands.",
+    tags: ["Astro", "MCP", "TypeScript"],
+    metric: "18 verified servers",
+    href: "https://mcp-atlas-orcin.vercel.app",
+    image: "/images/projects/mcp-atlas.png",
     featured: true,
   },
   {
@@ -90,8 +95,9 @@ export const PROJECTS: Project[] = [
     description:
       "Model Context Protocol server integrating Figma designs as structured context for AI coding assistants like Cursor and Claude Desktop.",
     tags: ["MCP", "Figma", "Design Systems"],
-    metric: "5,703+ npm installs",
+    metric: "5,703+ first-week installs",
     href: "/projects/forgekit-mcp",
+    image: "/images/projects/forgekit-mcp.png",
     featured: true,
   },
   {
@@ -249,40 +255,9 @@ export const ARTICLES: Article[] = [
   },
 ]
 
-export const TESTIMONIALS: Testimonial[] = [
-  {
-    id: "1",
-    quote:
-      "Rich transformed our frontend architecture from a collection of apps into a cohesive platform. His Nx monorepo work saved us months of refactoring.",
-    author: "Sarah Chen",
-    role: "VP of Engineering",
-    company: "Series B SaaS",
-  },
-  {
-    id: "2",
-    quote:
-      "ForgeKit MCP is a game-changer for design-to-code workflows. 5,700+ installs in months. Rich's focus on developer experience is evident in every API.",
-    author: "Marcus Webb",
-    role: "Staff Engineer",
-    company: "Design Tools Co",
-  },
-  {
-    id: "3",
-    quote:
-      "The design system Rich built scaled from 20 to 200+ components without breaking consumer apps. Storybook + Chromatic integration was flawless.",
-    author: "Elena Rodriguez",
-    role: "Design Systems Lead",
-    company: "Enterprise Platform",
-  },
-  {
-    id: "4",
-    quote:
-      "Rich doesn't just write code — he architects systems that teams can actually maintain. His documentation and onboarding materials are exceptional.",
-    author: "James Park",
-    role: "Engineering Director",
-    company: "FinTech Startup",
-  },
-]
+// Real testimonials pending: Matt, Adam, Clayton, Kurt, Anthony — add with their
+// actual quotes when supplied. Do not fabricate quotes for real named people.
+export const TESTIMONIALS: Testimonial[] = []
 
 export const SERVICES: Service[] = [
   {
@@ -332,16 +307,17 @@ export const SERVICES: Service[] = [
 export const CASE_STUDIES: CaseStudy[] = [
   {
     slug: "nx-monorepo",
-    title: "Nx Monorepo Architecture",
-    subtitle: "Scaling from 3 apps to 40+ packages",
-    tags: ["Nx", "Monorepo", "CI/CD"],
+    title: "Redesign Health Platform Portal",
+    subtitle: "Staff Frontend Engineer → Tech Lead, ~1y11mo",
+    tags: ["Nx", "Monorepo", "React 19", "Chakra UI v3"],
     summary:
-      "Architected an enterprise Nx monorepo serving 12 product teams with shared design system, auth, and data layers.",
+      "Led frontend strategy for an Nx monorepo running the Platform Portal, a mock API server, and a shared design system — mentoring engineers across 15+ person cross-functional teams.",
     metrics: [
-      { label: "Packages", value: "40+" },
-      { label: "Build time reduction", value: "65%" },
-      { label: "Teams onboarded", value: "12" },
+      { label: "Nx projects", value: "38" },
+      { label: "Cross-functional team", value: "15+" },
+      { label: "Files migrated to Chakra v3", value: "180+" },
     ],
+    image: "/images/case-studies/nx-monorepo.png",
   },
   {
     slug: "forgekit-mcp",
@@ -349,12 +325,44 @@ export const CASE_STUDIES: CaseStudy[] = [
     subtitle: "Design-to-code via Model Context Protocol",
     tags: ["MCP", "Figma", "AI"],
     summary:
-      "Built an MCP server exposing Figma designs as structured context for AI coding assistants, reaching 5,700+ npm installs.",
+      "Built an MCP server exposing Figma designs as structured context for AI coding assistants, reaching 5,703+ installs in its first week.",
     metrics: [
-      { label: "npm installs", value: "5,703+" },
+      { label: "First-week installs", value: "5,703+" },
       { label: "Components mapped", value: "200+" },
       { label: "IDE integrations", value: "4" },
     ],
+    image: "/images/projects/forgekit-mcp.png",
+    liveHref: "https://forgekit.cloud",
+  },
+  {
+    slug: "tokencast",
+    title: "TokenCast",
+    subtitle: "Design tokens in, live theme preview and export out",
+    tags: ["React Router", "Supabase", "Security"],
+    summary:
+      "A design-token pipeline built on React Router in framework mode (SSR, loaders, actions) — paste Figma variables or a Tailwind config, get a live preview, export to Tailwind/Chakra/shadcn, and save a server-rendered shareable link.",
+    metrics: [
+      { label: "Lighthouse accessibility", value: "100" },
+      { label: "Lighthouse performance", value: "99" },
+      { label: "Export targets", value: "3" },
+    ],
+    image: "/images/projects/tokencast.png",
+    liveHref: "https://tokencast.vercel.app",
+  },
+  {
+    slug: "mcp-atlas",
+    title: "MCP Atlas",
+    subtitle: "A verified directory for the MCP ecosystem",
+    tags: ["Astro", "MCP", "Islands Architecture"],
+    summary:
+      "Every MCP server directory listing gets sourced and link-checked before it ships — official and community servers, searchable and filterable, built on Astro's islands architecture to ship JS only where the page needs it.",
+    metrics: [
+      { label: "Verified servers", value: "18" },
+      { label: "Lighthouse accessibility", value: "100" },
+      { label: "Lighthouse performance", value: "97" },
+    ],
+    image: "/images/projects/mcp-atlas.png",
+    liveHref: "https://mcp-atlas-orcin.vercel.app",
   },
   {
     slug: "design-system-scale",
