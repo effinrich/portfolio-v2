@@ -45,25 +45,32 @@ export function TestimonialsPage({ testimonials }: TestimonialsPageProps) {
           ))}
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2">
-          {testimonials.map((testimonial, index) => (
-            <GlassPanel
-              key={testimonial.id}
-              className={`rounded-2xl p-8 stagger-${Math.min(index + 1, 6)}`}
-            >
-              <Quote className="mb-4 h-8 w-8 text-gold/40" />
-              <blockquote className="mb-6 text-lg leading-relaxed text-white/80">
-                &ldquo;{testimonial.quote}&rdquo;
-              </blockquote>
-              <div>
-                <p className="font-bold text-white">{testimonial.author}</p>
-                <p className="text-sm text-white/40">
-                  {testimonial.role} · {testimonial.company}
-                </p>
-              </div>
-            </GlassPanel>
-          ))}
-        </div>
+        {testimonials.length > 0 ? (
+          <div className="grid gap-8 md:grid-cols-2">
+            {testimonials.map((testimonial, index) => (
+              <GlassPanel
+                key={testimonial.id}
+                className={`rounded-2xl p-8 stagger-${Math.min(index + 1, 6)}`}
+              >
+                <Quote className="mb-4 h-8 w-8 text-gold/40" />
+                <blockquote className="mb-6 text-lg leading-relaxed text-white/80">
+                  &ldquo;{testimonial.quote}&rdquo;
+                </blockquote>
+                <div>
+                  <p className="font-bold text-white">{testimonial.author}</p>
+                  <p className="text-sm text-white/40">
+                    {testimonial.role} · {testimonial.company}
+                  </p>
+                </div>
+              </GlassPanel>
+            ))}
+          </div>
+        ) : (
+          <GlassPanel className="rounded-2xl p-12 text-center">
+            <Quote className="mx-auto mb-4 h-8 w-8 text-white/20" />
+            <p className="text-white/50">Quotes from recent collaborators are on the way.</p>
+          </GlassPanel>
+        )}
       </main>
     </PortfolioLayout>
   )

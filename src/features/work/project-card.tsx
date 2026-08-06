@@ -1,20 +1,48 @@
 import { Link } from "@tanstack/react-router"
-import { Box } from "lucide-react"
+import { BarChart3, Box, FileText } from "lucide-react"
 import type { Project } from "#/features/content/seed-data"
 
 type ProjectCardProps = {
   project: Project
 }
 
+type CardKind = "project" | "case-study" | "article"
+
+const KIND_META: Record<CardKind, { label: string; Icon: typeof Box }> = {
+  project: { label: "Project", Icon: Box },
+  "case-study": { label: "Case Study", Icon: BarChart3 },
+  article: { label: "Article", Icon: FileText },
+}
+
+function kindFor(href: string): CardKind {
+  if (href.startsWith("/case-studies/")) return "case-study"
+  if (href.startsWith("/insights/")) return "article"
+  return "project"
+}
+
 export function ProjectCard({ project }: ProjectCardProps) {
+  const kind = kindFor(project.href)
+  const { label, Icon } = KIND_META[kind]
   const className =
     "project-card group glass-panel block overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-[1.02] hover:border-gold/40 hover:shadow-[0_0_20px_rgba(255,215,0,0.1)]"
 
   const cardContent = (
     <>
-      <div className="relative flex h-48 items-center justify-center bg-gradient-to-br from-white/5 to-transparent">
-        <Box className="project-icon h-12 w-12 text-white/30 transition-all duration-500 group-hover:scale-110 group-hover:text-gold" />
+      <div className="relative flex h-48 items-center justify-center overflow-hidden bg-gradient-to-br from-white/5 to-transparent">
+        {project.image ? (
+          <img
+            src={project.image}
+            alt={`${project.title} screenshot`}
+            className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
+        ) : (
+          <Icon className="project-icon h-12 w-12 text-white/30 transition-all duration-500 group-hover:scale-110 group-hover:text-gold" />
+        )}
         <div className="project-img-overlay absolute inset-0 bg-gold/10 opacity-0 transition-opacity duration-500" />
+        <span className="absolute top-4 right-4 rounded-full border border-white/10 bg-black/40 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-white/50 backdrop-blur">
+          {label}
+        </span>
       </div>
       <div className="p-6">
         {project.metric ? (

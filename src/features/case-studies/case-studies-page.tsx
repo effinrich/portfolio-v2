@@ -28,6 +28,16 @@ export function CaseStudiesPage() {
               className={`grid gap-8 rounded-3xl p-8 md:grid-cols-3 md:p-10 stagger-${index + 1}`}
             >
               <div className="md:col-span-2">
+                {study.image ? (
+                  <div className="mb-6 overflow-hidden rounded-xl border border-white/10">
+                    <img
+                      src={study.image}
+                      alt={`${study.title} screenshot`}
+                      className="h-48 w-full object-cover object-top"
+                      loading="lazy"
+                    />
+                  </div>
+                ) : null}
                 <div className="mb-4 flex flex-wrap gap-2">
                   {study.tags.map((tag) => (
                     <span
