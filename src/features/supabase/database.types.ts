@@ -12,6 +12,7 @@ export type Database = {
           tags: string[]
           metric: string | null
           href: string
+          image: string | null
           featured: boolean
           created_at: string
         }
@@ -23,6 +24,7 @@ export type Database = {
           tags?: string[]
           metric?: string | null
           href: string
+          image?: string | null
           featured?: boolean
           created_at?: string
         }
@@ -34,6 +36,7 @@ export type Database = {
           tags?: string[]
           metric?: string | null
           href?: string
+          image?: string | null
           featured?: boolean
           created_at?: string
         }
