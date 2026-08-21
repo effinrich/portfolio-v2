@@ -37,6 +37,8 @@ export function CanvasBackground({ className }: CanvasBackgroundProps) {
 
   useEffect(() => {
     let cancelled = false
+    let frame = 0
+    let timeoutId: number | undefined
 
     async function init() {
       try {
@@ -48,14 +50,24 @@ export function CanvasBackground({ className }: CanvasBackgroundProps) {
         `
         document.head.appendChild(script)
 
-        await new Promise<void>((resolve) => {
+        await new Promise<void>((resolve, reject) => {
+          timeoutId = window.setTimeout(() => {
+            window.cancelAnimationFrame(frame)
+            reject(new Error("threejs-components CDN load timed out"))
+          }, 5000)
+
           const check = () => {
             if ((window as Window & { tubesCursor?: unknown }).tubesCursor) {
+              window.clearTimeout(timeoutId)
               resolve()
+            } else if (cancelled) {
+              window.clearTimeout(timeoutId)
+              reject(new Error("Canvas unmounted"))
             } else {
-              requestAnimationFrame(check)
+              frame = requestAnimationFrame(check)
             }
           }
+
           check()
         })
 
@@ -94,6 +106,8 @@ export function CanvasBackground({ className }: CanvasBackgroundProps) {
     void init()
     return () => {
       cancelled = true
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId)
+      window.cancelAnimationFrame(frame)
     }
   }, [])
 

@@ -51,7 +51,7 @@ export function SiteFooter() {
               <Mail className="h-4 w-4" />
             </a>
             <a
-              href="https://github.com/richtillman"
+              href="https://github.com/effinrich"
               target="_blank"
               rel="noopener noreferrer"
               className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 text-white/50 transition-colors hover:border-gold/30 hover:text-gold"

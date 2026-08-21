@@ -36,3 +36,7 @@ jobs:
         with:
           # ⚠️ Make sure to configure a `CHROMATIC_PROJECT_TOKEN` repository secret
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          # Block the PR check when visual changes are detected. Changes are
+          # reviewed/accepted in the Chromatic UI, then the baseline is updated
+          # by the main-branch workflow on merge.
+          exitZeroOnChanges: false

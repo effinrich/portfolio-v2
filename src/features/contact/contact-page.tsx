@@ -3,7 +3,7 @@ import { CheckCircle, Mail, MapPin } from "lucide-react"
 import { PortfolioLayout } from "#/features/layout/portfolio-layout"
 import { GlassPanel } from "#/features/ui/glass-panel"
 import { SectionHeader } from "#/features/ui/section-header"
-import { submitContactForm } from "#/features/content/queries"
+import { submitContactForm as submitContactFormDefault } from "#/features/content/queries"
 
 const PROJECT_TYPES = [
   "Design System",
@@ -52,7 +52,11 @@ function getFieldErrors(formData: Record<string, string>): Record<string, string
   }
 }
 
-export function ContactPage() {
+export function ContactPage({
+  submitContactForm = submitContactFormDefault,
+}: {
+  submitContactForm?: typeof submitContactFormDefault
+} = {}) {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
