@@ -1,19 +1,18 @@
 name: "Chromatic"
 
-# Run on PRs only, and only when files that can actually affect visual output
-# have changed. `ready_for_review` is listed so flipping a draft to ready
-# triggers a fresh run; the job-level `if:` keeps it off draft PRs entirely
-# (paths alone don't gate on draft state).
+# Runs on every non-draft PR. There is deliberately NO `paths:` filter here:
+# this is a *required* status check, and a workflow skipped by path filtering
+# never creates a check run — leaving "Expected" forever and blocking the
+# merge with no way to satisfy it. Always running is fine: TurboSnap keeps
+# builds fast, and the main-branch workflow keeps the baseline current so
+# diffs stay small.
+#
+# On draft PRs the job's `if:` skips it, which reports a "Skipped" check —
+# that DOES satisfy a required check. Marking the PR ready for review
+# re-triggers the workflow (`ready_for_review` event) and the real run happens.
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - "src/**"
-      - ".storybook/**"
-      - "chromatic.config.json"
-      - "package.json"
-      - "bun.lock"
-      - ".github/workflows/chromatic.yml"
 
 jobs:
   chromatic:
