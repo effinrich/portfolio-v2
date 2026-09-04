@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b0b0b"/>
+      <stop offset="1" stop-color="#161616"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.85" cy="0.85" r="0.7">
+      <stop offset="0" stop-color="#ffd700" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#ffd700" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M80 0H0V80" fill="none" stroke="#ffffff" stroke-opacity="0.04" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="800" fill="url(#bg)"/>
+  <rect width="1280" height="800" fill="url(#grid)"/>
+  <rect width="1280" height="800" fill="url(#glow)"/>
+  <path d="M-60 -60 L1340 700" stroke="#ffd700" stroke-opacity="0.10" stroke-width="2"/>
+
+  <g>
+    <rect x="140" y="110" width="1000" height="580" rx="20" fill="#121212" fill-opacity="0.92" stroke="#ffffff" stroke-opacity="0.10"/>
+    <rect x="140" y="110" width="1000" height="52" rx="20" fill="#ffffff" fill-opacity="0.03"/>
+    <rect x="140" y="146" width="1000" height="16" fill="#ffffff" fill-opacity="0.03"/>
+    <circle cx="176" cy="136" r="6" fill="#ff5f57"/>
+    <circle cx="200" cy="136" r="6" fill="#febc2e"/>
+    <circle cx="224" cy="136" r="6" fill="#28c840"/>
+    <rect x="260" y="124" width="420" height="24" rx="12" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.06"/>
+
+    <text x="180" y="268" font-family="Helvetica, Arial, sans-serif" font-size="64" font-weight="700" fill="#ffffff">Nx Monorepo Scale</text>
+    <text x="182" y="306" font-family="Menlo, Monaco, monospace" font-size="16" letter-spacing="4" fill="#ffd700">3 APPS → 40+ PACKAGES · 12 TEAMS · 65% FASTER CI</text>
+
+    <g transform="translate(180, 350)">
+      <g stroke="#ffd700" stroke-opacity="0.4" stroke-width="2">
+        <line x1="160" y1="30" x2="300" y2="30"/>
+        <line x1="300" y1="30" x2="300" y2="140"/>
+        <line x1="160" y1="30" x2="160" y2="140"/>
+        <line x1="300" y1="30" x2="460" y2="30"/>
+        <line x1="460" y1="30" x2="460" y2="140"/>
+      </g>
+      <rect x="0" y="0" width="160" height="60" rx="10" fill="#ffd700" fill-opacity="0.12" stroke="#ffd700" stroke-opacity="0.55"/>
+      <text x="80" y="36" font-family="Menlo, Monaco, monospace" font-size="16" fill="#ffd700" text-anchor="middle">apps/</text>
+      <rect x="220" y="0" width="160" height="60" rx="10" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.2"/>
+      <text x="300" y="36" font-family="Menlo, Monaco, monospace" font-size="16" fill="#ffffff" fill-opacity="0.8" text-anchor="middle">libs/</text>
+      <rect x="380" y="0" width="160" height="60" rx="10" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.2"/>
+      <text x="460" y="36" font-family="Menlo, Monaco, monospace" font-size="16" fill="#ffffff" fill-opacity="0.8" text-anchor="middle">tools/</text>
+      <g font-family="Menlo, Monaco, monospace" font-size="13" fill="#ffffff" fill-opacity="0.55">
+        <text x="52" y="170">design-system</text>
+        <text x="52" y="194">auth</text>
+        <text x="52" y="218">data-layer</text>
+        <rect x="0" y="158" width="8" height="8" rx="2" fill="#ffd700" fill-opacity="0.6"/>
+        <rect x="0" y="182" width="8" height="8" rx="2" fill="#ffd700" fill-opacity="0.6"/>
+        <rect x="0" y="206" width="8" height="8" rx="2" fill="#ffd700" fill-opacity="0.6"/>
+      </g>
+    </g>
+
+    <g transform="translate(760, 360)">
+      <rect x="0" y="0" width="300" height="120" rx="14" fill="#ffd700" fill-opacity="0.07" stroke="#ffd700" stroke-opacity="0.3"/>
+      <text x="24" y="40" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="700" fill="#ffd700">65%</text>
+      <text x="24" y="64" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#ffffff" fill-opacity="0.6">faster CI via Nx caching</text>
+      <rect x="24" y="84" width="200" height="10" rx="5" fill="#ffffff" fill-opacity="0.1"/>
+      <rect x="24" y="84" width="130" height="10" rx="5" fill="#ffd700" fill-opacity="0.8"/>
+      <rect x="0" y="150" width="300" height="120" rx="14" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.15"/>
+      <text x="24" y="190" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="700" fill="#ffffff">40+</text>
+      <text x="24" y="214" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#ffffff" fill-opacity="0.6">shared packages, one graph</text>
+      <rect x="24" y="234" width="200" height="10" rx="5" fill="#ffffff" fill-opacity="0.1"/>
+      <rect x="24" y="234" width="170" height="10" rx="5" fill="#ffffff" fill-opacity="0.45"/>
+    </g>
+
+    <text x="180" y="716" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#ffffff" fill-opacity="0.55">From 3 apps to 40+ packages across 12 product teams.</text>
+  </g>
+</svg>

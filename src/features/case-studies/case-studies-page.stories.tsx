@@ -24,5 +24,7 @@ export const Default: Story = {
     await expect(canvas.getAllByRole("link", { name: "Read case study" })).toHaveLength(
       CASE_STUDIES.length,
     )
+    // Every case study ships with artwork.
+    await expect(canvas.getAllByRole("img").length).toBe(CASE_STUDIES.length)
   },
 }

@@ -5,22 +5,22 @@ import { PortfolioLayout } from "#/features/layout/portfolio-layout"
 import { SectionHeader } from "#/features/ui/section-header"
 import { ProjectsGrid } from "#/features/work/projects-grid"
 
-type WorkPageProps = {
+type ProjectsPageProps = {
   projects: Project[]
 }
 
-export function WorkPage({ projects }: WorkPageProps) {
+export function ProjectsPage({ projects }: ProjectsPageProps) {
   return (
-    <PortfolioLayout activeItem="work">
+    <PortfolioLayout activeItem="projects">
       <main className="relative z-10 mx-auto max-w-7xl px-6 pt-32 pb-24">
         <SectionHeader
-          eyebrow="Selected Work"
+          eyebrow="Projects"
           title={
             <>
-              Selected <span className="neon-text">Work</span>
+              Everything I've <span className="neon-text">built</span>
             </>
           }
-          description="TokenCast, ForgeKit MCP, MCP Atlas — tools and platforms at the intersection of design systems and AI-native development."
+          description="The complete catalog — products, design systems, case studies, and deep dives, in one place."
         />
 
         <ProjectsGrid projects={projects} />

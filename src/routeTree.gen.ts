@@ -15,15 +15,15 @@ import { Route as SiteMapRouteImport } from './routes/site-map'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ResumeRouteImport } from './routes/resume'
 import { Route as ResourcesRouteImport } from './routes/resources'
-import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
 import { Route as InsightsIndexRouteImport } from './routes/insights/index'
 import { Route as CaseStudiesIndexRouteImport } from './routes/case-studies/index'
-import { Route as ProjectsForgekitMcpRouteImport } from './routes/projects/forgekit-mcp'
 import { Route as InsightsSlugRouteImport } from './routes/insights/$slug'
 import { Route as CaseStudiesSlugRouteImport } from './routes/case-studies/$slug'
+import { Route as ProjectsForgekitMcpIndexRouteImport } from './routes/projects/forgekit-mcp/index'
 
 const WorkRoute = WorkRouteImport.update({
   id: '/work',
@@ -55,11 +55,6 @@ const ResourcesRoute = ResourcesRouteImport.update({
   path: '/resources',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProjectsRoute = ProjectsRouteImport.update({
-  id: '/projects',
-  path: '/projects',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
@@ -75,6 +70,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
+  id: '/projects/',
+  path: '/projects/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InsightsIndexRoute = InsightsIndexRouteImport.update({
   id: '/insights/',
   path: '/insights/',
@@ -84,11 +84,6 @@ const CaseStudiesIndexRoute = CaseStudiesIndexRouteImport.update({
   id: '/case-studies/',
   path: '/case-studies/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const ProjectsForgekitMcpRoute = ProjectsForgekitMcpRouteImport.update({
-  id: '/forgekit-mcp',
-  path: '/forgekit-mcp',
-  getParentRoute: () => ProjectsRoute,
 } as any)
 const InsightsSlugRoute = InsightsSlugRouteImport.update({
   id: '/insights/$slug',
@@ -100,12 +95,17 @@ const CaseStudiesSlugRoute = CaseStudiesSlugRouteImport.update({
   path: '/case-studies/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsForgekitMcpIndexRoute =
+  ProjectsForgekitMcpIndexRouteImport.update({
+    id: '/projects/forgekit-mcp/',
+    path: '/projects/forgekit-mcp/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
-  '/projects': typeof ProjectsRouteWithChildren
   '/resources': typeof ResourcesRoute
   '/resume': typeof ResumeRoute
   '/services': typeof ServicesRoute
@@ -114,15 +114,15 @@ export interface FileRoutesByFullPath {
   '/work': typeof WorkRoute
   '/case-studies/$slug': typeof CaseStudiesSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
-  '/projects/forgekit-mcp': typeof ProjectsForgekitMcpRoute
   '/case-studies/': typeof CaseStudiesIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/projects/': typeof ProjectsIndexRoute
+  '/projects/forgekit-mcp/': typeof ProjectsForgekitMcpIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
-  '/projects': typeof ProjectsRouteWithChildren
   '/resources': typeof ResourcesRoute
   '/resume': typeof ResumeRoute
   '/services': typeof ServicesRoute
@@ -131,16 +131,16 @@ export interface FileRoutesByTo {
   '/work': typeof WorkRoute
   '/case-studies/$slug': typeof CaseStudiesSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
-  '/projects/forgekit-mcp': typeof ProjectsForgekitMcpRoute
   '/case-studies': typeof CaseStudiesIndexRoute
   '/insights': typeof InsightsIndexRoute
+  '/projects': typeof ProjectsIndexRoute
+  '/projects/forgekit-mcp': typeof ProjectsForgekitMcpIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
-  '/projects': typeof ProjectsRouteWithChildren
   '/resources': typeof ResourcesRoute
   '/resume': typeof ResumeRoute
   '/services': typeof ServicesRoute
@@ -149,9 +149,10 @@ export interface FileRoutesById {
   '/work': typeof WorkRoute
   '/case-studies/$slug': typeof CaseStudiesSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
-  '/projects/forgekit-mcp': typeof ProjectsForgekitMcpRoute
   '/case-studies/': typeof CaseStudiesIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/projects/': typeof ProjectsIndexRoute
+  '/projects/forgekit-mcp/': typeof ProjectsForgekitMcpIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -159,7 +160,6 @@ export interface FileRouteTypes {
     | '/'
     | '/contact'
     | '/faq'
-    | '/projects'
     | '/resources'
     | '/resume'
     | '/services'
@@ -168,15 +168,15 @@ export interface FileRouteTypes {
     | '/work'
     | '/case-studies/$slug'
     | '/insights/$slug'
-    | '/projects/forgekit-mcp'
     | '/case-studies/'
     | '/insights/'
+    | '/projects/'
+    | '/projects/forgekit-mcp/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/contact'
     | '/faq'
-    | '/projects'
     | '/resources'
     | '/resume'
     | '/services'
@@ -185,15 +185,15 @@ export interface FileRouteTypes {
     | '/work'
     | '/case-studies/$slug'
     | '/insights/$slug'
-    | '/projects/forgekit-mcp'
     | '/case-studies'
     | '/insights'
+    | '/projects'
+    | '/projects/forgekit-mcp'
   id:
     | '__root__'
     | '/'
     | '/contact'
     | '/faq'
-    | '/projects'
     | '/resources'
     | '/resume'
     | '/services'
@@ -202,16 +202,16 @@ export interface FileRouteTypes {
     | '/work'
     | '/case-studies/$slug'
     | '/insights/$slug'
-    | '/projects/forgekit-mcp'
     | '/case-studies/'
     | '/insights/'
+    | '/projects/'
+    | '/projects/forgekit-mcp/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
-  ProjectsRoute: typeof ProjectsRouteWithChildren
   ResourcesRoute: typeof ResourcesRoute
   ResumeRoute: typeof ResumeRoute
   ServicesRoute: typeof ServicesRoute
@@ -222,6 +222,8 @@ export interface RootRouteChildren {
   InsightsSlugRoute: typeof InsightsSlugRoute
   CaseStudiesIndexRoute: typeof CaseStudiesIndexRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
+  ProjectsIndexRoute: typeof ProjectsIndexRoute
+  ProjectsForgekitMcpIndexRoute: typeof ProjectsForgekitMcpIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -268,13 +270,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/projects': {
-      id: '/projects'
-      path: '/projects'
-      fullPath: '/projects'
-      preLoaderRoute: typeof ProjectsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/faq': {
       id: '/faq'
       path: '/faq'
@@ -296,6 +291,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projects/': {
+      id: '/projects/'
+      path: '/projects'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof ProjectsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/insights/': {
       id: '/insights/'
       path: '/insights'
@@ -309,13 +311,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/case-studies/'
       preLoaderRoute: typeof CaseStudiesIndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/projects/forgekit-mcp': {
-      id: '/projects/forgekit-mcp'
-      path: '/forgekit-mcp'
-      fullPath: '/projects/forgekit-mcp'
-      preLoaderRoute: typeof ProjectsForgekitMcpRouteImport
-      parentRoute: typeof ProjectsRoute
     }
     '/insights/$slug': {
       id: '/insights/$slug'
@@ -331,26 +326,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaseStudiesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projects/forgekit-mcp/': {
+      id: '/projects/forgekit-mcp/'
+      path: '/projects/forgekit-mcp'
+      fullPath: '/projects/forgekit-mcp/'
+      preLoaderRoute: typeof ProjectsForgekitMcpIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
-
-interface ProjectsRouteChildren {
-  ProjectsForgekitMcpRoute: typeof ProjectsForgekitMcpRoute
-}
-
-const ProjectsRouteChildren: ProjectsRouteChildren = {
-  ProjectsForgekitMcpRoute: ProjectsForgekitMcpRoute,
-}
-
-const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
-  ProjectsRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
-  ProjectsRoute: ProjectsRouteWithChildren,
   ResourcesRoute: ResourcesRoute,
   ResumeRoute: ResumeRoute,
   ServicesRoute: ServicesRoute,
@@ -361,6 +350,8 @@ const rootRouteChildren: RootRouteChildren = {
   InsightsSlugRoute: InsightsSlugRoute,
   CaseStudiesIndexRoute: CaseStudiesIndexRoute,
   InsightsIndexRoute: InsightsIndexRoute,
+  ProjectsIndexRoute: ProjectsIndexRoute,
+  ProjectsForgekitMcpIndexRoute: ProjectsForgekitMcpIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

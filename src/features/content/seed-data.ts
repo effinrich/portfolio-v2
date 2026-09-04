@@ -108,6 +108,7 @@ export const PROJECTS: Project[] = [
     tags: ["Storybook", "Chromatic", "React"],
     metric: "200+ components",
     href: "/case-studies/design-system-scale",
+    image: "/images/projects/storybook-system.svg",
     featured: true,
   },
   {
@@ -118,6 +119,7 @@ export const PROJECTS: Project[] = [
     tags: ["React Native", "Expo", "Mobile"],
     metric: "500K+ users",
     href: "/insights/shipping-react-native-at-scale",
+    image: "/images/projects/flagship-mobile.svg",
     featured: false,
   },
   {
@@ -128,6 +130,7 @@ export const PROJECTS: Project[] = [
     tags: ["Nx", "Monorepo", "CI/CD"],
     metric: "65% faster CI",
     href: "/case-studies/nx-monorepo",
+    image: "/images/projects/nx-monorepo-scale.svg",
     featured: true,
   },
   {
@@ -138,6 +141,7 @@ export const PROJECTS: Project[] = [
     tags: ["TanStack Start", "SSR", "Cloudflare"],
     metric: "Framework",
     href: "/insights/mastering-tanstack-start",
+    image: "/images/projects/tanstack-migration.svg",
     featured: false,
   },
   {
@@ -148,6 +152,7 @@ export const PROJECTS: Project[] = [
     tags: ["Figma", "MCP", "Tokens"],
     metric: "AI-native",
     href: "/projects/forgekit-mcp",
+    image: "/images/projects/figma-design-pipeline.svg",
     featured: false,
   },
 ]
@@ -376,6 +381,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       { label: "Consumer apps", value: "8" },
       { label: "Visual test coverage", value: "98%" },
     ],
+    image: "/images/case-studies/design-system-scale.svg",
   },
 ]
 

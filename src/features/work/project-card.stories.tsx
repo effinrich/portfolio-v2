@@ -27,6 +27,7 @@ export const ProjectWithImage: Story = {
     const canvas = within(canvasElement)
     await expect(canvas.getByText("ForgeKit MCP")).toBeInTheDocument()
     await expect(canvas.getByText("Project")).toBeInTheDocument()
+    await expect(canvas.getByRole("img")).toHaveAttribute("alt", "ForgeKit MCP screenshot")
     await expect(canvas.getByRole("link")).toHaveAttribute("href", "/projects/forgekit-mcp")
   },
 }
@@ -63,12 +64,22 @@ export const ExternalLink: Story = {
   },
 }
 
+// Every seeded project ships with artwork, so the icon fallback is exercised
+// with an explicit fixture lacking an image.
 export const WithoutImage: Story = {
-  args: { project: PROJECTS.find((p) => p.slug === "storybook-system") },
+  args: {
+    project: {
+      slug: "no-image",
+      title: "Icon Fallback",
+      description: "A project without artwork renders the icon fallback instead.",
+      tags: ["React", "Fallback"],
+      href: "https://example.com",
+      featured: false,
+    },
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText("Storybook System")).toBeInTheDocument()
-    // No <img> when the project has no image — the icon fallback renders instead.
+    await expect(canvas.getByText("Icon Fallback")).toBeInTheDocument()
     await expect(canvas.queryByRole("img")).not.toBeInTheDocument()
   },
 }

@@ -3,7 +3,10 @@ import { getProjects } from "#/features/content/queries"
 import { WorkPage } from "#/features/work/work-page"
 
 export const Route = createFileRoute("/work")({
-  loader: () => getProjects(),
+  loader: async () => {
+    const projects = await getProjects()
+    return projects.filter((project) => project.featured)
+  },
   component: WorkRoute,
 })
 
