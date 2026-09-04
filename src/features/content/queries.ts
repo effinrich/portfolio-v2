@@ -16,6 +16,8 @@ export async function getProjects() {
   const { data, error } = await supabase.from("projects").select("*").order("created_at")
   if (error || !data?.length) return PROJECTS
 
+  const seedBySlug = new Map(PROJECTS.map((project) => [project.slug, project]))
+
   return data.map((row) => ({
     slug: row.slug,
     title: row.title,
@@ -23,7 +25,9 @@ export async function getProjects() {
     tags: row.tags,
     metric: row.metric ?? undefined,
     href: row.href,
-    image: row.image ?? undefined,
+    // Fall back to the seed artwork when a row has no image (or an empty
+    // string) so every card always renders a visual.
+    image: row.image || seedBySlug.get(row.slug)?.image,
     featured: row.featured,
   }))
 }

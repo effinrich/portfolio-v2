@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b0b0b"/>
+      <stop offset="1" stop-color="#161616"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.2" cy="0.8" r="0.7">
+      <stop offset="0" stop-color="#00f0ff" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#00f0ff" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M80 0H0V80" fill="none" stroke="#ffffff" stroke-opacity="0.04" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="800" fill="url(#bg)"/>
+  <rect width="1280" height="800" fill="url(#grid)"/>
+  <rect width="1280" height="800" fill="url(#glow)"/>
+
+  <g>
+    <rect x="140" y="110" width="1000" height="580" rx="20" fill="#121212" fill-opacity="0.92" stroke="#ffffff" stroke-opacity="0.10"/>
+    <rect x="140" y="110" width="1000" height="52" rx="20" fill="#ffffff" fill-opacity="0.03"/>
+    <rect x="140" y="146" width="1000" height="16" fill="#ffffff" fill-opacity="0.03"/>
+    <circle cx="176" cy="136" r="6" fill="#ff5f57"/>
+    <circle cx="200" cy="136" r="6" fill="#febc2e"/>
+    <circle cx="224" cy="136" r="6" fill="#28c840"/>
+    <rect x="260" y="124" width="420" height="24" rx="12" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.06"/>
+
+    <text x="180" y="268" font-family="Helvetica, Arial, sans-serif" font-size="64" font-weight="700" fill="#ffffff">TanStack Migration</text>
+    <text x="182" y="306" font-family="Menlo, Monaco, monospace" font-size="16" letter-spacing="4" fill="#00f0ff">FULL-STACK REACT · SSR · CLOUDFLARE WORKERS</text>
+
+    <g transform="translate(180, 360)">
+      <rect x="0" y="0" width="240" height="120" rx="14" fill="#00f0ff" fill-opacity="0.08" stroke="#00f0ff" stroke-opacity="0.4"/>
+      <text x="24" y="38" font-family="Menlo, Monaco, monospace" font-size="15" fill="#00f0ff">vite.config</text>
+      <rect x="24" y="56" width="190" height="8" rx="4" fill="#ffffff" fill-opacity="0.4"/>
+      <rect x="24" y="72" width="160" height="8" rx="4" fill="#ffffff" fill-opacity="0.2"/>
+      <rect x="24" y="88" width="176" height="8" rx="4" fill="#ffffff" fill-opacity="0.2"/>
+    </g>
+    <g transform="translate(460, 360)">
+      <rect x="0" y="0" width="240" height="120" rx="14" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.15"/>
+      <text x="24" y="38" font-family="Menlo, Monaco, monospace" font-size="15" fill="#ffffff" fill-opacity="0.85">src/routes/</text>
+      <rect x="24" y="56" width="190" height="8" rx="4" fill="#ffffff" fill-opacity="0.4"/>
+      <rect x="24" y="72" width="130" height="8" rx="4" fill="#ffffff" fill-opacity="0.2"/>
+      <rect x="24" y="88" width="150" height="8" rx="4" fill="#ffffff" fill-opacity="0.2"/>
+    </g>
+    <g transform="translate(740, 360)">
+      <rect x="0" y="0" width="240" height="120" rx="14" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.15"/>
+      <text x="24" y="38" font-family="Menlo, Monaco, monospace" font-size="15" fill="#ffffff" fill-opacity="0.85">wrangler.toml</text>
+      <rect x="24" y="56" width="190" height="8" rx="4" fill="#ffffff" fill-opacity="0.4"/>
+      <rect x="24" y="72" width="140" height="8" rx="4" fill="#ffffff" fill-opacity="0.2"/>
+      <rect x="24" y="88" width="170" height="8" rx="4" fill="#ffffff" fill-opacity="0.2"/>
+    </g>
+    <g stroke="#00f0ff" stroke-opacity="0.7" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M320 410 L400 410 L440 380"/>
+      <path d="M620 410 L700 410 L740 380"/>
+    </g>
+    <circle cx="440" cy="380" r="8" fill="#00f0ff" fill-opacity="0.9"/>
+    <circle cx="740" cy="380" r="8" fill="#00f0ff" fill-opacity="0.9"/>
+
+    <g transform="translate(180, 540)">
+      <text x="0" y="24" font-family="Helvetica, Arial, sans-serif" font-size="20" font-weight="600" fill="#ffffff" fill-opacity="0.9">File-based routing · type-safe params</text>
+      <text x="0" y="52" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#ffffff" fill-opacity="0.5">Server functions and loaders, deployed to the edge.</text>
+      <rect x="0" y="76" width="80" height="12" rx="6" fill="#00f0ff" fill-opacity="0.6"/>
+      <rect x="92" y="76" width="80" height="12" rx="6" fill="#ffffff" fill-opacity="0.1"/>
+    </g>
+
+    <text x="180" y="716" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#ffffff" fill-opacity="0.55">This very portfolio runs on the TanStack Start stack.</text>
+  </g>
+</svg>
