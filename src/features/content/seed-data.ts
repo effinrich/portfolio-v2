@@ -381,6 +381,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       { label: "Consumer apps", value: "8" },
       { label: "Visual test coverage", value: "98%" },
     ],
+    image: "/images/case-studies/design-system-scale.svg",
   },
 ]
 
